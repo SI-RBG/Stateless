@@ -1,0 +1,195 @@
+{
+  "$Config": {
+    "$Config_ID": 1,
+    "$vCenter_IP": "1.1.1.1",
+    "$DataCenter_Name": "DATACENTER",
+    "$DomainName": "SSO",
+    "$Username": "administrator@layer0.xyz",
+    "$Password": "ThePassword!%$^%^#@#$"
+  },
+  "$Comptiontions": {
+    "$Comptintion_ID": 1,
+    "$Comptition_Uname": "Stateless",
+    "$Comptition_Teams": 10,
+    "$Win_VMs": 5,
+    "$Unix_VMs": 5,
+    "$Total_VMs": 10,
+    "$Resource_Pool": "Recources-pool1",
+    "Teams": [
+      {
+        "$Team_1": {
+          "$Comptintion_Uname": 1,
+          "$Team_ID": 1,
+          "$Team_Uname": "Tiger1",
+          "$Domain_Name": "tiger1.xyz",
+          "$Subnet": "10.0.1.0/24",
+          "$Gateway": "10.0.1.254",
+          "$DNS1": "10.0.1.10",
+          "$DNS2": "10.0.1.11",
+          "$NICAKA_PortGropu": "Team1_PG",
+          "VMs": [
+            {
+              "$VM1": {
+                "$Comptintion_Uname": 1,
+                "$VM_ID": 1,
+                "$Team_Uname": "Tiger1",
+                "$VM_Uname": "Windows_2019",
+                "Hostname": "Blake",
+                "$CPU": 2,
+                "$Memory": 6,
+                "Disk_Space": 20,
+                "$ISO_Path": "THEISO",
+                "$IP_Address": "10.0.1.1",
+                "$Guest_Type": "Windows_2016_and_later",
+                "$Template_Name": "TheTemplate_If_empty_no_chocolate_for_yah!",
+                "$RemoteConnection": [
+                  {
+                    "$Username": "root",
+                    "$Password": "toor"
+                  }
+                ],
+                "$Services": [
+                  {
+                    "Service_1": {
+                      "Service_Uname": "service_example",
+                      "Optitional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
+                    },
+                    "Service_2": {
+                      "Service_Uname": "SSH",
+                      "Optitional_flags": "Port:22, PermitRootLogin:prohibit-password"
+                    },
+                    "Service_3": {
+                      "Service_Uname": "DHCP",
+                      "Optitional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
+                    }
+                  }
+                ]
+              },
+              "$VM2": {
+                "$Comptintion_Uname": 1,
+                "$VM_ID": 2,
+                "$Team_Uname": "Tiger1",
+                "$VM_Uname": "Linux",
+                "Hostname": "Traveller",
+                "$CPU": 2,
+                "$Memory": 6,
+                "Disk_Space": 20,
+                "$ISO_Path": "THEISO",
+                "$IP_Address": "10.0.1.2",
+                "$Guest_Type": "Linux_4.0_kernal",
+                "$RemoteConnection": [
+                  {
+                    "$Username": "root",
+                    "$Password": "toor"
+                  }
+                ],
+                "$Services": [
+                  {
+                    "Service_1": {
+                      "Service_Uname": "service_example",
+                      "Optitional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
+                    },
+                    "Service_2": {
+                      "Service_Uname": "SSH",
+                      "Optitional_flags": "Port:22, PermitRootLogin:prohibit-password"
+                    },
+                    "Service_3": {
+                      "Service_Uname": "DHCP",
+                      "Optitional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "$Team_2": {
+          "$Comptintion_Uname": 1,
+          "$Team_ID": 3,
+          "$Team_Uname": "Tiger2",
+          "$Domain_Name": "tiger2.xyz",
+          "$Subnet": "10.0.2.0/24",
+          "$Gateway": "10.0.2.254",
+          "$DNS1": "10.0.2.10",
+          "$DNS2": "10.0.2.11",
+          "$NICAKA_PortGropu": "Team2_PG",
+          "VMs": [
+            {
+              "$VM1": {
+                "$Comptintion_Uname": 1,
+                "$VM_ID": 1,
+                "$Team_Uname": "Tiger2",
+                "$VM_Uname": "Windows_2019",
+                "Hostname": "Blake",
+                "$CPU": 2,
+                "$Memory": 6,
+                "Disk_Space": 20,
+                "$ISO_Path": "THEISO",
+                "$IP_Address": "10.0.2.1",
+                "$Guest_Type": "Windows_2016_and_later",
+                "$Template_Name": "TheTemplate_If_empty_no_chocolate_for_yah!",
+                "$RemoteConnection": [
+                  {
+                    "$Username": "root",
+                    "$Password": "toor"
+                  }
+                ],
+                "$Services": [
+                  {
+                    "Service_1": {
+                      "Service_Uname": "service_example",
+                      "Optitional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
+                    },
+                    "Service_2": {
+                      "Service_Uname": "SSH",
+                      "Optitional_flags": "Port:22, PermitRootLogin:prohibit-password"
+                    },
+                    "Service_3": {
+                      "Service_Uname": "DHCP",
+                      "Optitional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
+                    }
+                  }
+                ]
+              },
+              "$VM2": {
+                "$Comptintion_Uname": 1,
+                "$VM_ID": 4,
+                "$Team_Uname": "Tiger2",
+                "$VM_Uname": "Linux",
+                "Hostname": "Traveller",
+                "$CPU": 2,
+                "$Memory": 6,
+                "Disk_Space": 20,
+                "$ISO_Path": "THEISO",
+                "$IP_Address": "10.0.2.2",
+                "$Guest_Type": "Linux_4.0_kernal",
+                "$RemoteConnection": [
+                  {
+                    "$Username": "root",
+                    "$Password": "toor"
+                  }
+                ],
+                "$Services": [
+                  {
+                    "Service_1": {
+                      "Service_Uname": "service_example",
+                      "Optitional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
+                    },
+                    "Service_2": {
+                      "Service_Uname": "SSH",
+                      "Optitional_flags": "Port:22, PermitRootLogin:prohibit-password"
+                    },
+                    "Service_3": {
+                      "Service_Uname": "DHCP",
+                      "Optitional_flags": "Network:10.0.2.0/24, Gateway:10.0.2.254, DNS:10.0.2.253"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
