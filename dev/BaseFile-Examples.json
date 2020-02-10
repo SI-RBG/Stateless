@@ -7,10 +7,10 @@
     "$Username": "administrator@layer0.xyz",
     "$Password": "ThePassword!%$^%^#@#$"
   },
-  "$Comptiontions": {
-    "$Comptintion_ID": 1,
-    "$Comptition_Uname": "Stateless",
-    "$Comptition_Teams": 10,
+  "$Competitions": {
+    "$Competition_ID": 1,
+    "$Competition_Uname": "Stateless",
+    "$Competition_Teams": 10,
     "$Win_VMs": 5,
     "$Unix_VMs": 5,
     "$Total_VMs": 10,
@@ -18,7 +18,7 @@
     "Teams": [
       {
         "$Team_1": {
-          "$Comptintion_Uname": 1,
+          "$Competition_Uname": 1,
           "$Team_ID": 1,
           "$Team_Uname": "Tiger1",
           "$Domain_Name": "tiger1.xyz",
@@ -30,7 +30,7 @@
           "VMs": [
             {
               "$VM1": {
-                "$Comptintion_Uname": 1,
+                "$Competition_Uname": 1,
                 "$VM_ID": 1,
                 "$Team_Uname": "Tiger1",
                 "$VM_Uname": "Windows_2019",
@@ -52,21 +52,21 @@
                   {
                     "Service_1": {
                       "Service_Uname": "service_example",
-                      "Optitional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
+                      "Optional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
                     },
                     "Service_2": {
                       "Service_Uname": "SSH",
-                      "Optitional_flags": "Port:22, PermitRootLogin:prohibit-password"
+                      "Optional_flags": "Port:22, PermitRootLogin:prohibit-password"
                     },
                     "Service_3": {
                       "Service_Uname": "DHCP",
-                      "Optitional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
+                      "Optional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
                     }
                   }
                 ]
               },
               "$VM2": {
-                "$Comptintion_Uname": 1,
+                "$Competition_Uname": 1,
                 "$VM_ID": 2,
                 "$Team_Uname": "Tiger1",
                 "$VM_Uname": "Linux",
@@ -87,15 +87,15 @@
                   {
                     "Service_1": {
                       "Service_Uname": "service_example",
-                      "Optitional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
+                      "Optional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
                     },
                     "Service_2": {
                       "Service_Uname": "SSH",
-                      "Optitional_flags": "Port:22, PermitRootLogin:prohibit-password"
+                      "Optional_flags": "Port:22, PermitRootLogin:prohibit-password"
                     },
                     "Service_3": {
                       "Service_Uname": "DHCP",
-                      "Optitional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
+                      "Optional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
                     }
                   }
                 ]
@@ -104,7 +104,7 @@
           ]
         },
         "$Team_2": {
-          "$Comptintion_Uname": 1,
+          "$Competition_Uname": 1,
           "$Team_ID": 3,
           "$Team_Uname": "Tiger2",
           "$Domain_Name": "tiger2.xyz",
@@ -116,7 +116,7 @@
           "VMs": [
             {
               "$VM1": {
-                "$Comptintion_Uname": 1,
+                "$Competition_Uname": 1,
                 "$VM_ID": 1,
                 "$Team_Uname": "Tiger2",
                 "$VM_Uname": "Windows_2019",
@@ -138,21 +138,21 @@
                   {
                     "Service_1": {
                       "Service_Uname": "service_example",
-                      "Optitional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
+                      "Optional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
                     },
                     "Service_2": {
                       "Service_Uname": "SSH",
-                      "Optitional_flags": "Port:22, PermitRootLogin:prohibit-password"
+                      "Optional_flags": "Port:22, PermitRootLogin:prohibit-password"
                     },
                     "Service_3": {
                       "Service_Uname": "DHCP",
-                      "Optitional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
+                      "Optional_flags": "Network:10.0.1.0/24, Gateway:10.0.1.254, DNS:10.0.1.253"
                     }
                   }
                 ]
               },
               "$VM2": {
-                "$Comptintion_Uname": 1,
+                "$Competition_Uname": 1,
                 "$VM_ID": 4,
                 "$Team_Uname": "Tiger2",
                 "$VM_Uname": "Linux",
@@ -173,15 +173,15 @@
                   {
                     "Service_1": {
                       "Service_Uname": "service_example",
-                      "Optitional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
+                      "Optional_flags": "Things_Like_DHCP_can_be_processed_in_the_converter"
                     },
                     "Service_2": {
                       "Service_Uname": "SSH",
-                      "Optitional_flags": "Port:22, PermitRootLogin:prohibit-password"
+                      "Optional_flags": "Port:22, PermitRootLogin:prohibit-password"
                     },
                     "Service_3": {
                       "Service_Uname": "DHCP",
-                      "Optitional_flags": "Network:10.0.2.0/24, Gateway:10.0.2.254, DNS:10.0.2.253"
+                      "Optional_flags": "Network:10.0.2.0/24, Gateway:10.0.2.254, DNS:10.0.2.253"
                     }
                   }
                 ]
