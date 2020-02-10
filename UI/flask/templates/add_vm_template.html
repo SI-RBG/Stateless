@@ -1,0 +1,22 @@
+<div class="form1">
+    <h3 >Add a vm</h3>
+    <form class="form1" action="/competitions_vm_add" method="POST">
+        <tr>
+            <p><td>Competition name <input type="text" value="" placeholder="Co1" name="COMPETITION_NAME"></td></p>
+            <p><td>Team name <input type="text" value="" placeholder="Tigers1" name="TEAM"></td></p>
+            <p><td>VM name <input type="text" value="" placeholder="Windows_7" name="VM_NAME"></td></p>
+            <p><td>CPUs <input type="text" value="" placeholder="2" name="CPU"></td></p>
+            <p><td>Memory <input type="text" value="" placeholder="1024" name="MEMORY"></td></p>
+            <p><td>Guest Type
+                <select name="GUEST_OS_TYPE">
+                    <option value="ubuntu64Guest">Ubuntu 18 64bit</option>
+                    <option value="windows9_64Guest">Windows 10 64bit</option>
+                    <option value="darwin16_64Guest">MacOS</option>
+                    <option value="TODO">Audi</option>
+                </select>
+            </td>
+            </p>
+            <p><td><input type="submit" value="Start"></td></p>
+        </tr>
+    </form>
+</div>

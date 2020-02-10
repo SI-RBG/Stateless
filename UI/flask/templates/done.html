@@ -1,0 +1,23 @@
+{% include "header.html" %}
+
+<title>Redirecting</title>
+</head> <!-- <head> in the header - End -->
+
+
+
+<body>
+{% include "bar.html" %}
+
+{% include "after-bar.html" %}
+
+The action has been successfully completed.
+<br>
+Please wait, we are redirecting you..
+<meta http-equiv="refresh" content="3;url={{ url }}" />
+
+
+</body>
+
+
+{% include "footer.html" %}
+
