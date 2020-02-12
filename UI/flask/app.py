@@ -7,12 +7,16 @@ from werkzeug import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import requests
 from auth import *
-#from comp import *
+from databaseCommunication import *
+from databaseCommunicationUtilities import *
+from Utilities import *
+from SQLFunctions import *
+from config import *
+import sys
 
 
 # Wait
 time.sleep(2)
-debug = 1
 
 # Get the dir name
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -99,6 +103,8 @@ def mysqlExecuteAll(q):
     mysqlConnCursor.close()
     mysqlConn.close()
     return result
+
+
 
 
 @app.route("/")
@@ -345,10 +351,11 @@ def competitions_edit():
                 TEAMS = pymysql.escape_string(request.values.get('TEAMS'))
 
                 CREATED_TEAMS = pymysql.escape_string(request.values.get('CREATED_TEAMS'))
+                UNIX_VMS = pymysql.escape_string(request.values.get('UNIX_VMS'))
                 if len(UNIX_VMS) < 1:
                     if debug:
                         error_message = "Missing CREATED_TEAMS"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
 
@@ -356,21 +363,21 @@ def competitions_edit():
                 if len(WIN_VMS) < 1:
                     if debug:
                         error_message = "Missing WIN_VMS"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
                 UNIX_VMS = pymysql.escape_string(request.values.get('UNIX_VMS'))
                 if len(UNIX_VMS) < 1:
                     if debug:
                         error_message = "Missing UNIX_VMS"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
 
                 TOTAL_VMS = str(int(WIN_VMS) + int(UNIX_VMS))
 
                 # Edit a comp and make an event
-                raw_competitions_edit(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, ID)
+                raw_competitions_edit(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS,"0", ID)
 
 
 
@@ -391,23 +398,6 @@ def competitions_edit():
     return root()
 
 
-def raw_competitions_edit(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, ID):
-    mysqlExecute("UPDATE competitions SET "
-                 " UNAME = '{}',"
-                 " TEAMS= '{}',"
-                 " CREATED_TEAMS= '{}',"
-                 " WIN_VMS= '{}',"
-                 " UNIX_VMS= '{}',"
-                 " TOTAL_VMS= '{}' WHERE ID = '{}'"
-                 .format(UNAME,
-                         TEAMS,
-                         CREATED_TEAMS,
-                         WIN_VMS,
-                         UNIX_VMS,
-                         TOTAL_VMS,
-                         ID))
-    addEvent(session['username'], "Competition modification", UNAME+" competition has been modified")
-
 
 @app.route("/competitions_add", methods=['GET','POST'])
 def competitions_add():
@@ -423,51 +413,29 @@ def competitions_add():
                 if len(WIN_VMS) < 1:
                     if debug:
                         error_message = "Missing WIN_VMS"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
                 UNIX_VMS = pymysql.escape_string(request.values.get('UNIX_VMS'))
                 if len(UNIX_VMS) < 1:
                     if debug:
                         error_message = "Missing UNIX_VMS"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
 
                 TOTAL_VMS = str(int(WIN_VMS) + int(UNIX_VMS))
-                CREATED_FLAG = CREATED_FLAG_C = "0"
+                CREATED_FLAG = CREATED_FLAG_C = TOTAL_CREATED_VMS = "0"
 
 
                 # Create a comp and make an event
-                raw_competitions_add(UNAME, TEAMS, "0", WIN_VMS, UNIX_VMS, TOTAL_VMS, CREATED_FLAG, CREATED_FLAG_C)
+                raw_competitions_add(UNAME, TEAMS, "0", WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C)
 
                 return render_template('done.html', url = url_for('competitions'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
             except:
                 pass
         return render_template('competitions_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
     return root()
-
-
-def raw_competitions_add(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, CREATED_FLAG, CREATED_FLAG_C):
-    mysqlExecute("INSERT INTO competitions("
-                 "UNAME, "
-                 "TEAMS, "
-                 "CREATED_TEAMS, " \
-                 "WIN_VMS, "
-                 "UNIX_VMS, "
-                 "TOTAL_VMS, "
-                 "CREATED_FLAG, "
-                 "CREATED_FLAG_C) VALUES ('{}' , '{}', '{}' , '{}', '{}', '{}', '{}', '{}')"
-                 .format(
-                    UNAME,
-                    TEAMS,
-                    CREATED_TEAMS,
-                    WIN_VMS,
-                    UNIX_VMS,
-                    TOTAL_VMS,
-                    CREATED_FLAG,
-                    CREATED_FLAG_C))
-    addEvent(session['username'], "Competition addition", UNAME+" competition has been created with "+TEAMS+" teams")
 
 
 
@@ -542,42 +510,42 @@ def competitions_team_edit():
                 if len(TEAM) < 1:
                     if debug:
                         error_message = "Missing TEAM"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
                 DOMAIN_NAME = pymysql.escape_string(request.values.get('DOMAIN_NAME'))
                 if len(DOMAIN_NAME) < 1:
                     if debug:
                         error_message = "Missing DOMAIN_NAME"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
                 SUBNET = pymysql.escape_string(request.values.get('SUBNET'))
                 if len(SUBNET) < 1:
                     if debug:
                         error_message = "Missing SUBNET"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
                 GATEWAY = pymysql.escape_string(request.values.get('GATEWAY'))
                 if len(GATEWAY) < 1:
                     if debug:
                         error_message = "Missing GATEWAY"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
                 DNS_SERVER1 = pymysql.escape_string(request.values.get('DNS_SERVER1'))
                 if len(DNS_SERVER1) < 1:
                     if debug:
                         error_message = "Missing DNS_SERVER1"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
                 NIC = pymysql.escape_string(request.values.get('NIC'))
                 if len(NIC) < 1:
                     if debug:
                         error_message = "Missing NIC"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
 
@@ -604,7 +572,7 @@ def competitions_team_edit():
                 if len(TEAM_ID) < 1:
                     if debug:
                         error_message = "Missing TEAM_ID"
-                        print(error_message, file=sys.stderr)
+                        debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
                 data = mysqlExecuteAll("SELECT * FROM teams WHERE ID={}".format(TEAM_ID))
@@ -657,6 +625,600 @@ def raw_competitions_team_edit(COMPETITION_NAME,
         print("UPDATING "+q, file=sys.stderr)
     mysqlExecute(q)
     addEvent(session['username'], "Team modification", TEAM+" from competition "+COMPETITION_NAME+" has been updated")
+
+
+
+
+@app.route("/competitions_team_add", methods=['GET','POST'])
+def competitions_team_add():
+    if 'username' in session:
+        if request.method == 'POST':
+            try:
+                # Check
+                COMPETITION_NAME = pymysql.escape_string(request.values.get('COMPETITION_NAME'))
+
+                # First check if the COMPETITION_NAME exist.
+                error_message = 'The selected competition ('+ COMPETITION_NAME +') doesn\'t exist'
+                try:
+                    q = "select UNAME from competitions where UNAME = '{}'".format(COMPETITION_NAME)
+                    result = mysqlExecute(q)
+
+                    if debug:
+                        print("Testing "+COMPETITION_NAME, file=sys.stderr)
+                        print("Mysql output: "+result, file=sys.stderr)
+                    if len(str(result)) <= 1:
+                        return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+                except:
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                TEAM = pymysql.escape_string(request.values.get('TEAM'))
+                if len(TEAM) < 1:
+                    if debug:
+                        error_message = "Missing TEAM"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                DOMAIN_NAME = pymysql.escape_string(request.values.get('DOMAIN_NAME'))
+                if len(DOMAIN_NAME) < 1:
+                    if debug:
+                        error_message = "Missing DOMAIN_NAME"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                SUBNET = pymysql.escape_string(request.values.get('SUBNET'))
+                if len(SUBNET) < 1:
+                    if debug:
+                        error_message = "Missing SUBNET"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                GATEWAY = pymysql.escape_string(request.values.get('GATEWAY'))
+                if len(GATEWAY) < 1:
+                    if debug:
+                        error_message = "Missing GATEWAY"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                DNS_SERVER1 = pymysql.escape_string(request.values.get('DNS_SERVER1'))
+                if len(DNS_SERVER1) < 1:
+                    if debug:
+                        error_message = "Missing DNS_SERVER1"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                NIC = pymysql.escape_string(request.values.get('NIC'))
+                if len(NIC) < 1:
+                    if debug:
+                        error_message = "Missing NIC"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                CREATED_FLAG = "0"
+                CREATED_FLAG_C = "0"
+
+                # Create a team and make an event
+                raw_competitions_team_add(COMPETITION_NAME,
+                                          TEAM,
+                                          DOMAIN_NAME,
+                                          SUBNET,
+                                          GATEWAY,
+                                          DNS_SERVER1,
+                                          NIC,
+                                          CREATED_FLAG,
+                                          CREATED_FLAG_C)
+
+
+                return render_template('done.html', url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+            except:
+                error_message = "Unknown problem in competitions_team_add()"
+                print("Error: "+error_message, file=sys.stderr)
+                return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+        else:
+            # if request.method == 'GET':
+            return render_template('competitions_team_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+    return root()
+
+
+# VMs section
+
+@app.route("/competitions_vm", methods=['GET'])
+def competitions_vm():
+    if 'username' in session:
+        data = mysqlExecuteAll("SELECT * FROM vms")
+        return render_template('competitions_vm.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+    return root()
+
+
+@app.route("/competitions_vm_edit", methods=['GET','POST'])
+def competitions_vm_edit():
+    if 'username' in session:
+        if request.method == 'POST':
+            try:
+                ID = pymysql.escape_string(request.values.get('ID'))
+                COMPETITION_NAME = pymysql.escape_string(request.values.get('COMPETITION_NAME'))
+                TEAM = pymysql.escape_string(request.values.get('TEAM'))
+                VM_NAME = pymysql.escape_string(request.values.get('VM_NAME'))
+                CPU = pymysql.escape_string(request.values.get('CPU'))
+                MEMORY = pymysql.escape_string(request.values.get('MEMORY'))
+                GUEST_OS_TYPE = pymysql.escape_string(request.values.get('GUEST_OS_TYPE'))
+                CREATED_FLAG = CREATED_FLAG_C = "0"
+
+                # Edit a comp and make an event
+                raw_competitions_vm_edit(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C, ID)
+
+                return render_template('done.html', url = url_for('competitions_vm'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+            except:
+                # TODO Add a error.html page where it just redirects to a url_for('url') like done.html
+                data = mysqlExecuteAll("SELECT * FROM vms")
+                return render_template('competitions_vm.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+        else:
+
+            # IF 'GET'
+            try:
+                VM_ID = pymysql.escape_string(request.args.get('VM_ID'))
+                data = mysqlExecuteAll("SELECT * FROM vms WHERE ID={}".format(VM_ID))
+                return render_template('competitions_vm_edit.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+            except:
+                # TODO Add a error.html page where it just redirects to a url_for('url') like done.html
+                data = mysqlExecuteAll("SELECT * FROM vms")
+                return render_template('competitions_vm.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+    return root()
+
+"""
+
+"""
+def raw_competitions_vm_edit(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C, ID):
+    mysqlExecute("UPDATE vms SET CPU = '{}', MEMORY = '{}', CREATED_FLAG = '{}', CREATED_FLAG_C = '{}' WHERE ID = '{}'".format(CPU, MEMORY, CREATED_FLAG, CREATED_FLAG_C, ID))
+    addEvent(session['username'], "VM modification", VM_NAME+" VM for team "+TEAM+" in competition "+COMPETITION_NAME+" has been modified")
+
+
+
+def raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C):
+    mysqlExecute("INSERT INTO vms(COMPETITION_NAME,"
+                 " TEAM,"
+                 " VM_NAME,"
+                 " CPU,"
+                 " MEMORY,"
+                 " GUEST_OS_TYPE,"
+                 " CREATED_FLAG,"
+                 " CREATED_FLAG_C) VALUES ('{}', '{}', '{}', '{}','{}', '{}', '{}', '{}')"
+                 .format(COMPETITION_NAME,
+                         TEAM,
+                         VM_NAME,
+                         CPU,
+                         MEMORY,
+                         GUEST_OS_TYPE,
+                         CREATED_FLAG,
+                         CREATED_FLAG_C))
+    if debug:
+        print("A vm has been created "+str(VM_NAME), file=sys.stderr)
+    addEvent(session['username'], "VM addition",VM_NAME+" VM has been created for team "+TEAM+" in competition "+COMPETITION_NAME)
+
+
+
+
+@app.route("/competitions_vm_add", methods=['GET','POST'])
+def competitions_vm_add():
+    if 'username' in session:
+        if request.method == 'POST':
+            try:
+                """
+                    ID INTEGER NOT NULL AUTO_INCREMENT,
+                    COMPETITION_NAME VARCHAR(50) NOT NULL,  -- A unique name
+                    TEAM VARCHAR(50) NOT NULL,
+                    VM_NAME VARCHAR(50) NOT NULL, -- This is "Name" and "Hostname"
+                    CPU VARCHAR(50) NOT NULL,
+                    MEMORY VARCHAR(50) NOT NULL,
+                    GUEST_OS_TYPE VARCHAR(50),
+                    CREATED_FLAG INTEGER NOT NULL,
+                    CREATED_FLAG_C INTEGER NOT NULL,
+                """
+                COMPETITION_NAME = pymysql.escape_string(request.values.get('COMPETITION_NAME'))
+                if len(COMPETITION_NAME) < 1:
+                    if debug:
+                        error_message = "Missing COMPETITION_NAME"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                TEAM = pymysql.escape_string(request.values.get('TEAM'))
+                if len(TEAM) < 1:
+                    if debug:
+                        error_message = "Missing TEAM"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                VM_NAME = pymysql.escape_string(request.values.get('VM_NAME'))
+                if len(VM_NAME) < 1:
+                    if debug:
+                        error_message = "Missing VM_NAME"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                CPU = pymysql.escape_string(request.values.get('CPU'))
+                if len(CPU) < 1:
+                    if debug:
+                        error_message = "Missing CPU"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                MEMORY = pymysql.escape_string(request.values.get('MEMORY'))
+                if len(MEMORY) < 1:
+                    if debug:
+                        error_message = "Missing MEMORY"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                GUEST_OS_TYPE = pymysql.escape_string(request.values.get('GUEST_OS_TYPE'))
+                if len(GUEST_OS_TYPE) < 1:
+                    if debug:
+                        error_message = "Missing GUEST_OS_TYPE"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                CREATED_FLAG = CREATED_FLAG_C = "0"
+
+                # Create a vm and make an event
+                raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C)
+
+                return render_template('done.html', url = url_for('competitions_vm'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+            except:
+                pass
+        return render_template('competitions_vm_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+    return root()
+
+
+
+
+@app.route("/competitions_wizard", methods=['GET', 'POST'])
+def competitions_wizard():
+    if 'username' in session:
+        # Note that we are not calling this function plain "random()" because random
+        # is the name of a package we imported.
+        # Step 1, Create a comp
+
+        if "step" not in request.form:
+            """
+            Doesn't take anything
+            Sends a page where users can send the application back a new comp data.
+            """
+            debugMessage("Redirect #1278313")
+            return render_template("wizard.html", step="PAGE_CREATE_COMP")
+        elif request.form["step"] == "PAGE_2":
+            """
+            When it's PAGE_2, it gets:
+            UNAME, TEAMS, WIN_VMS, UNIX_VMS.
+            
+            It redirects it to PAGE_3.
+            """
+            try:
+                error_message = ""
+
+                UNAME = pymysql.escape_string(str(request.form['UNAME']))
+                TEAMS = pymysql.escape_string(str(request.form['TEAMS']))
+
+                # If some of them is empty.
+                if (len(UNAME) < 1 or len(TEAMS) < 1):
+                    pass
+
+                WIN_VMS = pymysql.escape_string(request.values.get('WIN_VMS'))
+                if len(WIN_VMS) < 1:
+                    if debug:
+                        error_message = "Missing WIN_VMS"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                UNIX_VMS = pymysql.escape_string(request.values.get('UNIX_VMS'))
+                if len(UNIX_VMS) < 1:
+                    if debug:
+                        error_message = "Missing UNIX_VMS"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+
+                TOTAL_VMS = str(int(WIN_VMS) + int(UNIX_VMS))
+                CREATED_FLAG = CREATED_FLAG_C = CREATED_TEAMS = TOTAL_CREATED_VMS = "0"
+
+
+                # Create a COMPETITION
+                raw_competitions_add(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C)
+
+                # Add teams objects to mysql so we use get_competition_teams(COMPETITION_NAME) in step "PAGE_3_PICK"
+                for i in range(int(TEAMS)):
+                    TEAM_tmp = "Team_"+str(i+1)
+                    raw_competitions_team_add(UNAME,
+                                              TEAM_tmp,
+                                              "0",
+                                              "0",
+                                              "0",
+                                              "0",
+                                              "0",
+                                              "0",
+                                              "0")
+
+
+                # Move to the next page which is editing teams in step 2 template
+                TEAMS = get_competition_teams(UNAME)
+                debugMessage("Redirect #813613")
+                return render_template("wizard.html", step="PAGE_3_PICK", UNAME=UNAME, TEAMS = TEAMS)
+            except Exception as ex:
+                if debug:
+                    debugMessage("Couldn't create a comp")
+                    debugMessage("Error: "+str(ex))
+                    debugMessage("Block #134233")
+        # Step 3, where we can create teams
+        elif request.form["step"] == "PAGE_CREATE_TEAM":
+            """
+            PAGE_CREATE_TEAM, it helps creating teams using UNAME.
+            
+            """
+            try:
+                """
+                This block tris to get some parameters that step "PAGE_3_PICK" should submit.
+                If it didn't get all the parameters that means something went wrong, thus redirect to step "PAGE_3_PICK"
+                """
+                # Sanitize
+                COMPETITION_NAME = UNAME = pymysql.escape_string(str(request.form['UNAME']))
+                TEAM = pymysql.escape_string(str(request.form['TEAM']))
+
+
+                # Get all elements of a comp
+                # elements = get_all_elements_comp(UNAME)
+                # debugMessage("Getting all elements: "+str(elements))
+                # TEAMS = elements[2]
+                # CREATED_TEAMS = elements[3]
+                # if debug:
+                #     debugMessage("Comparing "+str(TEAMS)+" and "+str(CREATED_TEAMS))
+                #     debugMessage("Checking if we need more teams, TEAMS:" + str(TEAMS) + " > CREATED_TEAMS:" + str(
+                #         CREATED_TEAMS) + " ?")
+                # # Check if we need to create a new team.
+                # if int(TEAMS) > int(CREATED_TEAMS):
+                #     debugMessage("Redirect #841611")
+                #     # Send it back to itself.
+                return render_template("wizard.html", step="PAGE_CREATE_TEAM", UNAME=UNAME, TEAM=TEAM)
+            except Exception as e:
+                if debug:
+                    debugMessage(e)
+                    debugMessage("Error #72521 ")
+                    debugMessage("Block #77823")
+
+        elif request.form["step"] == "TAKE_PARAMETERS":
+            """
+            This block gets the values coming from PAGE_CREATE_TEAM and process it.
+            Then redirect back to PAGE_3_PICK
+            """
+            try:
+                COMPETITION_NAME = UNAME = pymysql.escape_string(str(request.form['UNAME']))
+                TEAM = pymysql.escape_string(request.values.get('TEAM'))
+
+
+                if len(TEAM) < 1:
+                    if debug:
+                        error_message = "Missing TEAM"
+                        debugMessage(error_message)
+                    return render_template('error.html', message=error_message, url=url_for('competitions_team'),
+                                           templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+
+                DOMAIN_NAME = pymysql.escape_string(request.values.get('DOMAIN_NAME'))
+                if len(DOMAIN_NAME) < 1:
+                    if debug:
+                        error_message = "Missing DOMAIN_NAME"
+                        debugMessage(error_message)
+                    DOMAIN_NAME = TEAM + ".com"
+
+                SUBNET = pymysql.escape_string(request.values.get('SUBNET'))
+                if len(SUBNET) < 1:
+                    if debug:
+                        error_message = "Missing SUBNET"
+                        debugMessage(error_message)
+                    return render_template('error.html', message=error_message, url=url_for('competitions_team'),
+                                           templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+
+                GATEWAY = pymysql.escape_string(request.values.get('GATEWAY'))
+                if len(GATEWAY) < 1:
+                    if debug:
+                        error_message = "Missing GATEWAY"
+                        debugMessage(error_message)
+                    return render_template('error.html', message=error_message, url=url_for('competitions_team'),
+                                           templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+
+                DNS_SERVER1 = pymysql.escape_string(request.values.get('DNS_SERVER1'))
+                if len(DNS_SERVER1) < 1:
+                    if debug:
+                        error_message = "Missing DNS_SERVER1"
+                        debugMessage(error_message)
+                    return render_template('error.html', message=error_message, url=url_for('competitions_team'),
+                                           templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+
+                NIC = pymysql.escape_string(request.values.get('NIC'))
+                if len(NIC) < 1:
+                    if debug:
+                        error_message = "Missing NIC"
+                        debugMessage(error_message)
+                    return render_template('error.html', message=error_message, url=url_for('competitions_team'),
+                                           templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+
+                CREATED_FLAG = CREATED_VMS_FLAG = CONFIGURED_VMS_FLAG = "0"
+                CREATED_FLAG_C = "1" # So the team object knows that it has been edited
+
+                """
+                Since the team has been created in the past step we need to edit this.
+                Edit a team and make an event.
+                """
+                safe_competitions_team_edit_by_name(COMPETITION_NAME,
+                                                    TEAM,
+                                                    DOMAIN_NAME,
+                                                    SUBNET,
+                                                    GATEWAY,
+                                                    DNS_SERVER1,
+                                                    NIC,
+                                                    CREATED_FLAG,
+                                                    CREATED_FLAG_C,
+                                                    CREATED_VMS_FLAG,
+                                                    CONFIGURED_VMS_FLAG)
+
+                # Update
+                update_CREATED_TEAMS_comp(COMPETITION_NAME)
+
+
+                """
+                In this stage they are two ways it can end up with.
+                one - we still have teams to create.
+                    How to go with that
+                        Get the comp teams and created_teams and according to that move.
+                        
+                    What it will happen
+                        Goes back to PAGE_3_PICK
+                Two - we don't have teams to create
+                    How to go with that
+                        
+                    What it will happen
+                        move forward to step "PAGE_3_PICK_VMS"
+                
+                """
+
+                elements = get_all_elements_comp(UNAME)
+                TEAMS = elements[2]
+                CREATED_TEAMS = elements[3]
+
+
+                if int(TEAMS) > int(CREATED_TEAMS):
+                    debugMessage("Redirect #841611")
+                    # Send it back to pick another team to create/edit.
+                    TEAMS = get_competition_teams(UNAME)
+                    return render_template("wizard.html", step="PAGE_3_PICK", UNAME=UNAME, TEAMS = TEAMS)
+                else:
+                    """
+                    At this point we need to start creating VMs for each team.
+                    """
+                    debugMessage("Redirect #98181")
+                    # Get all teams
+                    # Check if any team has no VMS
+                    teams = next_unedited_vm(COMPETITION_NAME)
+                    i = 0
+                    for team in teams:
+                        """
+                        ID INTEGER NOT NULL AUTO_INCREMENT,
+                        COMPETITION_NAME VARCHAR(50) NOT NULL,  -- A unique name
+                        TEAM VARCHAR(50) NOT NULL,
+                        DOMAIN_NAME VARCHAR(50) NOT NULL,
+                        SUBNET VARCHAR(50) NOT NULL,
+                        GATEWAY VARCHAR(50) NOT NULL,
+                        DNS_SERVER1 VARCHAR(50) NOT NULL,
+                        NIC VARCHAR(50) NOT NULL,
+                        CREATED_FLAG INTEGER NOT NULL,
+                        CREATED_FLAG_C INTEGER NOT NULL, -- Created/Edited flag
+                        CREATED_VMS_FLAG INTEGER NOT NULL, -- I don't need it anymore
+                        CONFIGURED_VMS_FLAG INTEGER NOT NULL, --
+                        CONSTRAINT users_pk PRIMARY KEY(ID)
+                        """
+                        debugMessage(str(i)+"- "+str(team))
+
+                    return render_template("wizard.html", step="PAGE_CREATE_VM", UNAME=UNAME)
+
+            except Exception as e:
+                if debug:
+                    debugMessage(e)
+                    debugMessage("NOTE: We don't need to config a tame ")
+                    debugMessage("Block #1987823")
+        elif request.form["step"] == "PAGE_3_PROCESS":
+            pass
+        elif request.form["step"] == "step_f":
+            pass
+        else:
+            print("None of these steps is valid", file=sys.stderr)
+            debugMessage("Redirect #1337912")
+            return root()
+    debugMessage("No session competitions_wizard()")
+    debugMessage("Redirect #812323613")
+    return root()
+
+
+
+
+@app.route("/competition_summary", methods=['GET'])
+def competition_summary():
+    return render_template('competition_summary.html',competition_data = get_competition_data("co1"))
+
+
+
+
+
+
+
+
+def raw_competitions_add(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C):
+    """
+
+    :param UNAME:
+    :param TEAMS:
+    :param CREATED_TEAMS:
+    :param WIN_VMS:
+    :param UNIX_VMS:
+    :param TOTAL_VMS:
+    :param TOTAL_CREATED_VMS:
+    :param CREATED_FLAG:
+    :param CREATED_FLAG_C:
+    :return:
+    """
+    mysqlExecute("INSERT INTO competitions("
+                 "UNAME, "
+                 "TEAMS, "
+                 "CREATED_TEAMS, " \
+                 "WIN_VMS, "
+                 "UNIX_VMS, "
+                 "TOTAL_VMS, "
+                 "TOTAL_CREATED_VMS, "
+                 "CREATED_FLAG, "
+                 "CREATED_FLAG_C) VALUES ('{}' , '{}', '{}' , '{}', '{}', '{}', '{}', '{}', '{}')"
+                 .format(
+                    UNAME,
+                    TEAMS,
+                    CREATED_TEAMS,
+                    WIN_VMS,
+                    UNIX_VMS,
+                    TOTAL_VMS,
+                    TOTAL_CREATED_VMS,
+                    CREATED_FLAG,
+                    CREATED_FLAG_C))
+    addEvent(session['username'], "Competition addition", UNAME+" competition has been created with "+TEAMS+" teams")
+
+
+
+
+
+def raw_competitions_edit(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, ID):
+    """
+
+    :param UNAME:
+    :param TEAMS:
+    :param CREATED_TEAMS:
+    :param WIN_VMS:
+    :param UNIX_VMS:
+    :param TOTAL_VMS:
+    :param TOTAL_CREATED_VMS:
+    :param ID:
+    :return:
+    """
+    mysqlExecute("UPDATE competitions SET "
+                 " UNAME = '{}',"
+                 " TEAMS= '{}',"
+                 " CREATED_TEAMS= '{}',"
+                 " WIN_VMS= '{}',"
+                 " UNIX_VMS= '{}',"
+                 " TOTAL_VMS= '{},'"
+                 " TOTAL_CREATED_VMS= '{}'"
+                 " WHERE ID = '{}'"
+                 .format(UNAME,
+                         TEAMS,
+                         CREATED_TEAMS,
+                         WIN_VMS,
+                         UNIX_VMS,
+                         TOTAL_VMS,
+                         TOTAL_CREATED_VMS,
+                         ID))
+    addEvent(session['username'], "Competition modification", UNAME+" competition has been modified")
+
+
 
 
 def safe_competitions_team_edit_by_name(COMPETITION_NAME,
@@ -821,537 +1383,6 @@ def raw_competitions_team_add(COMPETITION_NAME,
 
 
 
-@app.route("/competitions_team_add", methods=['GET','POST'])
-def competitions_team_add():
-    if 'username' in session:
-        if request.method == 'POST':
-            try:
-                # Check
-                COMPETITION_NAME = pymysql.escape_string(request.values.get('COMPETITION_NAME'))
-
-                # First check if the COMPETITION_NAME exist.
-                error_message = 'The selected competition ('+ COMPETITION_NAME +') doesn\'t exist'
-                try:
-                    q = "select UNAME from competitions where UNAME = '{}'".format(COMPETITION_NAME)
-                    result = mysqlExecute(q)
-
-                    if debug:
-                        print("Testing "+COMPETITION_NAME, file=sys.stderr)
-                        print("Mysql output: "+result, file=sys.stderr)
-                    if len(str(result)) <= 1:
-                        return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-                except:
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                TEAM = pymysql.escape_string(request.values.get('TEAM'))
-                if len(TEAM) < 1:
-                    if debug:
-                        error_message = "Missing TEAM"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                DOMAIN_NAME = pymysql.escape_string(request.values.get('DOMAIN_NAME'))
-                if len(DOMAIN_NAME) < 1:
-                    if debug:
-                        error_message = "Missing DOMAIN_NAME"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                SUBNET = pymysql.escape_string(request.values.get('SUBNET'))
-                if len(SUBNET) < 1:
-                    if debug:
-                        error_message = "Missing SUBNET"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                GATEWAY = pymysql.escape_string(request.values.get('GATEWAY'))
-                if len(GATEWAY) < 1:
-                    if debug:
-                        error_message = "Missing GATEWAY"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                DNS_SERVER1 = pymysql.escape_string(request.values.get('DNS_SERVER1'))
-                if len(DNS_SERVER1) < 1:
-                    if debug:
-                        error_message = "Missing DNS_SERVER1"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                NIC = pymysql.escape_string(request.values.get('NIC'))
-                if len(NIC) < 1:
-                    if debug:
-                        error_message = "Missing NIC"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                CREATED_FLAG = "0"
-                CREATED_FLAG_C = "0"
-
-                # Create a team and make an event
-                raw_competitions_team_add(COMPETITION_NAME,
-                                          TEAM,
-                                          DOMAIN_NAME,
-                                          SUBNET,
-                                          GATEWAY,
-                                          DNS_SERVER1,
-                                          NIC,
-                                          CREATED_FLAG,
-                                          CREATED_FLAG_C)
-
-
-                return render_template('done.html', url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-            except:
-                error_message = "Unknown problem in competitions_team_add()"
-                print("Error: "+error_message, file=sys.stderr)
-                return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-        else:
-            # if request.method == 'GET':
-            return render_template('competitions_team_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-    return root()
-
-
-# VMs section
-
-@app.route("/competitions_vm", methods=['GET'])
-def competitions_vm():
-    if 'username' in session:
-        data = mysqlExecuteAll("SELECT * FROM vms")
-        return render_template('competitions_vm.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-    return root()
-
-
-@app.route("/competitions_vm_edit", methods=['GET','POST'])
-def competitions_vm_edit():
-    if 'username' in session:
-        if request.method == 'POST':
-            try:
-                ID = pymysql.escape_string(request.values.get('ID'))
-                COMPETITION_NAME = pymysql.escape_string(request.values.get('COMPETITION_NAME'))
-                TEAM = pymysql.escape_string(request.values.get('TEAM'))
-                VM_NAME = pymysql.escape_string(request.values.get('VM_NAME'))
-                CPU = pymysql.escape_string(request.values.get('CPU'))
-                MEMORY = pymysql.escape_string(request.values.get('MEMORY'))
-                GUEST_OS_TYPE = pymysql.escape_string(request.values.get('GUEST_OS_TYPE'))
-                CREATED_FLAG = CREATED_FLAG_C = "0"
-
-                # Edit a comp and make an event
-                raw_competitions_vm_edit(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C, ID)
-
-                return render_template('done.html', url = url_for('competitions_vm'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-            except:
-                # TODO Add a error.html page where it just redirects to a url_for('url') like done.html
-                data = mysqlExecuteAll("SELECT * FROM vms")
-                return render_template('competitions_vm.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-        else:
-
-            # IF 'GET'
-            try:
-                VM_ID = pymysql.escape_string(request.args.get('VM_ID'))
-                data = mysqlExecuteAll("SELECT * FROM vms WHERE ID={}".format(VM_ID))
-                return render_template('competitions_vm_edit.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-            except:
-                # TODO Add a error.html page where it just redirects to a url_for('url') like done.html
-                data = mysqlExecuteAll("SELECT * FROM vms")
-                return render_template('competitions_vm.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-    return root()
-
-"""
-
-"""
-def raw_competitions_vm_edit(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C, ID):
-    mysqlExecute("UPDATE vms SET CPU = '{}', MEMORY = '{}', CREATED_FLAG = '{}', CREATED_FLAG_C = '{}' WHERE ID = '{}'".format(CPU, MEMORY, CREATED_FLAG, CREATED_FLAG_C, ID))
-    addEvent(session['username'], "VM modification", VM_NAME+" VM for team "+TEAM+" in competition "+COMPETITION_NAME+" has been modified")
-
-
-
-def raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C):
-    mysqlExecute("INSERT INTO vms(COMPETITION_NAME,"
-                 " TEAM,"
-                 " VM_NAME,"
-                 " CPU,"
-                 " MEMORY,"
-                 " GUEST_OS_TYPE,"
-                 " CREATED_FLAG,"
-                 " CREATED_FLAG_C) VALUES ('{}', '{}', '{}', '{}','{}', '{}', '{}', '{}')"
-                 .format(COMPETITION_NAME,
-                         TEAM,
-                         VM_NAME,
-                         CPU,
-                         MEMORY,
-                         GUEST_OS_TYPE,
-                         CREATED_FLAG,
-                         CREATED_FLAG_C))
-    if debug:
-        print("A vm has been created "+str(VM_NAME), file=sys.stderr)
-    addEvent(session['username'], "VM addition",VM_NAME+" VM has been created for team "+TEAM+" in competition "+COMPETITION_NAME)
-
-
-
-
-@app.route("/competitions_vm_add", methods=['GET','POST'])
-def competitions_vm_add():
-    if 'username' in session:
-        if request.method == 'POST':
-            try:
-                """
-                    ID INTEGER NOT NULL AUTO_INCREMENT,
-                    COMPETITION_NAME VARCHAR(50) NOT NULL,  -- A unique name
-                    TEAM VARCHAR(50) NOT NULL,
-                    VM_NAME VARCHAR(50) NOT NULL, -- This is "Name" and "Hostname"
-                    CPU VARCHAR(50) NOT NULL,
-                    MEMORY VARCHAR(50) NOT NULL,
-                    GUEST_OS_TYPE VARCHAR(50),
-                    CREATED_FLAG INTEGER NOT NULL,
-                    CREATED_FLAG_C INTEGER NOT NULL,
-                """
-                COMPETITION_NAME = pymysql.escape_string(request.values.get('COMPETITION_NAME'))
-                if len(COMPETITION_NAME) < 1:
-                    if debug:
-                        error_message = "Missing COMPETITION_NAME"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                TEAM = pymysql.escape_string(request.values.get('TEAM'))
-                if len(TEAM) < 1:
-                    if debug:
-                        error_message = "Missing TEAM"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                VM_NAME = pymysql.escape_string(request.values.get('VM_NAME'))
-                if len(VM_NAME) < 1:
-                    if debug:
-                        error_message = "Missing VM_NAME"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                CPU = pymysql.escape_string(request.values.get('CPU'))
-                if len(CPU) < 1:
-                    if debug:
-                        error_message = "Missing CPU"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                MEMORY = pymysql.escape_string(request.values.get('MEMORY'))
-                if len(MEMORY) < 1:
-                    if debug:
-                        error_message = "Missing MEMORY"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                GUEST_OS_TYPE = pymysql.escape_string(request.values.get('GUEST_OS_TYPE'))
-                if len(GUEST_OS_TYPE) < 1:
-                    if debug:
-                        error_message = "Missing GUEST_OS_TYPE"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                CREATED_FLAG = CREATED_FLAG_C = "0"
-
-                # Create a vm and make an event
-                raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C)
-
-                return render_template('done.html', url = url_for('competitions_vm'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-            except:
-                pass
-        return render_template('competitions_vm_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-    return root()
-
-
-
-
-@app.route("/competitions_wizard", methods=['GET', 'POST'])
-def competitions_wizard():
-    if 'username' in session:
-        # Note that we are not calling this function plain "random()" because random
-        # is the name of a package we imported.
-        # Step 1, Create a comp
-
-        if "step" not in request.form:
-            """
-            Doesn't take anything
-            Sends a page where users can send the application back a new comp data.
-            """
-            return render_template("wizard.html", step="PAGE_CREATE_COMP")
-        elif request.form["step"] == "PAGE_2":
-            """
-            When it's PAGE_2, it gets:
-            UNAME, TEAMS, WIN_VMS, UNIX_VMS.
-            
-            It redirects it to PAGE_3.
-            """
-            try:
-                error_message = ""
-
-                UNAME = pymysql.escape_string(str(request.form['UNAME']))
-                TEAMS = pymysql.escape_string(str(request.form['TEAMS']))
-
-                # If some of them is empty.
-                if (len(UNAME) < 1 or len(TEAMS) < 1):
-                    pass
-
-                WIN_VMS = pymysql.escape_string(request.values.get('WIN_VMS'))
-                if len(WIN_VMS) < 1:
-                    if debug:
-                        error_message = "Missing WIN_VMS"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                UNIX_VMS = pymysql.escape_string(request.values.get('UNIX_VMS'))
-                if len(UNIX_VMS) < 1:
-                    if debug:
-                        error_message = "Missing UNIX_VMS"
-                        print(error_message, file=sys.stderr)
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-
-                TOTAL_VMS = str(int(WIN_VMS) + int(UNIX_VMS))
-                CREATED_FLAG = CREATED_FLAG_C = CREATED_TEAMS = "0"
-
-
-                # Create a COMPETITION
-                raw_competitions_add(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, CREATED_FLAG, CREATED_FLAG_C)
-
-                # Add teams objects to mysql so we use get_competition_teams(COMPETITION_NAME) in step "PAGE_3_PICK"
-                for i in range(int(TEAMS)):
-                    TEAM_tmp = "Team_"+str(i+1)
-                    raw_competitions_team_add(UNAME,
-                                              TEAM_tmp,
-                                              "0",
-                                              "0",
-                                              "0",
-                                              "0",
-                                              "0",
-                                              "0",
-                                              "0")
-
-
-                # Move to the next page which is editing teams in step 2 template
-                TEAMS = get_competition_teams(UNAME)
-                return render_template("wizard.html", step="PAGE_3_PICK", UNAME=UNAME, TEAMS = TEAMS)
-            except Exception as ex:
-                if debug:
-                    print("Couldn't create a comp", file=sys.stderr)
-                    print("Error: "+str(ex), file=sys.stderr)
-        # Step 3, where we can create teams
-        elif request.form["step"] == "PAGE_CREATE_TEAM":
-            """
-            PAGE_CREATE_TEAM, it helps creating teams using UNAME.
-            
-            """
-            try:
-                COMPETITION_NAME = UNAME = pymysql.escape_string(str(request.form['UNAME']))
-                elements = get_all_elements_comp(UNAME)
-                TEAMS = elements[2]
-                CREATED_TEAMS = elements[3]
-                if debug:
-                    print("Comparing "+str(TEAMS)+" and "+str(CREATED_TEAMS), file=sys.stderr)
-
-                # Check if we need to create a new team.
-                if int(TEAMS) > int(CREATED_TEAMS):
-                    try:
-                        TEAM = pymysql.escape_string(request.values.get('TEAM'))
-                        if len(TEAM) < 1:
-                            if debug:
-                                error_message = "Missing TEAM"
-                                print(error_message, file=sys.stderr)
-                            return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                        DOMAIN_NAME = pymysql.escape_string(request.values.get('DOMAIN_NAME'))
-                        if len(DOMAIN_NAME) < 1:
-                            if debug:
-                                error_message = "Missing DOMAIN_NAME"
-                                print(error_message, file=sys.stderr)
-                            DOMAIN_NAME = TEAM+".com"
-
-                        SUBNET = pymysql.escape_string(request.values.get('SUBNET'))
-                        if len(SUBNET) < 1:
-                            if debug:
-                                error_message = "Missing SUBNET"
-                                print(error_message, file=sys.stderr)
-                            return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                        GATEWAY = pymysql.escape_string(request.values.get('GATEWAY'))
-                        if len(GATEWAY) < 1:
-                            if debug:
-                                error_message = "Missing GATEWAY"
-                                print(error_message, file=sys.stderr)
-                            return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                        DNS_SERVER1 = pymysql.escape_string(request.values.get('DNS_SERVER1'))
-                        if len(DNS_SERVER1) < 1:
-                            if debug:
-                                error_message = "Missing DNS_SERVER1"
-                                print(error_message, file=sys.stderr)
-                            return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                        NIC = pymysql.escape_string(request.values.get('NIC'))
-                        if len(NIC) < 1:
-                            if debug:
-                                error_message = "Missing NIC"
-                                print(error_message, file=sys.stderr)
-                            return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-
-                        CREATED_FLAG = CREATED_FLAG_C = CREATED_VMS_FLAG = CONFIGURED_VMS_FLAG = "0"
-
-                        # Edit a team and make an event
-                        safe_competitions_team_edit_by_name(COMPETITION_NAME,
-                                                            TEAM,
-                                                            DOMAIN_NAME,
-                                                            SUBNET,
-                                                            GATEWAY,
-                                                            DNS_SERVER1,
-                                                            NIC,
-                                                            CREATED_FLAG,
-                                                            CREATED_FLAG_C,
-                                                            CREATED_VMS_FLAG,
-                                                            CONFIGURED_VMS_FLAG)
-
-                        # Update
-                        update_CREATED_TEAMS_comp(COMPETITION_NAME)
-
-                        # Send it back to itself.
-                        return render_template("wizard.html", step="PAGE_CREATE_TEAM", UNAME=UNAME)
-                    except Exception as e:
-                        if debug:
-                            print("NOTE: We don't need to config a tame ", file=sys.stderr)
-                else:
-                    # Get all teams
-                    # LASTTHIG
-                    TEAMS = get_competition_teams(COMPETITION_NAME)
-                    return render_template("wizard.html", step="PAGE_3_PICK_VMS", UNAME=UNAME, TEAMS = TEAMS)
-            except Exception as e:
-                if debug:
-                    print(e, file=sys.stderr)
-                    print("Error #72521 ", file=sys.stderr)
-        elif request.form["step"] == "PAGE_3_PROCESS":
-            """
-            This section assumes that all teams have een created and now,
-            we should start the process of making VMs.
-            """
-            try:
-                error_message = ""
-                # Get the data coming from step 2
-                COMPETITION_NAME = UNAME = pymysql.escape_string(str(request.form['UNAME']))
-                TEAM = pymysql.escape_string(str(request.form['TEAM']))
-
-                # First check if the COMPETITION_NAME exist.
-
-                if check_competition_existence(COMPETITION_NAME) == 0:
-                    error_message = 'The selected competition ('+ COMPETITION_NAME +') doesn\'t exist'
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-                if check_team_existence(COMPETITION_NAME, TEAM) == 0:
-                    error_message = 'The selected team ('+ TEAM +') doesn\'t exist'
-                    return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-
-
-                # c flag is to identify if all the teams vms have been added to mysql to a specific competition (COMPETITION_NAME)
-                c_flag = 0
-                # Check if all teams has int(CONFIGURED_VMS_FLAG) >= int(TOTAL_VMS)
-                teams = get_competition_teams(COMPETITION_NAME)
-                WIN_VMS_tmp, UNIX_VMS_tmp, TOTAL_VMS_tmp = get_vms_comp(COMPETITION_NAME)
-                for team in teams:
-                    elements = get_all_elements_team(COMPETITION_NAME, team)
-                    CONFIGURED_VMS_FLAG_tmp = elements[11]
-                    print("Comparing "+str(CONFIGURED_VMS_FLAG_tmp)+" and "+str(TOTAL_VMS_tmp), file=sys.stderr)
-                    if (int(CONFIGURED_VMS_FLAG_tmp) >= int(TOTAL_VMS_tmp)):
-                        c_flag = 1
-
-                # If there is a least one VM where a team's vm han't been added/configured to mysql
-                if c_flag:
-                    # Leave
-                    if debug:
-                        print("Leaving #5232", file=sys.stderr)
-                    return render_template('competition_summary.html',competition_data = get_competition_data(COMPETITION_NAME))
-
-
-                # If good to go, get the team's info.
-                # get_all_elements_team(TEAM,COMPETITION_NAME)
-                ID, COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG = get_all_elements_team_ordered(COMPETITION_NAME, TEAM)
-
-                # To check if we can create a new VM.
-                WIN_VMS, UNIX_VMS, TOTAL_VMS = get_vms_comp(COMPETITION_NAME)
-
-                if int(CONFIGURED_VMS_FLAG) < int(TOTAL_VMS):
-                    # If there are variables to start creating a VM.
-                    try:
-                        creation_attempt_flag = 1
-                        VM_NAME = pymysql.escape_string(request.values.get('VM_NAME'))
-                        if len(VM_NAME) < 1:
-                            if debug:
-                                error_message = "Missing VM_NAME since it's not a creation attempt"
-                                print(error_message, file=sys.stderr)
-                            # not a creation attempt.
-                            creation_attempt_flag = 0
-
-                        CPU = pymysql.escape_string(request.values.get('CPU'))
-                        if len(CPU) < 1:
-                            if debug:
-                                error_message = "Missing CPU since it's not a creation attempt"
-                                print(error_message, file=sys.stderr)
-                            # not a creation attempt.
-                            creation_attempt_flag = 0
-                        MEMORY = pymysql.escape_string(request.values.get('MEMORY'))
-                        if len(MEMORY) < 1:
-                            if debug:
-                                error_message = "Missing MEMORY since it's not a creation attempt"
-                                print(error_message, file=sys.stderr)
-                            # not a creation attempt.
-                            creation_attempt_flag = 0
-                        GUEST_OS_TYPE = pymysql.escape_string(request.values.get('GUEST_OS_TYPE'))
-                        if len(GUEST_OS_TYPE) < 1:
-                            if debug:
-                                error_message = "Missing GUEST_OS_TYPE since it's not a creation attempt"
-                                print(error_message, file=sys.stderr)
-                            # not a creation attempt.
-                            creation_attempt_flag = 0
-
-                        if creation_attempt_flag:
-                            CREATED_FLAG = CREATED_FLAG_C = "0"
-
-                            # Create a vm object and make an event
-                            raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C)
-
-                            # Update the team's CONFIGURED_VMS_FLAG
-                            update_CONFIGURED_VMS_FLAG(TEAM)
-
-                            # Pick again
-                            # Get all teams
-                            TEAMS = get_competition_teams(COMPETITION_NAME)
-                            return render_template("wizard.html", step="PAGE_3_PICK", UNAME=UNAME, TEAMS = TEAMS)
-
-                    except:
-                        print("Not a creation attempt. try()", file=sys.stderr)
-
-                return render_template("wizard.html", step="PAGE_CREATE_VM",
-                                       UNAME = UNAME,
-                                       COMPETITION_NAME = COMPETITION_NAME,
-                                       TEAM= TEAM,
-                                       DOMAIN_NAME = DOMAIN_NAME,
-                                       SUBNET = SUBNET,
-                                       GATEWAY = GATEWAY,
-                                       DNS_SERVER1 = DNS_SERVER1,
-                                       NIC = NIC)
-            except:
-                print("Error #16212", file=sys.stderr)
-        elif request.form["step"] == "step_f":
-            pass
-        else:
-            print("None of these steps is valid", file=sys.stderr)
-            return root()
-    print("No session competitions_wizard()", file=sys.stderr)
-    return root()
-
-
-
-
-@app.route("/competition_summary", methods=['GET'])
-def competition_summary():
-    return render_template('competition_summary.html',competition_data = get_competition_data("co1"))
-
 
 
 def get_competition_data(COMPETITION_NAME):
@@ -1399,6 +1430,12 @@ def get_all_elements_team(COMPETITION_NAME, TEAM):
     return elements
 
 
+def get_all_teams_by_competition_name(COMPETITION_NAME):
+    elements = mysqlExecuteAll("select * from teams where COMPETITION_NAME = '{}'".format(COMPETITION_NAME))
+    #elements = cleanSQLOutputs(elements)
+    return elements
+
+
 
 def get_all_elements_team_ordered(COMPETITION_NAME, TEAM):
     """
@@ -1424,6 +1461,78 @@ def get_all_elements_team_ordered(COMPETITION_NAME, TEAM):
     CREATED_VMS_FLAG = all_elements[10]
     CONFIGURED_VMS_FLAG = all_elements[11]
     return ID, COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG
+
+
+
+
+def get_all_elements_comp(COMPETITION_NAME):
+    """
+
+    :param COMPETITION_NAME:
+    :return:
+    :example of what it can return:
+    Two teams, 0 created teams, 2 win vms, 2 linux vms, total vms, ...etc.
+    returning :['comp2', '2', '0', '2', '2', '4', '0', '0']
+    """
+    elements = mysqlExecute("select * from competitions where UNAME = '{}'".format(COMPETITION_NAME))
+    elements = cleanSQLOutputs(elements)
+    return elements
+
+
+
+def update_CONFIGURED_VMS_FLAG(TEAM):
+    CONFIGURED_VMS_FLAG = mysqlExecute("select CONFIGURED_VMS_FLAG from teams where TEAM = '{}'".format(TEAM))
+    CONFIGURED_VMS_FLAG = cleanSQLOutputs(CONFIGURED_VMS_FLAG)
+    CONFIGURED_VMS_FLAG = (int(CONFIGURED_VMS_FLAG) + 1)
+    CONFIGURED_VMS_FLAG = str(CONFIGURED_VMS_FLAG)
+    mysqlExecute("UPDATE teams SET CONFIGURED_VMS_FLAG= '{}' WHERE TEAM = '{}'"
+                 .format(CONFIGURED_VMS_FLAG,TEAM))
+    addEvent(session['username'], "CONFIGURED_VMS_FLAG has been updated for team ("+TEAM+")")
+
+
+def update_CREATED_TEAMS_comp(COMPETITION_NAME):
+    CREATED_TEAMS = mysqlExecute("select CREATED_TEAMS from competitions where UNAME = '{}'".format(COMPETITION_NAME))
+    CREATED_TEAMS = CREATED_TEAMS.replace("(","").replace(")","").replace(",","")
+    CREATED_TEAMS = (int(str(CREATED_TEAMS)) + 1)
+    CREATED_TEAMS = str(CREATED_TEAMS)
+    mysqlExecute("UPDATE competitions SET CREATED_TEAMS= '{}' WHERE UNAME = '{}'"
+                 .format(CREATED_TEAMS,COMPETITION_NAME))
+    addEvent(session['username'], "CREATED_TEAMS has been updated for competition ("+COMPETITION_NAME+")")
+
+
+
+
+
+
+
+def next_unedited_vm(COMPETITION_NAME):
+    """
+    Database schema sensitive --> Which means this will break if you change he database structure for "competitions" table.
+    :param COMPETITION_NAME:
+    :return:
+    """
+    if debug:
+        debugMessage("Executing next_unedited_vm()")
+    teams = get_all_teams_by_competition_name(COMPETITION_NAME)
+    return teams
+
+
+
+def get_vms_comp(COMPETITION_NAME):
+    """
+    This function needs to be updated if MYSQL table changed
+    TAG: Table-dependent
+
+    :param COMPETITION_NAME:
+    :return:
+    """
+    elements = get_all_elements_comp(COMPETITION_NAME)
+    WIN_VMS = elements[4]
+    UNIX_VMS = elements[5]
+    TOTAL_VMS = elements[6]
+    TOTAL_CREATED_VMS = elements[7]
+    return WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS
+
 
 
 
@@ -1459,56 +1568,27 @@ def get_next_team_to_configure(COMPETITION_NAME):
     return None, None, None, None, None, None, None, None, None, None
 
 
-def get_all_elements_comp(COMPETITION_NAME):
-    elements = mysqlExecute("select * from competitions where UNAME = '{}'".format(COMPETITION_NAME))
-    elements = cleanSQLOutputs(elements)
-    return elements
 
 
 
-def get_vms_comp(COMPETITION_NAME):
+def cleanSQLOutputs(outputs):
     """
-    This function needs to be updated if MYSQL table changed
-    TAG: Table-dependent
-
-    :param COMPETITION_NAME:
+    Takes a string
+    returns a list of elements
+    :param outputs:
     :return:
     """
-    elements = get_all_elements_comp(COMPETITION_NAME)
-    WIN_VMS = elements[4]
-    UNIX_VMS = elements[5]
-    TOTAL_VMS = elements[6]
-    return WIN_VMS, UNIX_VMS, TOTAL_VMS
-
-
-
-def update_CONFIGURED_VMS_FLAG(TEAM):
-    CONFIGURED_VMS_FLAG = mysqlExecute("select CONFIGURED_VMS_FLAG from teams where TEAM = '{}'".format(TEAM))
-    CONFIGURED_VMS_FLAG = cleanSQLOutputs(CONFIGURED_VMS_FLAG)
-    CONFIGURED_VMS_FLAG = (int(CONFIGURED_VMS_FLAG) + 1)
-    CONFIGURED_VMS_FLAG = str(CONFIGURED_VMS_FLAG)
-    mysqlExecute("UPDATE teams SET CONFIGURED_VMS_FLAG= '{}' WHERE TEAM = '{}'"
-                 .format(CONFIGURED_VMS_FLAG,TEAM))
-    addEvent(session['username'], "CONFIGURED_VMS_FLAG has been updated for team ("+TEAM+")")
-
-
-def update_CREATED_TEAMS_comp(COMPETITION_NAME):
-    CREATED_TEAMS = mysqlExecute("select CREATED_TEAMS from competitions where UNAME = '{}'".format(COMPETITION_NAME))
-    CREATED_TEAMS = cleanSQLOutputs(CREATED_TEAMS)
-    CREATED_TEAMS = (int(CREATED_TEAMS) + 1)
-    CREATED_TEAMS = str(CREATED_TEAMS)
-    mysqlExecute("UPDATE competitions SET CREATED_TEAMS= '{}' WHERE UNAME = '{}'"
-                 .format(CREATED_TEAMS,COMPETITION_NAME))
-    addEvent(session['username'], "CREATED_TEAMS has been updated for competition ("+COMPETITION_NAME+")")
-
-
-"""
-Takes a string
-returns a list of elements
-"""
-def cleanSQLOutputs(outputs):
     outputs = str(outputs)
-    return [s.strip() for s in outputs.replace('(','').replace(')','').replace('\'','').split(',') if (len(str(s)) > 1)]
+    return [s.replace('(','').replace(')','').replace('\'','').strip() for s in outputs.split(',') if (len(str(s)) > 1)]
+
+
+
+def debugMessage(q):
+    """
+    :param q: a string
+    :return: None
+    """
+    print("Debug Message :" + str(q), file=sys.stderr)
 
 
 if __name__ == "__main__":

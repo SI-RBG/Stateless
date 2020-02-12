@@ -21,7 +21,7 @@ Creating a team for {{UNAME}}.
     <input type="hidden" name="UNAME" value="{{UNAME}}" readonly>
 
     <p>Competition name <input type="text" value="{{UNAME}}" placeholder="{{UNAME}}" name="COMPETITION_NAME" readonly></p>
-    <p>Team name <input type="text" value="" placeholder="{{TEAM}}" name="TEAM"></p>
+    <p>Team name<input type="text" value="{{TEAM}}" placeholder="{{TEAM}}" name="TEAM" readonly></p>
     <p>Team Domain <input type="text" value="" placeholder="Example.com" name="DOMAIN_NAME"></p>
     <p>Subnet <input type="text" value="" placeholder="10.1.1.0/24" name="SUBNET"></p>
     <p>Gateway <input type="text" value="" placeholder="10.1.1.254" name="GATEWAY"></p>
@@ -30,7 +30,7 @@ Creating a team for {{UNAME}}.
     <p>NIC/PortGroup <input type="text" value="" placeholder="Group100" name="NIC"></p>
 
 <!-- Next one -->
-    <input type="hidden" name="step" value="PAGE_CREATE_TEAM">
+    <input type="hidden" name="step" value="TAKE_PARAMETERS">
     <input type="submit" value="Generate">
 </form>
 
@@ -52,29 +52,32 @@ Creating a team for {{UNAME}}.
 
 </form>
 
-{% elif step == "PAGE_3_PICK_VMS" %}
+<!--{% elif step == "PAGE_3_PICK_VMS" %}-->
 
-<form action="{{ url_for('competitions_wizard') }}" method="post">
-    <input type="hidden" name="UNAME" value="{{UNAME}}" readonly>
-    <select name="TEAM">
-        {% for e in TEAMS %}
-        <option value="{{e}}">{{e}}</option>
-        {% endfor %}
-    </select>
-    </p>
+<!--<form action="{{ url_for('competitions_wizard') }}" method="post">-->
+<!--    <input type="hidden" name="UNAME" value="{{UNAME}}" readonly>-->
+<!--    <select name="TEAM">-->
+<!--        {% for e in VMS %}-->
+<!--        <option value="{{e}}">{{e}}</option>-->
+<!--        {% endfor %}-->
+<!--    </select>-->
+<!--    </p>-->
 
-    <!-- Next one -->
-    <input type="hidden" name="step" value="PAGE_CREATE_TEAM">
-    <input type="submit" value="Generate">
+<!--    &lt;!&ndash; Next one &ndash;&gt;-->
+<!--    <input type="hidden" name="step" value="PAGE_CREATE_VM">-->
+<!--    <input type="submit" value="Generate">-->
 
-</form>
+<!--</form>-->
 
 
 
 {% elif step == "PAGE_CREATE_VM" %}
 
+
+{% for vm in VMS %}
+
 <br>
-Creating a vm instance for {{COMPETITION_NAME}}.
+Creating a {{vm}} instance for {{COMPETITION_NAME}}.
 <br>
 
 <form action="{{ url_for('competitions_wizard') }}" method="post">
@@ -99,6 +102,13 @@ Creating a vm instance for {{COMPETITION_NAME}}.
         <option value="TODO">Audi</option>
     </select>
     </p>
+
+
+
+
+            {% endfor %}
+
+
 
 <!-- Next one -->
     <input type="hidden" name="step" value="PAGE_CREATE_VM">
