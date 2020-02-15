@@ -74,10 +74,51 @@ Creating a team for {{UNAME}}.
 {% elif step == "PAGE_CREATE_VM" %}
 
 
-{% for vm in VMS %}
+{% for winvm in WINVMS %}
 
 <br>
-Creating a {{vm}} instance for {{COMPETITION_NAME}}.
+Creating a {{winvm}} instance for {{COMPETITION_NAME}}.
+<br>
+
+<form action="{{ url_for('competitions_wizard') }}" method="post">
+
+    <p>Competition name <input type="text" name="COMPETITION_NAME" value="{{COMPETITION_NAME}}" readonly></p>
+{#    <p>Domain name <input type="text" name="DOMAIN_NAME" value="{{DOMAIN_NAME}}" readonly></p>#}
+{#    <p>Network <input type="text" name="SUBNET" value="{{SUBNET}}" readonly></p>#}
+{#    <p>Gateway <input type="text" name="GATEWAY" value="{{GATEWAY}}" readonly></p>#}
+{#    <p>DNS server <input type="text" name="DNS_SERVER1" value="{{DNS_SERVER1}}" readonly></p>#}
+{#    <p>Team name <input type="text" name="TEAM" value="{{TEAM}}" readonly></p>#}
+{#<!--    <p>DNS server <input type="text" name="DNS_SERVER1" value="{{DNS_SERVER2}}" readonly></p>-->#}
+
+    <p>VM name <input type="text" value="" placeholder="Windows_7" name="VM_NAME">
+<!--    <p>VM IP <input type="text" value="" placeholder="10.1.1.1" name="VM_IP"></p>-->
+    <p>CPUs <input type="text" value="" placeholder="2" name="CPU"></p>
+    <p>Memory <input type="text" value="" placeholder="1024" name="MEMORY"></p>
+    <p>Guest Type
+    <select name="GUEST_OS_TYPE">
+        <option value="ubuntu64Guest">Ubuntu 18 64bit</option>
+        <option value="windows9_64Guest">Windows 10 64bit</option>
+        <option value="darwin16_64Guest">MacOS</option>
+        <option value="TODO">Audi</option>
+    </select>
+    </p>
+
+            {% endfor %}
+
+<!-- Next one -->
+    <input type="hidden" name="step" value="PAGE_CREATE_VM">
+    <input type="submit" value="Generate">
+</form>
+
+
+
+
+
+
+    {% for unixvm in UNIXVMS %}
+
+<br>
+Creating a {{unixvm}} instance for {{COMPETITION_NAME}}.
 <br>
 
 <form action="{{ url_for('competitions_wizard') }}" method="post">
@@ -103,17 +144,20 @@ Creating a {{vm}} instance for {{COMPETITION_NAME}}.
     </select>
     </p>
 
-
-
-
             {% endfor %}
-
-
 
 <!-- Next one -->
     <input type="hidden" name="step" value="PAGE_CREATE_VM">
     <input type="submit" value="Generate">
 </form>
+
+
+
+
+
+
+
+
 
 
 {% elif step == "PAGE_5" %}

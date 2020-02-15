@@ -3,7 +3,7 @@ from flask_cors import CORS, cross_origin
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import pymysql, datetime, requests, shutil, json, time, sys, os, hashlib,random
-from werkzeug import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import requests
 from auth import *
@@ -813,43 +813,55 @@ def competitions_vm_add():
                     CREATED_FLAG INTEGER NOT NULL,
                     CREATED_FLAG_C INTEGER NOT NULL,
                 """
+                if debug:
+                    debugMessage("Getting COMPETITION_NAME on competitions_vm_add()")
                 COMPETITION_NAME = pymysql.escape_string(request.values.get('COMPETITION_NAME'))
-                if len(COMPETITION_NAME) < 1:
+                if COMPETITION_NAME == None:
                     if debug:
                         error_message = "Missing COMPETITION_NAME"
                         debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
+                if debug:
+                    debugMessage("Getting TEAM on competitions_vm_add()")
                 TEAM = pymysql.escape_string(request.values.get('TEAM'))
-                if len(TEAM) < 1:
+                if TEAM == None:
                     if debug:
                         error_message = "Missing TEAM"
                         debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
+                if debug:
+                    debugMessage("Getting VM_NAME on competitions_vm_add()")
                 VM_NAME = pymysql.escape_string(request.values.get('VM_NAME'))
-                if len(VM_NAME) < 1:
+                if VM_NAME == None:
                     if debug:
                         error_message = "Missing VM_NAME"
                         debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
+                if debug:
+                    debugMessage("Getting CPU on competitions_vm_add()")
                 CPU = pymysql.escape_string(request.values.get('CPU'))
-                if len(CPU) < 1:
+                if CPU == None:
                     if debug:
                         error_message = "Missing CPU"
                         debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
+                if debug:
+                    debugMessage("Getting MEMORY on competitions_vm_add()")
                 MEMORY = pymysql.escape_string(request.values.get('MEMORY'))
-                if len(MEMORY) < 1:
+                if MEMORY == None:
                     if debug:
                         error_message = "Missing MEMORY"
                         debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
+                if debug:
+                    debugMessage("Getting GUEST_OS_TYPE on competitions_vm_add()")
                 GUEST_OS_TYPE = pymysql.escape_string(request.values.get('GUEST_OS_TYPE'))
-                if len(GUEST_OS_TYPE) < 1:
+                if GUEST_OS_TYPE == None:
                     if debug:
                         error_message = "Missing GUEST_OS_TYPE"
                         debugMessage(error_message)
@@ -857,12 +869,67 @@ def competitions_vm_add():
 
                 CREATED_FLAG = CREATED_FLAG_C = "0"
 
-                # Create a vm and make an event
-                raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C)
 
-                return render_template('done.html', url = url_for('competitions_vm'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
-            except:
-                pass
+                try:
+                    # Create a vm and make an event
+                    raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG,
+                                            CREATED_FLAG_C)
+                except Exception as ex:
+                    if debug:
+                        debugMessage("Error: "+str(ex))
+                        debugMessage("Error #893278923")
+
+
+                try:
+                    # Update a comp object
+                    update_TOTAL_CREATED_VMS_comp(COMPETITION_NAME)
+                except Exception as ex:
+                    if debug:
+                        debugMessage("Error: "+str(ex))
+                        debugMessage("Error #4545231")
+
+
+                try:
+                    # If u want update a team object
+                    update_CREATED_VMS_FLAG_comp_team(COMPETITION_NAME, TEAM)
+                except Exception as ex:
+                    if debug:
+                        debugMessage("Error: "+str(ex))
+                        debugMessage("Error #3434232")
+
+                # Set all to None
+                WIN_VMS = None
+                UNIX_VMS = None
+                TOTAL_VMS = None
+                TOTAL_CREATED_VMS = None
+
+                try:
+                    elements = get_all_elements_comp(COMPETITION_NAME)
+                    WIN_VMS = elements[4]
+                    UNIX_VMS = elements[5]
+                    TOTAL_VMS = elements[6]
+                    TOTAL_CREATED_VMS = elements[7]
+                except Exception as ex:
+                    if debug:
+                        debugMessage("Error: "+str(ex))
+                        debugMessage("Error #12123234")
+
+
+                if int(TOTAL_VMS) > int(TOTAL_CREATED_VMS):
+                    if int(UNIX_VMS) >= int(TOTAL_CREATED_VMS):
+                        # Stop creating UNIX VMs
+                        vmtype = "Unix VM"
+                    else:
+                        # Create Win VMs
+                        vmtype = "Windows VM"
+                    debugMessage("competitions_vm_add again")
+                    return render_template('competitions_vm_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength(), COMPETITION_NAME=COMPETITION_NAME, vmtype=vmtype)
+                else:
+                    return render_template('done.html', username = session['username'], url = url_for('competitions_vm'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+            except Exception as ex:
+                if debug:
+                    debugMessage("Error: "+str(ex))
+                    debugMessage("Error #873216812")
         return render_template('competitions_vm_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
     return root()
 
@@ -1079,6 +1146,10 @@ def competitions_wizard():
                 elements = get_all_elements_comp(UNAME)
                 TEAMS = elements[2]
                 CREATED_TEAMS = elements[3]
+                WIN_VMS = elements[4]
+                UNIX_VMS = elements[5]
+                TOTAL_VMS = elements[6]
+                TOTAL_CREATED_VMS = elements[7]
 
 
                 if int(TEAMS) > int(CREATED_TEAMS):
@@ -1090,7 +1161,7 @@ def competitions_wizard():
                     """
                     At this point we need to start creating VMs for each team.
                     """
-                    debugMessage("Redirect #98181")
+                    debugMessage("Redirect #198181")
                     # Get all teams
                     # Check if any team has no VMS
                     teams = next_unedited_vm(COMPETITION_NAME)
@@ -1113,8 +1184,16 @@ def competitions_wizard():
                         """
                         debugMessage(str(i)+"- "+str(team))
 
-                    return render_template("wizard.html", step="PAGE_CREATE_VM", UNAME=UNAME)
+                    if int(TOTAL_VMS) > int(TOTAL_CREATED_VMS):
+                        if int(UNIX_VMS) >= int(TOTAL_CREATED_VMS):
+                            # Stop creating UNIX VMs
+                            vmtype = "Unix VM"
+                        else:
+                            # Create Win VMs
+                            vmtype = "Windows VM"
 
+                        # Get how many Win VM and Unix.
+                        return render_template('competitions_vm_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength(), COMPETITION_NAME=COMPETITION_NAME, TEAM=TEAM, vmtype=vmtype)
             except Exception as e:
                 if debug:
                     debugMessage(e)
@@ -1481,6 +1560,16 @@ def get_all_elements_comp(COMPETITION_NAME):
 
 
 def update_CONFIGURED_VMS_FLAG(TEAM):
+    """
+    This function updates "CONFIGURED_VMS_FLAG" in the mysql database for a "TEAM"
+    It also adds/logs an event.
+
+
+    TODO - Needs more testing
+
+    :param TEAM:
+    :return:
+    """
     CONFIGURED_VMS_FLAG = mysqlExecute("select CONFIGURED_VMS_FLAG from teams where TEAM = '{}'".format(TEAM))
     CONFIGURED_VMS_FLAG = cleanSQLOutputs(CONFIGURED_VMS_FLAG)
     CONFIGURED_VMS_FLAG = (int(CONFIGURED_VMS_FLAG) + 1)
@@ -1490,7 +1579,36 @@ def update_CONFIGURED_VMS_FLAG(TEAM):
     addEvent(session['username'], "CONFIGURED_VMS_FLAG has been updated for team ("+TEAM+")")
 
 
+
+def update_CREATED_VMS_FLAG_comp_team(COMPETITION_NAME,TEAM):
+    """
+    This function updates "CREATED_VMS_FLAG" in the mysql database for a "TEAM"
+    It also adds/logs an event.
+
+
+    :param TEAM:
+    :return:
+    """
+    CREATED_VMS_FLAG = mysqlExecute("select CREATED_VMS_FLAG from teams where TEAM = '{}' and COMPETITION_NAME = '{}'".format(TEAM,COMPETITION_NAME))
+    CREATED_VMS_FLAG = CREATED_VMS_FLAG.replace("(","").replace(")","").replace(",","")
+    CREATED_VMS_FLAG = (int(str(CREATED_VMS_FLAG)) + 1)
+    CREATED_VMS_FLAG = str(CREATED_VMS_FLAG)
+    mysqlExecute("UPDATE teams SET CREATED_VMS_FLAG= '{}' WHERE TEAM = '{}'"
+                 .format(CREATED_VMS_FLAG,TEAM))
+    addEvent(session['username'], "CREATED_VMS_FLAG has been updated for team ("+TEAM+")")
+
+
+
+
 def update_CREATED_TEAMS_comp(COMPETITION_NAME):
+    """
+    This function updates "CREATED_TEAMS" in the mysql database for a "COMPETITION_NAME"
+    It also adds/logs an event.
+
+
+    :param COMPETITION_NAME:
+    :return:
+    """
     CREATED_TEAMS = mysqlExecute("select CREATED_TEAMS from competitions where UNAME = '{}'".format(COMPETITION_NAME))
     CREATED_TEAMS = CREATED_TEAMS.replace("(","").replace(")","").replace(",","")
     CREATED_TEAMS = (int(str(CREATED_TEAMS)) + 1)
@@ -1501,6 +1619,22 @@ def update_CREATED_TEAMS_comp(COMPETITION_NAME):
 
 
 
+def update_TOTAL_CREATED_VMS_comp(COMPETITION_NAME):
+    """
+    This function updates "TOTAL_CREATED_VMS" in the mysql database for a "COMPETITION_NAME"
+    It also adds/logs an event.
+
+
+    :param COMPETITION_NAME:
+    :return:
+    """
+    TOTAL_CREATED_VMS = mysqlExecute("select TOTAL_CREATED_VMS from competitions where UNAME = '{}'".format(COMPETITION_NAME))
+    TOTAL_CREATED_VMS = TOTAL_CREATED_VMS.replace("(","").replace(")","").replace(",","")
+    TOTAL_CREATED_VMS = (int(str(TOTAL_CREATED_VMS)) + 1)
+    TOTAL_CREATED_VMS = str(TOTAL_CREATED_VMS)
+    mysqlExecute("UPDATE competitions SET TOTAL_CREATED_VMS= '{}' WHERE UNAME = '{}'"
+                 .format(TOTAL_CREATED_VMS,COMPETITION_NAME))
+    addEvent(session['username'], "TOTAL_CREATED_VMS has been updated for competition ("+COMPETITION_NAME+")")
 
 
 
