@@ -11,12 +11,15 @@
 
             {% if COMPETITION_NAME is defined %}
                 <p><td>Competition name <input type="text" name="COMPETITION_NAME" value="{{COMPETITION_NAME}}" readonly></td></p>
+                <p><td><input type="hidden" name="tobedeployed" value="1"></td></p>
             {% else %}
                 <p><td>Competition name <input type="text" value="" placeholder="Co1" name="COMPETITION_NAME"></td></p>
+                <p><td><input type="hidden" name="tobedeployed" value="0"></td></p>
+
             {% endif %}
 
             {% if TEAM is defined %}
-            <p><td>Team name <input type="text" value="" placeholder="{{TEAM}}" name="TEAM"></td></p>
+                <p><td>Team name <input type="text" name="TEAM" value="Undefinedtable" readonly></td></p>
             {% else %}
             <p><td>Team name <input type="text" value="" placeholder="Tigers1" name="TEAM"></td></p>
             {% endif %}
@@ -38,6 +41,7 @@
                 </select>
             </td>
             </p>
+
 
             <p><td><input type="submit" value="Start"></td></p>
 

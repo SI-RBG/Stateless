@@ -6,7 +6,6 @@ This file should have independent fuctions where it validates data.
 
 
 
-
 def isIP(parameter):
     """
     Is parameter an IP?

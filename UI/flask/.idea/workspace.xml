@@ -2,12 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af7dd18d-2f15-45b4-947a-32d6cc35b059" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/pyCompetitionObject.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pyTeamObject.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pyVMObject.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../db/database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../db/database.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/add_vm_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/add_vm_template.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/competitions_vm.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/competitions_vm.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/wizard_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/wizard_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/validator.py" beforeDir="false" afterPath="$PROJECT_DIR$/validator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/ubuntu-16.04.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/ubuntu-16.04.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/variables.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/variables.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/tmp.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/tmp.py" afterDir="false" />
@@ -19,12 +22,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="528">
-              <caret line="829" column="54" lean-forward="true" selection-start-line="829" selection-start-column="54" selection-end-line="829" selection-end-column="54" />
+            <state relative-caret-position="740">
+              <caret line="2014" column="9" selection-start-line="2014" selection-start-column="9" selection-end-line="2014" selection-end-column="9" />
               <folding>
                 <element signature="e#0#100#0" expanded="true" />
               </folding>
@@ -33,19 +36,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/add_vm_template.html">
+        <entry file="file://$PROJECT_DIR$/pyCompetitionObject.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/validator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="795">
-              <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
+            <state relative-caret-position="135">
+              <caret line="9" column="17" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -53,8 +47,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/wizard_base.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="326">
-              <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
+            <state relative-caret-position="684">
+              <caret line="152" selection-start-line="152" selection-end-line="152" />
             </state>
           </provider>
         </entry>
@@ -78,6 +72,8 @@
       <find>PAGE_CREATE_VM</find>
       <find>competitions_vm_add</find>
       <find>873216812</find>
+      <find>login</find>
+      <find>hidd</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -91,19 +87,22 @@
         <option value="$PROJECT_DIR$/Utilities.py" />
         <option value="$PROJECT_DIR$/databaseCommunication.py" />
         <option value="$PROJECT_DIR$/SQLFunctions.py" />
-        <option value="$PROJECT_DIR$/validator.py" />
         <option value="$PROJECT_DIR$/templates/competitions_vm.html" />
-        <option value="$PROJECT_DIR$/templates/wizard_base.html" />
-        <option value="$PROJECT_DIR$/app.py" />
+        <option value="$PROJECT_DIR$/validator.py" />
+        <option value="$PROJECT_DIR$/templates/add_team_template.html" />
         <option value="$PROJECT_DIR$/templates/add_vm_template.html" />
+        <option value="$PROJECT_DIR$/templates/wizard_base.html" />
+        <option value="$PROJECT_DIR$/pyTeamObject.py" />
+        <option value="$PROJECT_DIR$/pyCompetitionObject.py" />
+        <option value="$PROJECT_DIR$/app.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="x" value="-308" />
-    <option name="y" value="-1080" />
+    <option name="x" value="-336" />
+    <option name="y" value="-1200" />
     <option name="width" value="1920" />
-    <option name="height" value="1080" />
+    <option name="height" value="1200" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -111,6 +110,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -127,7 +127,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -160,22 +159,25 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1581468948974</updated>
-      <workItem from="1581468950466" duration="13065000" />
+      <workItem from="1581468950466" duration="14003000" />
+      <workItem from="1581890213233" duration="176000" />
+      <workItem from="1581966983239" duration="732000" />
+      <workItem from="1581985221366" duration="9269000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13065000" />
+    <option name="totallyTimeSpent" value="24180000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-308" y="-1080" width="1920" height="1080" extended-state="0" />
+    <frame x="-336" y="-1200" width="1920" height="1200" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.1485623" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.1544196" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" order="0" />
-      <window_info anchor="bottom" id="Terminal" order="1" visible="true" weight="0.09108911" />
+      <window_info anchor="bottom" id="Terminal" order="1" visible="true" weight="0.11415929" />
       <window_info anchor="bottom" id="Event Log" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="3" />
       <window_info anchor="bottom" id="Python Console" order="4" />
@@ -245,9 +247,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/competitions_add.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/competitions_edit.html">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -271,34 +270,61 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/validator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_add.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/add_team_template.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="104" selection-start-line="10" selection-start-column="104" selection-end-line="10" selection-end-column="104" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/templates/competitions_vm_add.html">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/wizard_base.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/validator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="795">
-          <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/templates/wizard.html">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/add_vm_template.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+        <state relative-caret-position="270">
+          <caret line="18" column="23" lean-forward="true" selection-start-line="18" selection-start-column="23" selection-end-line="18" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyTeamObject.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyCompetitionObject.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="17" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/wizard_base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="684">
+          <caret line="152" selection-start-line="152" selection-end-line="152" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="829" column="54" lean-forward="true" selection-start-line="829" selection-start-column="54" selection-end-line="829" selection-end-column="54" />
+        <state relative-caret-position="740">
+          <caret line="2014" column="9" selection-start-line="2014" selection-start-column="9" selection-end-line="2014" selection-end-column="9" />
           <folding>
             <element signature="e#0#100#0" expanded="true" />
           </folding>

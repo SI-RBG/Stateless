@@ -13,6 +13,7 @@ from Utilities import *
 from SQLFunctions import *
 from config import *
 import sys
+import pyTeamObject, pyVMObject, pyCompetitionObject
 
 
 # Wait
@@ -63,6 +64,12 @@ def test_add_date_1():
     raw_competitions_team_add("GODS_COMP", "Team2", "Team2.com", "192.168.2.0/24", "192.168.2.254", "8.8.8.8", "Group100", "2", "4", "6", "0", "0")
     raw_competitions_team_add("GODS_COMP", "Team3", "Team3.com", "192.168.3.0/24", "192.168.3.254", "8.8.8.8", "Group100", "2", "4", "6", "0", "0")
 
+def debugMessage(q):
+    """
+    :param q: a string
+    :return: None
+    """
+    print("Debug Message :" + str(q), file=sys.stderr)
 
 
 def mysqlExecute(q):
@@ -103,6 +110,537 @@ def mysqlExecuteAll(q):
     mysqlConnCursor.close()
     mysqlConn.close()
     return result
+
+
+
+
+
+
+def raw_competitions_add(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C):
+    """
+
+    :param UNAME:
+    :param TEAMS:
+    :param CREATED_TEAMS:
+    :param WIN_VMS:
+    :param UNIX_VMS:
+    :param TOTAL_VMS:
+    :param TOTAL_CREATED_VMS:
+    :param CREATED_FLAG:
+    :param CREATED_FLAG_C:
+    :return:
+    """
+    mysqlExecute("INSERT INTO competitions("
+                 "UNAME, "
+                 "TEAMS, "
+                 "CREATED_TEAMS, " \
+                 "WIN_VMS, "
+                 "UNIX_VMS, "
+                 "TOTAL_VMS, "
+                 "TOTAL_CREATED_VMS, "
+                 "CREATED_FLAG, "
+                 "CREATED_FLAG_C) VALUES ('{}' , '{}', '{}' , '{}', '{}', '{}', '{}', '{}', '{}')"
+                 .format(
+                    UNAME,
+                    TEAMS,
+                    CREATED_TEAMS,
+                    WIN_VMS,
+                    UNIX_VMS,
+                    TOTAL_VMS,
+                    TOTAL_CREATED_VMS,
+                    CREATED_FLAG,
+                    CREATED_FLAG_C))
+    addEvent(session['username'], "Competition addition", UNAME+" competition has been created with "+TEAMS+" teams")
+
+
+
+
+
+def raw_competitions_edit(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, ID):
+    """
+
+    :param UNAME:
+    :param TEAMS:
+    :param CREATED_TEAMS:
+    :param WIN_VMS:
+    :param UNIX_VMS:
+    :param TOTAL_VMS:
+    :param TOTAL_CREATED_VMS:
+    :param ID:
+    :return:
+    """
+    mysqlExecute("UPDATE competitions SET "
+                 " UNAME = '{}',"
+                 " TEAMS= '{}',"
+                 " CREATED_TEAMS= '{}',"
+                 " WIN_VMS= '{}',"
+                 " UNIX_VMS= '{}',"
+                 " TOTAL_VMS= '{},'"
+                 " TOTAL_CREATED_VMS= '{}'"
+                 " WHERE ID = '{}'"
+                 .format(UNAME,
+                         TEAMS,
+                         CREATED_TEAMS,
+                         WIN_VMS,
+                         UNIX_VMS,
+                         TOTAL_VMS,
+                         TOTAL_CREATED_VMS,
+                         ID))
+    addEvent(session['username'], "Competition modification", UNAME+" competition has been modified")
+
+
+
+
+def safe_competitions_team_edit_by_name(COMPETITION_NAME,
+                                        TEAM,
+                                        DOMAIN_NAME,
+                                        SUBNET,
+                                        GATEWAY,
+                                        DNS_SERVER1,
+                                        NIC,
+                                        CREATED_FLAG,
+                                        CREATED_FLAG_C,
+                                        CREATED_VMS_FLAG,
+                                        CONFIGURED_VMS_FLAG):
+    """
+    This function never changes COMPETITION_NAME and TEAM.
+    :param COMPETITION_NAME:
+    :param TEAM:
+    :param DOMAIN_NAME:
+    :param SUBNET:
+    :param GATEWAY:
+    :param DNS_SERVER1:
+    :param NIC:
+    :param CREATED_FLAG:
+    :param CREATED_FLAG_C:
+    :param CREATED_VMS_FLAG:
+    :param CONFIGURED_VMS_FLAG:
+    :return:
+    """
+    q = "UPDATE teams SET " \
+        "DOMAIN_NAME= '{}'," \
+        "SUBNET= '{}'," \
+        "GATEWAY= '{}'," \
+        "DNS_SERVER1= '{}'," \
+        "NIC= '{}'," \
+        "CREATED_FLAG = '{}'," \
+        "CREATED_FLAG_C = '{}'," \
+        "CREATED_VMS_FLAG = '{}'," \
+        "CONFIGURED_VMS_FLAG = '{}' WHERE TEAM = '{}' and COMPETITION_NAME = '{}'".format(
+                                                            DOMAIN_NAME,
+                                                            SUBNET,
+                                                            GATEWAY,
+                                                            DNS_SERVER1,
+                                                            NIC,
+                                                            CREATED_FLAG,
+                                                            CREATED_FLAG_C,
+                                                            CREATED_VMS_FLAG,
+                                                            CONFIGURED_VMS_FLAG,
+                                                            TEAM,
+                                                            COMPETITION_NAME)
+    if debug:
+        print("UPDATING "+q, file=sys.stderr)
+    mysqlExecute(q)
+    addEvent(session['username'], "Team modification", TEAM+" from competition "+COMPETITION_NAME+" has been updated")
+
+
+def safe_competitions_team_edit(COMPETITION_NAME,TEAM,
+                               DOMAIN_NAME,
+                               SUBNET,
+                               GATEWAY,
+                               DNS_SERVER1,
+                               CREATED_FLAG,
+                               CREATED_FLAG_C,
+                               CREATED_VMS_FLAG,
+                               CONFIGURED_VMS_FLAG):
+
+    elements = get_all_elements_team(TEAM,COMPETITION_NAME)
+    old_ID = elements[0]
+    old_COMPETITION_NAME = elements[1]
+    old_TEAM = elements[2]
+    old_DOMAIN_NAME = elements[3]
+    old_SUBNET = elements[4]
+    old_GATEWAY = elements[5]
+    old_DNS_SERVER1 = elements[6]
+    old_NIC = elements[7]
+    old_CREATED_FLAG = elements[8]
+    old_CREATED_FLAG_C = elements[9]
+    old_CREATED_VMS_FLAG = elements[10]
+    old_CONFIGURED_VMS_FLAG = elements[11]
+    raw_competitions_team_edit(old_COMPETITION_NAME,
+                               TEAM,
+                               DOMAIN_NAME,
+                               SUBNET,
+                               GATEWAY,
+                               DNS_SERVER1,
+                               old_NIC,
+                               CREATED_FLAG,
+                               CREATED_FLAG_C,
+                               CREATED_VMS_FLAG,
+                               CONFIGURED_VMS_FLAG,
+                               old_ID)
+
+
+
+def raw_competitions_team_add(COMPETITION_NAME,
+                              TEAM,
+                              DOMAIN_NAME,
+                              SUBNET,
+                              GATEWAY,
+                              DNS_SERVER1,
+                              NIC,
+                              CREATED_FLAG = "0",
+                              CREATED_FLAG_C = "0" ,
+                              CREATED_VMS_FLAG = "0",
+                              CONFIGURED_VMS_FLAG = "0"):
+    """
+
+    :param COMPETITION_NAME:
+    :param TEAM:
+    :param DOMAIN_NAME:
+    :param SUBNET:
+    :param GATEWAY:
+    :param DNS_SERVER1:
+    :param NIC:
+    :param CREATED_FLAG:
+    :param CREATED_FLAG_C:
+    :param CREATED_VMS_FLAG:
+    :param CONFIGURED_VMS_FLAG:
+    :return:
+
+    MYSQL:
+    ID INTEGER NOT NULL AUTO_INCREMENT,
+	COMPETITION_NAME VARCHAR(50) NOT NULL,  -- A unique name
+	TEAM VARCHAR(50) NOT NULL,
+	DOMAIN_NAME VARCHAR(50) NOT NULL,
+	SUBNET VARCHAR(50) NOT NULL,
+	GATEWAY VARCHAR(50) NOT NULL,
+	DNS_SERVER1 VARCHAR(50) NOT NULL,
+	NIC VARCHAR(50) NOT NULL,
+	CREATED_FLAG INTEGER NOT NULL,
+	CREATED_FLAG_C INTEGER NOT NULL,
+	CREATED_VMS_FLAG INTEGER NOT NULL, -- I don't need it anymore
+	CONFIGURED_VMS_FLAG INTEGER NOT NULL,
+    """
+    q = "INSERT INTO teams(" \
+        "COMPETITION_NAME," \
+        " TEAM," \
+        " DOMAIN_NAME," \
+        " SUBNET," \
+        " GATEWAY," \
+        " DNS_SERVER1," \
+        " NIC," \
+        " CREATED_FLAG," \
+        " CREATED_FLAG_C," \
+        " CREATED_VMS_FLAG," \
+        " CONFIGURED_VMS_FLAG) VALUES ('{}', '{}','{}','{}', '{}', '{}', '{}','{}','{}','{}','{}')" \
+        .format(COMPETITION_NAME,
+                TEAM,
+                DOMAIN_NAME,
+                SUBNET,
+                GATEWAY,
+                DNS_SERVER1,
+                NIC,
+                CREATED_FLAG,
+                CREATED_FLAG_C,
+                CREATED_VMS_FLAG,
+                CONFIGURED_VMS_FLAG)
+    mysqlExecute(q)
+    if debug:
+        print("A team has been created: "+str(TEAM), file=sys.stderr)
+    addEvent(session['username'], "Team addition", TEAM+" has been added to competition "+COMPETITION_NAME)
+
+
+
+
+
+
+def get_competition_data(COMPETITION_NAME):
+    data = {}
+    teams = get_competition_teams(COMPETITION_NAME)
+    for TEAM in teams:
+        vms = get_team_vms(TEAM)
+        data[TEAM] = vms
+        if debug:
+            print("Team :"+str(TEAM)+" has "+str(vms), file=sys.stderr)
+    return data
+
+
+
+def get_competition_teams(COMPETITION_NAME):
+    teams = mysqlExecuteAll("select TEAM from teams where COMPETITION_NAME = '{}'".format(COMPETITION_NAME))
+    teams = cleanSQLOutputs(teams)
+    return teams
+
+
+def get_team_vms(TEAM):
+    vms = mysqlExecuteAll("select VM_NAME from vms where TEAM = '{}'".format(TEAM))
+    vms = cleanSQLOutputs(vms)
+    return vms
+
+
+def has_configured_vms(TEAM):
+    boo = mysqlExecuteAll("select CONFIGURED_VMS_FLAG from teams where TEAM = '{}'".format(TEAM))
+    boo = cleanSQLOutputs(boo)
+    if boo == '1' or int(boo) == 1:
+        return True
+    return False
+
+"""
+mysql> select * from teams where TEAM = 'co110';
++----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
+| ID | COMPETITION_NAME | TEAM  | DOMAIN_NAME | SUBNET      | GATEWAY    | DNS_SERVER1 | NIC   | CREATED_FLAG | CREATED_FLAG_C |
++----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
+|  1 | co11             | co110 | co110.com   | 10.1.1.0/24 | 10.1.1.254 | 1.1.1.1     | go100 |            0 |              0 |
++----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
+"""
+def get_all_elements_team(COMPETITION_NAME, TEAM):
+    elements = mysqlExecuteAll("select * from teams where TEAM = '{}' and COMPETITION_NAME = '{}'".format(TEAM, COMPETITION_NAME))
+    elements = cleanSQLOutputs(elements)
+    return elements
+
+def get_all_elements_team2(COMPETITION_NAME, TEAM):
+    elements = mysqlExecuteAll("select * from teams where TEAM = '{}' and COMPETITION_NAME = '{}'".format(TEAM, COMPETITION_NAME))
+    elements = cleanSQLOutputs(elements)
+    return elements
+
+
+def get_all_teams_by_competition_name(COMPETITION_NAME):
+    elements = mysqlExecuteAll("select * from teams where COMPETITION_NAME = '{}'".format(COMPETITION_NAME))
+    #elements = cleanSQLOutputs(elements)
+    return elements
+
+
+def get_all_vms_by_competition_name(COMPETITION_NAME):
+    elements = mysqlExecuteAll("select * from wizard_vms where COMPETITION_NAME = '{}'".format(COMPETITION_NAME))
+    #elements = cleanSQLOutputs(elements)
+    return elements
+
+
+def get_all_elements_team_ordered(COMPETITION_NAME, TEAM):
+    """
+    This function needs to be updated if MYSQL table changed
+    TAG: Table-dependent
+
+    Usage:
+    ID, COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG = get_all_elements_team_ordered(TEAM)
+
+    :return:
+    """
+    all_elements = get_all_elements_team(COMPETITION_NAME, TEAM)
+    ID = all_elements[0]
+    COMPETITION_NAME = all_elements[1]
+    TEAM = all_elements[2]
+    DOMAIN_NAME = all_elements[3]
+    SUBNET = all_elements[4]
+    GATEWAY = all_elements[5]
+    DNS_SERVER1 = all_elements[6]
+    NIC = all_elements[7]
+    CREATED_FLAG = all_elements[8]
+    CREATED_FLAG_C = all_elements[9]
+    CREATED_VMS_FLAG = all_elements[10]
+    CONFIGURED_VMS_FLAG = all_elements[11]
+    return ID, COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG
+
+
+
+
+def get_all_elements_comp(COMPETITION_NAME):
+    """
+
+    :param COMPETITION_NAME:
+    :return:
+    :example of what it can return:
+    Two teams, 0 created teams, 2 win vms, 2 linux vms, total vms, ...etc.
+    returning :['comp2', '2', '0', '2', '2', '4', '0', '0']
+    """
+    elements = mysqlExecute("select * from competitions where UNAME = '{}'".format(COMPETITION_NAME))
+    elements = cleanSQLOutputs(elements)
+    return elements
+
+
+def get_all_elements_comp2(COMPETITION_NAME):
+    """
+
+    :param COMPETITION_NAME:
+    :return:
+    :example of what it can return:
+    Two teams, 0 created teams, 2 win vms, 2 linux vms, total vms, ...etc.
+    returning :['comp2', '2', '0', '2', '2', '4', '0', '0']
+    """
+    elements = mysqlExecute("select * from competitions where UNAME = '{}'".format(COMPETITION_NAME))
+    return elements
+
+
+
+
+def update_CONFIGURED_VMS_FLAG(TEAM):
+    """
+    This function updates "CONFIGURED_VMS_FLAG" in the mysql database for a "TEAM"
+    It also adds/logs an event.
+
+
+    TODO - Needs more testing
+
+    :param TEAM:
+    :return:
+    """
+    CONFIGURED_VMS_FLAG = mysqlExecute("select CONFIGURED_VMS_FLAG from teams where TEAM = '{}'".format(TEAM))
+    CONFIGURED_VMS_FLAG = cleanSQLOutputs(CONFIGURED_VMS_FLAG)
+    CONFIGURED_VMS_FLAG = (int(CONFIGURED_VMS_FLAG) + 1)
+    CONFIGURED_VMS_FLAG = str(CONFIGURED_VMS_FLAG)
+    mysqlExecute("UPDATE teams SET CONFIGURED_VMS_FLAG= '{}' WHERE TEAM = '{}'"
+                 .format(CONFIGURED_VMS_FLAG,TEAM))
+    addEvent(session['username'], "CONFIGURED_VMS_FLAG has been updated for team ("+TEAM+")")
+
+
+
+def update_CREATED_VMS_FLAG_comp_team(COMPETITION_NAME,TEAM):
+    """
+    This function updates "CREATED_VMS_FLAG" in the mysql database for a "TEAM"
+    It also adds/logs an event.
+
+
+    :param TEAM:
+    :return:
+    """
+    CREATED_VMS_FLAG = mysqlExecute("select CREATED_VMS_FLAG from teams where TEAM = '{}' and COMPETITION_NAME = '{}'".format(TEAM,COMPETITION_NAME))
+    CREATED_VMS_FLAG = CREATED_VMS_FLAG.replace("(","").replace(")","").replace(",","")
+    CREATED_VMS_FLAG = (int(str(CREATED_VMS_FLAG)) + 1)
+    CREATED_VMS_FLAG = str(CREATED_VMS_FLAG)
+    mysqlExecute("UPDATE teams SET CREATED_VMS_FLAG= '{}' WHERE TEAM = '{}'"
+                 .format(CREATED_VMS_FLAG,TEAM))
+    addEvent(session['username'], "CREATED_VMS_FLAG has been updated for team ("+TEAM+")")
+
+
+
+
+def update_CREATED_TEAMS_comp(COMPETITION_NAME):
+    """
+    This function updates "CREATED_TEAMS" in the mysql database for a "COMPETITION_NAME"
+    It also adds/logs an event.
+
+
+    :param COMPETITION_NAME:
+    :return:
+    """
+    CREATED_TEAMS = mysqlExecute("select CREATED_TEAMS from competitions where UNAME = '{}'".format(COMPETITION_NAME))
+    CREATED_TEAMS = CREATED_TEAMS.replace("(","").replace(")","").replace(",","")
+    CREATED_TEAMS = (int(str(CREATED_TEAMS)) + 1)
+    CREATED_TEAMS = str(CREATED_TEAMS)
+    mysqlExecute("UPDATE competitions SET CREATED_TEAMS= '{}' WHERE UNAME = '{}'"
+                 .format(CREATED_TEAMS,COMPETITION_NAME))
+    addEvent(session['username'], "CREATED_TEAMS has been updated for competition ("+COMPETITION_NAME+")")
+
+
+
+def update_TOTAL_CREATED_VMS_comp(COMPETITION_NAME):
+    """
+    This function updates "TOTAL_CREATED_VMS" in the mysql database for a "COMPETITION_NAME"
+    It also adds/logs an event.
+
+
+    :param COMPETITION_NAME:
+    :return:
+    """
+    TOTAL_CREATED_VMS = mysqlExecute("select TOTAL_CREATED_VMS from competitions where UNAME = '{}'".format(COMPETITION_NAME))
+    TOTAL_CREATED_VMS = TOTAL_CREATED_VMS.replace("(","").replace(")","").replace(",","")
+    TOTAL_CREATED_VMS = (int(str(TOTAL_CREATED_VMS)) + 1)
+    TOTAL_CREATED_VMS = str(TOTAL_CREATED_VMS)
+    mysqlExecute("UPDATE competitions SET TOTAL_CREATED_VMS= '{}' WHERE UNAME = '{}'"
+                 .format(TOTAL_CREATED_VMS,COMPETITION_NAME))
+    addEvent(session['username'], "TOTAL_CREATED_VMS has been updated for competition ("+COMPETITION_NAME+")")
+
+
+
+
+def next_unedited_vm(COMPETITION_NAME):
+    """
+    Database schema sensitive --> Which means this will break if you change he database structure for "competitions" table.
+    :param COMPETITION_NAME:
+    :return:
+    """
+    if debug:
+        debugMessage("Executing next_unedited_vm()")
+    teams = get_all_teams_by_competition_name(COMPETITION_NAME)
+    return teams
+
+
+
+def get_vms_comp(COMPETITION_NAME):
+    """
+    This function needs to be updated if MYSQL table changed
+    TAG: Table-dependent
+
+    :param COMPETITION_NAME:
+    :return:
+    """
+    elements = get_all_elements_comp(COMPETITION_NAME)
+    WIN_VMS = elements[4]
+    UNIX_VMS = elements[5]
+    TOTAL_VMS = elements[6]
+    TOTAL_CREATED_VMS = elements[7]
+    return WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS
+
+
+
+
+def get_next_team_to_configure(COMPETITION_NAME):
+    """
+    This function needs to be updated if MYSQL table changed
+    TAG: Table-dependent
+
+    :param COMPETITION_NAME:
+    :return:
+    """
+    teams = get_competition_teams(COMPETITION_NAME)
+    for team in teams:
+        # If any team hasn't finished configuring its VMs
+        if has_configured_vms(team):
+            """
+            +----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
+            | ID | COMPETITION_NAME | TEAM  | DOMAIN_NAME | SUBNET      | GATEWAY    | DNS_SERVER1 | NIC   | CREATED_FLAG | CREATED_FLAG_C |
+            +----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
+            |  1 | co11             | co110 | co110.com   | 10.1.1.0/24 | 10.1.1.254 | 1.1.1.1     | go100 |            0 |              0 |
+            +----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
+            """
+            elements = get_all_elements_team(COMPETITION_NAME, team)
+            COMPETITION_NAME = elements[1]
+            TEAM = elements[2]
+            CREATED_TEAMS = elements[3]
+            DOMAIN_NAME = elements[4]
+            SUBNET = elements[5]
+            GATEWAY = elements[6]
+            DNS_SERVER1 = elements[7]
+            NIC = elements[8]
+            return COMPETITION_NAME, TEAM, CREATED_TEAMS, DOMAIN_NAME, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, DNS_SERVER1, NIC
+    return None, None, None, None, None, None, None, None, None, None
+
+
+
+
+def get_all_undeployed_vms_by_competition_name(COMPETITION_NAME):
+    elements = mysqlExecuteAll("select * from wizard_vms where COMPETITION_NAME = '{}'".format(COMPETITION_NAME))
+    #elements = cleanSQLOutputs(elements)
+    return elements
+
+
+
+def cleanSQLOutputs(outputs):
+    """
+    Takes a string
+    returns a list of elements
+    :param outputs:
+    :return:
+    """
+    outputs = str(outputs)
+    return [s.replace('(','').replace(')','').replace('\'','').strip() for s in outputs.split(',') if (len(str(s)) > 1)]
+
+
+
+
+
+
 
 
 
@@ -796,6 +1334,29 @@ def raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_
 
 
 
+def raw_competitions_wizard_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C):
+    mysqlExecute("INSERT INTO wizard_vms(COMPETITION_NAME,"
+                 " TEAM,"
+                 " VM_NAME,"
+                 " CPU,"
+                 " MEMORY,"
+                 " GUEST_OS_TYPE,"
+                 " CREATED_FLAG,"
+                 " CREATED_FLAG_C) VALUES ('{}', '{}', '{}', '{}','{}', '{}', '{}', '{}')"
+                 .format(COMPETITION_NAME,
+                         TEAM,
+                         VM_NAME,
+                         CPU,
+                         MEMORY,
+                         GUEST_OS_TYPE,
+                         CREATED_FLAG,
+                         CREATED_FLAG_C))
+    if debug:
+        debugMessage("A generic vm has been created "+str(VM_NAME)+" raw_competitions_vm_add() ")
+    addEvent(session['username'], "Generic VM addition",VM_NAME+" VM has been created for competition "+COMPETITION_NAME+" read to be deployed")
+
+
+
 
 @app.route("/competitions_vm_add", methods=['GET','POST'])
 def competitions_vm_add():
@@ -867,18 +1428,47 @@ def competitions_vm_add():
                         debugMessage(error_message)
                     return render_template('error.html', message= error_message ,url = url_for('competitions_team'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
 
+                if debug:
+                    debugMessage("Getting tobedeployed on competitions_vm_add()")
+                tobedeployed = pymysql.escape_string(request.values.get('tobedeployed'))
+                if GUEST_OS_TYPE == None:
+                    if debug:
+                        error_message = "Missing tobedeployed"
+                        debugMessage(error_message)
+                    return render_template('error.html', message=error_message, url=url_for('competitions_team'),
+                                           templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+
                 CREATED_FLAG = CREATED_FLAG_C = "0"
 
 
+
                 try:
-                    # Create a vm and make an event
-                    raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG,
-                                            CREATED_FLAG_C)
+                    # If coming from the wizard
+                    if (tobedeployed == "1"):
+                        try:
+                            # Create a vm and make an event
+                            raw_competitions_wizard_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG,
+                                                    CREATED_FLAG_C)
+                        except Exception as ex:
+                            if debug:
+                                debugMessage("Error: "+str(ex))
+                                debugMessage("Error #8224344352323")
+                    else:
+                    # If this is just a normal VM creation.
+                        try:
+                            # Create a vm and make an event
+                            raw_competitions_vm_add(COMPETITION_NAME, TEAM, VM_NAME, CPU, MEMORY, GUEST_OS_TYPE, CREATED_FLAG,
+                                                    CREATED_FLAG_C)
+                        except Exception as ex:
+                            if debug:
+                                debugMessage("Error: "+str(ex))
+                                debugMessage("Error #84532323223233")
+
+
                 except Exception as ex:
                     if debug:
                         debugMessage("Error: "+str(ex))
-                        debugMessage("Error #893278923")
-
+                        debugMessage("Error #782337823")
 
                 try:
                     # Update a comp object
@@ -925,7 +1515,11 @@ def competitions_vm_add():
                     debugMessage("competitions_vm_add again")
                     return render_template('competitions_vm_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength(), COMPETITION_NAME=COMPETITION_NAME, vmtype=vmtype)
                 else:
-                    return render_template('done.html', username = session['username'], url = url_for('competitions_vm'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+                    """
+                    At this point we should be done creating VMs for a comp not for a team.
+                    """
+                    competitions_wizard_summary_function(COMPETITION_NAME)
+                    #return render_template('done.html', username = session['username'], url = url_for('competitions_vm'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
             except Exception as ex:
                 if debug:
                     debugMessage("Error: "+str(ex))
@@ -1185,7 +1779,7 @@ def competitions_wizard():
                         debugMessage(str(i)+"- "+str(team))
 
                     if int(TOTAL_VMS) > int(TOTAL_CREATED_VMS):
-                        if int(UNIX_VMS) >= int(TOTAL_CREATED_VMS):
+                        if int(UNIX_VMS) > int(TOTAL_CREATED_VMS):
                             # Stop creating UNIX VMs
                             vmtype = "Unix VM"
                         else:
@@ -1212,212 +1806,94 @@ def competitions_wizard():
     return root()
 
 
+def competitions_wizard_summary_function(COMPETITION_NAME):
+    if len(COMPETITION_NAME) < 1:
+        if debug:
+            error_message = "Missing COMPETITION_NAME in competitions_wizard_summary_function()"
+            debugMessage(error_message)
+        return render_template('error.html', message=error_message, url=url_for('competitions_team'),
+                               templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+    TEAMS = get_all_teams_by_competition_name(COMPETITION_NAME)
+    VMS = get_all_undeployed_vms_by_competition_name(COMPETITION_NAME)
+    return render_template("wizard.html", username=session['username'], step="READY", COMPETITION_NAME=COMPETITION_NAME, TEAMS=TEAMS, VMS=VMS)
 
 
-@app.route("/competition_summary", methods=['GET'])
-def competition_summary():
-    return render_template('competition_summary.html',competition_data = get_competition_data("co1"))
+
+@app.route("/competitions_wizard_summary", methods=['GET', 'POST'])
+def competitions_wizard_summary():
+    if 'username' in session:
+        # Note that we are not calling this function plain "random()" because random
+        # is the name of a package we imported.
+        # Step 1, Create a comp
+
+        if "step" not in request.form:
+            """
+            Doesn't take anything
+            Sends a page where users can send the application back a new comp data.
+            """
+            debugMessage("Redirect #91243432233")
+            return render_template("wizard.html")
+        elif request.form["step"] == "READY":
+            try:
+                pass
+            except Exception as e:
+                if debug:
+                    debugMessage(e)
+                    debugMessage("NOTE: We don't need to config a tame ")
+                    debugMessage("Block #19823243237823")
+                pass
+    debugMessage("No session competitions_wizard_summary()")
+    debugMessage("Redirect #81324324377654613")
+    return root()
 
 
-
-
-
-
-
-
-def raw_competitions_add(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C):
+def from_MySQL_table_to_pyObject_Competition(pyCompOb, COMPETITION_NAME):
     """
+    convert a Mysql row to a pyObject for Competition.
 
-    :param UNAME:
-    :param TEAMS:
-    :param CREATED_TEAMS:
-    :param WIN_VMS:
-    :param UNIX_VMS:
-    :param TOTAL_VMS:
-    :param TOTAL_CREATED_VMS:
-    :param CREATED_FLAG:
-    :param CREATED_FLAG_C:
-    :return:
+    :param pyCompOb: a Competition object from pyCompetitionObject
+    :param COMPETITION_NAME: a string - the name of the comp in the database.
+    :return: the same object "pyCompObject"
     """
-    mysqlExecute("INSERT INTO competitions("
-                 "UNAME, "
-                 "TEAMS, "
-                 "CREATED_TEAMS, " \
-                 "WIN_VMS, "
-                 "UNIX_VMS, "
-                 "TOTAL_VMS, "
-                 "TOTAL_CREATED_VMS, "
-                 "CREATED_FLAG, "
-                 "CREATED_FLAG_C) VALUES ('{}' , '{}', '{}' , '{}', '{}', '{}', '{}', '{}', '{}')"
-                 .format(
-                    UNAME,
-                    TEAMS,
-                    CREATED_TEAMS,
-                    WIN_VMS,
-                    UNIX_VMS,
-                    TOTAL_VMS,
-                    TOTAL_CREATED_VMS,
-                    CREATED_FLAG,
-                    CREATED_FLAG_C))
-    addEvent(session['username'], "Competition addition", UNAME+" competition has been created with "+TEAMS+" teams")
-
-
-
-
-
-def raw_competitions_edit(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, ID):
+    comp_sql_elements = get_all_elements_comp2(COMPETITION_NAME)
     """
-
-    :param UNAME:
-    :param TEAMS:
-    :param CREATED_TEAMS:
-    :param WIN_VMS:
-    :param UNIX_VMS:
-    :param TOTAL_VMS:
-    :param TOTAL_CREATED_VMS:
-    :param ID:
-    :return:
+    Current table structure
+    ID INTEGER NOT NULL AUTO_INCREMENT,
+    UNAME VARCHAR(50) NOT NULL,  -- HAS TO BE A unique names
+    TEAMS INTEGER NOT NULL,
+    CREATED_TEAMS INTEGER NOT NULL,
+    WIN_VMS INTEGER NOT NULL,
+    UNIX_VMS INTEGER NOT NULL,
+    TOTAL_VMS INTEGER NOT NULL,
+    TOTAL_CREATED_VMS INTEGER NOT NULL,
+    CREATED_FLAG INTEGER NOT NULL,
+    CREATED_FLAG_C INTEGER NOT NULL,
     """
-    mysqlExecute("UPDATE competitions SET "
-                 " UNAME = '{}',"
-                 " TEAMS= '{}',"
-                 " CREATED_TEAMS= '{}',"
-                 " WIN_VMS= '{}',"
-                 " UNIX_VMS= '{}',"
-                 " TOTAL_VMS= '{},'"
-                 " TOTAL_CREATED_VMS= '{}'"
-                 " WHERE ID = '{}'"
-                 .format(UNAME,
-                         TEAMS,
-                         CREATED_TEAMS,
-                         WIN_VMS,
-                         UNIX_VMS,
-                         TOTAL_VMS,
-                         TOTAL_CREATED_VMS,
-                         ID))
-    addEvent(session['username'], "Competition modification", UNAME+" competition has been modified")
+    COMPETITION_ID = comp_sql_elements[0]
+    TEAMS = comp_sql_elements[1]
+    CREATED_TEAMS = comp_sql_elements[2]
+    WIN_VMS = comp_sql_elements[3]
+    UNIX_VMS = comp_sql_elements[4]
+    TOTAL_VMS = comp_sql_elements[5]
+    TOTAL_CREATED_VMS = comp_sql_elements[6]
+    CREATED_FLAG = comp_sql_elements[7]
+    CREATED_FLAG_C = comp_sql_elements[8]
+    # This is an int
+    pyCompOb.set_Competition_Teams(TEAMS)
+    # This is an int
+    pyCompOb.set_Total_VMs(TOTAL_VMS)
+    # This is an int
+    pyCompOb.set_Unix_VMs(UNIX_VMS)
+    # This is an int
+    pyCompOb.set_Win_VMs(WIN_VMS)
+
+    return pyCompOb
 
 
+def from_MySQL_table_to_pyObject_Team(Competition_Uname, Team_Uname, pyTeamOb):
+    team_sql_elements = get_all_elements_team2(Competition_Uname, Team_Uname)
 
-
-def safe_competitions_team_edit_by_name(COMPETITION_NAME,
-                                        TEAM,
-                                        DOMAIN_NAME,
-                                        SUBNET,
-                                        GATEWAY,
-                                        DNS_SERVER1,
-                                        NIC,
-                                        CREATED_FLAG,
-                                        CREATED_FLAG_C,
-                                        CREATED_VMS_FLAG,
-                                        CONFIGURED_VMS_FLAG):
     """
-    This function never changes COMPETITION_NAME and TEAM.
-    :param COMPETITION_NAME:
-    :param TEAM:
-    :param DOMAIN_NAME:
-    :param SUBNET:
-    :param GATEWAY:
-    :param DNS_SERVER1:
-    :param NIC:
-    :param CREATED_FLAG:
-    :param CREATED_FLAG_C:
-    :param CREATED_VMS_FLAG:
-    :param CONFIGURED_VMS_FLAG:
-    :return:
-    """
-    q = "UPDATE teams SET " \
-        "DOMAIN_NAME= '{}'," \
-        "SUBNET= '{}'," \
-        "GATEWAY= '{}'," \
-        "DNS_SERVER1= '{}'," \
-        "NIC= '{}'," \
-        "CREATED_FLAG = '{}'," \
-        "CREATED_FLAG_C = '{}'," \
-        "CREATED_VMS_FLAG = '{}'," \
-        "CONFIGURED_VMS_FLAG = '{}' WHERE TEAM = '{}' and COMPETITION_NAME = '{}'".format(
-                                                            DOMAIN_NAME,
-                                                            SUBNET,
-                                                            GATEWAY,
-                                                            DNS_SERVER1,
-                                                            NIC,
-                                                            CREATED_FLAG,
-                                                            CREATED_FLAG_C,
-                                                            CREATED_VMS_FLAG,
-                                                            CONFIGURED_VMS_FLAG,
-                                                            TEAM,
-                                                            COMPETITION_NAME)
-    if debug:
-        print("UPDATING "+q, file=sys.stderr)
-    mysqlExecute(q)
-    addEvent(session['username'], "Team modification", TEAM+" from competition "+COMPETITION_NAME+" has been updated")
-
-
-def safe_competitions_team_edit(COMPETITION_NAME,TEAM,
-                               DOMAIN_NAME,
-                               SUBNET,
-                               GATEWAY,
-                               DNS_SERVER1,
-                               CREATED_FLAG,
-                               CREATED_FLAG_C,
-                               CREATED_VMS_FLAG,
-                               CONFIGURED_VMS_FLAG):
-
-    elements = get_all_elements_team(TEAM,COMPETITION_NAME)
-    old_ID = elements[0]
-    old_COMPETITION_NAME = elements[1]
-    old_TEAM = elements[2]
-    old_DOMAIN_NAME = elements[3]
-    old_SUBNET = elements[4]
-    old_GATEWAY = elements[5]
-    old_DNS_SERVER1 = elements[6]
-    old_NIC = elements[7]
-    old_CREATED_FLAG = elements[8]
-    old_CREATED_FLAG_C = elements[9]
-    old_CREATED_VMS_FLAG = elements[10]
-    old_CONFIGURED_VMS_FLAG = elements[11]
-    raw_competitions_team_edit(old_COMPETITION_NAME,
-                               TEAM,
-                               DOMAIN_NAME,
-                               SUBNET,
-                               GATEWAY,
-                               DNS_SERVER1,
-                               old_NIC,
-                               CREATED_FLAG,
-                               CREATED_FLAG_C,
-                               CREATED_VMS_FLAG,
-                               CONFIGURED_VMS_FLAG,
-                               old_ID)
-
-
-
-def raw_competitions_team_add(COMPETITION_NAME,
-                              TEAM,
-                              DOMAIN_NAME,
-                              SUBNET,
-                              GATEWAY,
-                              DNS_SERVER1,
-                              NIC,
-                              CREATED_FLAG = "0",
-                              CREATED_FLAG_C = "0" ,
-                              CREATED_VMS_FLAG = "0",
-                              CONFIGURED_VMS_FLAG = "0"):
-    """
-
-    :param COMPETITION_NAME:
-    :param TEAM:
-    :param DOMAIN_NAME:
-    :param SUBNET:
-    :param GATEWAY:
-    :param DNS_SERVER1:
-    :param NIC:
-    :param CREATED_FLAG:
-    :param CREATED_FLAG_C:
-    :param CREATED_VMS_FLAG:
-    :param CONFIGURED_VMS_FLAG:
-    :return:
-
-    MYSQL:
     ID INTEGER NOT NULL AUTO_INCREMENT,
 	COMPETITION_NAME VARCHAR(50) NOT NULL,  -- A unique name
 	TEAM VARCHAR(50) NOT NULL,
@@ -1427,302 +1903,187 @@ def raw_competitions_team_add(COMPETITION_NAME,
 	DNS_SERVER1 VARCHAR(50) NOT NULL,
 	NIC VARCHAR(50) NOT NULL,
 	CREATED_FLAG INTEGER NOT NULL,
-	CREATED_FLAG_C INTEGER NOT NULL,
+	CREATED_FLAG_C INTEGER NOT NULL, -- Created/Edited flag
 	CREATED_VMS_FLAG INTEGER NOT NULL, -- I don't need it anymore
-	CONFIGURED_VMS_FLAG INTEGER NOT NULL,
-    """
-    q = "INSERT INTO teams(" \
-        "COMPETITION_NAME," \
-        " TEAM," \
-        " DOMAIN_NAME," \
-        " SUBNET," \
-        " GATEWAY," \
-        " DNS_SERVER1," \
-        " NIC," \
-        " CREATED_FLAG," \
-        " CREATED_FLAG_C," \
-        " CREATED_VMS_FLAG," \
-        " CONFIGURED_VMS_FLAG) VALUES ('{}', '{}','{}','{}', '{}', '{}', '{}','{}','{}','{}','{}')" \
-        .format(COMPETITION_NAME,
-                TEAM,
-                DOMAIN_NAME,
-                SUBNET,
-                GATEWAY,
-                DNS_SERVER1,
-                NIC,
-                CREATED_FLAG,
-                CREATED_FLAG_C,
-                CREATED_VMS_FLAG,
-                CONFIGURED_VMS_FLAG)
-    mysqlExecute(q)
-    if debug:
-        print("A team has been created: "+str(TEAM), file=sys.stderr)
-    addEvent(session['username'], "Team addition", TEAM+" has been added to competition "+COMPETITION_NAME)
-
-
-
-
-
-
-def get_competition_data(COMPETITION_NAME):
-    data = {}
-    teams = get_competition_teams(COMPETITION_NAME)
-    for TEAM in teams:
-        vms = get_team_vms(TEAM)
-        data[TEAM] = vms
-        if debug:
-            print("Team :"+str(TEAM)+" has "+str(vms), file=sys.stderr)
-    return data
-
-
-
-def get_competition_teams(COMPETITION_NAME):
-    teams = mysqlExecuteAll("select TEAM from teams where COMPETITION_NAME = '{}'".format(COMPETITION_NAME))
-    teams = cleanSQLOutputs(teams)
-    return teams
-
-
-def get_team_vms(TEAM):
-    vms = mysqlExecuteAll("select VM_NAME from vms where TEAM = '{}'".format(TEAM))
-    vms = cleanSQLOutputs(vms)
-    return vms
-
-
-def has_configured_vms(TEAM):
-    boo = mysqlExecuteAll("select CONFIGURED_VMS_FLAG from teams where TEAM = '{}'".format(TEAM))
-    boo = cleanSQLOutputs(boo)
-    if boo == '1' or int(boo) == 1:
-        return True
-    return False
-
-"""
-mysql> select * from teams where TEAM = 'co110';
-+----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
-| ID | COMPETITION_NAME | TEAM  | DOMAIN_NAME | SUBNET      | GATEWAY    | DNS_SERVER1 | NIC   | CREATED_FLAG | CREATED_FLAG_C |
-+----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
-|  1 | co11             | co110 | co110.com   | 10.1.1.0/24 | 10.1.1.254 | 1.1.1.1     | go100 |            0 |              0 |
-+----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
-"""
-def get_all_elements_team(COMPETITION_NAME, TEAM):
-    elements = mysqlExecuteAll("select * from teams where TEAM = '{}' and COMPETITION_NAME = '{}'".format(TEAM, COMPETITION_NAME))
-    elements = cleanSQLOutputs(elements)
-    return elements
-
-
-def get_all_teams_by_competition_name(COMPETITION_NAME):
-    elements = mysqlExecuteAll("select * from teams where COMPETITION_NAME = '{}'".format(COMPETITION_NAME))
-    #elements = cleanSQLOutputs(elements)
-    return elements
-
-
-
-def get_all_elements_team_ordered(COMPETITION_NAME, TEAM):
-    """
-    This function needs to be updated if MYSQL table changed
-    TAG: Table-dependent
-
-    Usage:
-    ID, COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG = get_all_elements_team_ordered(TEAM)
-
-    :return:
-    """
-    all_elements = get_all_elements_team(COMPETITION_NAME, TEAM)
-    ID = all_elements[0]
-    COMPETITION_NAME = all_elements[1]
-    TEAM = all_elements[2]
-    DOMAIN_NAME = all_elements[3]
-    SUBNET = all_elements[4]
-    GATEWAY = all_elements[5]
-    DNS_SERVER1 = all_elements[6]
-    NIC = all_elements[7]
-    CREATED_FLAG = all_elements[8]
-    CREATED_FLAG_C = all_elements[9]
-    CREATED_VMS_FLAG = all_elements[10]
-    CONFIGURED_VMS_FLAG = all_elements[11]
-    return ID, COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG
-
-
-
-
-def get_all_elements_comp(COMPETITION_NAME):
+	CONFIGURED_VMS_FLAG INTEGER NOT NULL, --
+	CONSTRAINT users_pk PRIMARY KEY(ID)
     """
 
-    :param COMPETITION_NAME:
-    :return:
-    :example of what it can return:
-    Two teams, 0 created teams, 2 win vms, 2 linux vms, total vms, ...etc.
-    returning :['comp2', '2', '0', '2', '2', '4', '0', '0']
+    TEAM_ID = team_sql_elements[0]
+    COMPETITION_NAME = team_sql_elements[1]
+    TEAM_NAME = team_sql_elements[2]
+    DOMAIN_NAME = team_sql_elements[3]
+    SUBNET = team_sql_elements[4]
+    GATEWAY = team_sql_elements[5]
+    DNS_SERVER1 = team_sql_elements[6]
+    NIC = team_sql_elements[7]
+    CREATED_FLAG = team_sql_elements[8]
+    CREATED_FLAG_C = team_sql_elements[9]
+    CREATED_VMS_FLAG = team_sql_elements[10]
+    CONFIGURED_VMS_FLAG = team_sql_elements[11]
+    # Set
+    pyTeamOb.set_Competition_Uname(COMPETITION_NAME)
+    pyTeamOb.set_Team_ID(TEAM_ID)
+    pyTeamOb.set_Team_Uname(TEAM_NAME)
+    pyTeamOb.set_DNS1(DNS_SERVER1)
+    pyTeamOb.set_Domain_Name(DOMAIN_NAME)
+    pyTeamOb.set_Gateway(GATEWAY)
+    pyTeamOb.set_NICAKA_PortGropu(NIC)
+    pyTeamOb.set_Subnet(SUBNET)
+
+    return pyTeamOb
+
+
+def from_MySQL_table_to_one_pyObject_VM(Competition_Uname, Team_Uname, pyVMOb):
+
+
+
     """
-    elements = mysqlExecute("select * from competitions where UNAME = '{}'".format(COMPETITION_NAME))
-    elements = cleanSQLOutputs(elements)
-    return elements
-
-
-
-def update_CONFIGURED_VMS_FLAG(TEAM):
+	ID INTEGER NOT NULL AUTO_INCREMENT,
+	COMPETITION_NAME VARCHAR(50) NOT NULL,  -- A unique name
+	TEAM VARCHAR(50) NOT NULL,
+	VM_NAME VARCHAR(50) NOT NULL, -- This is "Name" and "Hostname"
+	CPU VARCHAR(50) NOT NULL,
+	MEMORY VARCHAR(50) NOT NULL,
+    GUEST_OS_TYPE VARCHAR(50),
+    CREATED_FLAG INTEGER NOT NULL,
+	CREATED_FLAG_C INTEGER NOT NULL,
     """
-    This function updates "CONFIGURED_VMS_FLAG" in the mysql database for a "TEAM"
-    It also adds/logs an event.
+
+    VM_ID = team_sql_elements[0]
+    COMPETITION_NAME = team_sql_elements[1]
+    TEAM_NAME = team_sql_elements[2]
+    VM_NAME = team_sql_elements[3]
+    CPU = team_sql_elements[4]
+    MEMORY = team_sql_elements[5]
+    GUEST_OS_TYPE = team_sql_elements[6]
+    CREATED_FLAG = team_sql_elements[7]
+    CREATED_FLAG_C = team_sql_elements[8]
+    # Set
+    pyVMOb.set_VM_ID(VM_ID)
+    pyVMOb.set_Team_Uname(TEAM_NAME)
+    pyVMOb.set_VM_Uname(VM_NAME)
+    pyVMOb.set_Competition_Uname(COMPETITION_NAME)
+    pyVMOb.set_CPU(CPU)
+    pyVMOb.set_Memory(MEMORY)
+    # pyVMOb.set_Disk_Space()
+    pyVMOb.set_Guest_Type(GUEST_OS_TYPE)
+
+    return pyVMOb
 
 
-    TODO - Needs more testing
 
-    :param TEAM:
-    :return:
+def from_MySQL_Teams_to_pyObject_Competition(COMPETITION_NAME, pyCompOb):
     """
-    CONFIGURED_VMS_FLAG = mysqlExecute("select CONFIGURED_VMS_FLAG from teams where TEAM = '{}'".format(TEAM))
-    CONFIGURED_VMS_FLAG = cleanSQLOutputs(CONFIGURED_VMS_FLAG)
-    CONFIGURED_VMS_FLAG = (int(CONFIGURED_VMS_FLAG) + 1)
-    CONFIGURED_VMS_FLAG = str(CONFIGURED_VMS_FLAG)
-    mysqlExecute("UPDATE teams SET CONFIGURED_VMS_FLAG= '{}' WHERE TEAM = '{}'"
-                 .format(CONFIGURED_VMS_FLAG,TEAM))
-    addEvent(session['username'], "CONFIGURED_VMS_FLAG has been updated for team ("+TEAM+")")
-
-
-
-def update_CREATED_VMS_FLAG_comp_team(COMPETITION_NAME,TEAM):
-    """
-    This function updates "CREATED_VMS_FLAG" in the mysql database for a "TEAM"
-    It also adds/logs an event.
-
-
-    :param TEAM:
-    :return:
-    """
-    CREATED_VMS_FLAG = mysqlExecute("select CREATED_VMS_FLAG from teams where TEAM = '{}' and COMPETITION_NAME = '{}'".format(TEAM,COMPETITION_NAME))
-    CREATED_VMS_FLAG = CREATED_VMS_FLAG.replace("(","").replace(")","").replace(",","")
-    CREATED_VMS_FLAG = (int(str(CREATED_VMS_FLAG)) + 1)
-    CREATED_VMS_FLAG = str(CREATED_VMS_FLAG)
-    mysqlExecute("UPDATE teams SET CREATED_VMS_FLAG= '{}' WHERE TEAM = '{}'"
-                 .format(CREATED_VMS_FLAG,TEAM))
-    addEvent(session['username'], "CREATED_VMS_FLAG has been updated for team ("+TEAM+")")
-
-
-
-
-def update_CREATED_TEAMS_comp(COMPETITION_NAME):
-    """
-    This function updates "CREATED_TEAMS" in the mysql database for a "COMPETITION_NAME"
-    It also adds/logs an event.
-
+    This function takes a pyCompetitionObject and fills it with data from MySQL.
 
     :param COMPETITION_NAME:
     :return:
     """
-    CREATED_TEAMS = mysqlExecute("select CREATED_TEAMS from competitions where UNAME = '{}'".format(COMPETITION_NAME))
-    CREATED_TEAMS = CREATED_TEAMS.replace("(","").replace(")","").replace(",","")
-    CREATED_TEAMS = (int(str(CREATED_TEAMS)) + 1)
-    CREATED_TEAMS = str(CREATED_TEAMS)
-    mysqlExecute("UPDATE competitions SET CREATED_TEAMS= '{}' WHERE UNAME = '{}'"
-                 .format(CREATED_TEAMS,COMPETITION_NAME))
-    addEvent(session['username'], "CREATED_TEAMS has been updated for competition ("+COMPETITION_NAME+")")
+    listOfTeams = get_all_teams_by_competition_name(COMPETITION_NAME)
+    for team in listOfTeams:
+        # TODO - check if pyCompOb is a pyCompObject
+        team_name = team[2]
+        pyCompOb.add_Team(team_name)
+    return pyCompOb
 
 
-
-def update_TOTAL_CREATED_VMS_comp(COMPETITION_NAME):
+def from_MySQL_wizard_vms_to_pyObject_Teams(COMPETITION_NAME, pyTeamOb):
     """
-    This function updates "TOTAL_CREATED_VMS" in the mysql database for a "COMPETITION_NAME"
-    It also adds/logs an event.
-
+    This function takes a pyCompetitionObject and fills it with data from MySQL.
 
     :param COMPETITION_NAME:
     :return:
     """
-    TOTAL_CREATED_VMS = mysqlExecute("select TOTAL_CREATED_VMS from competitions where UNAME = '{}'".format(COMPETITION_NAME))
-    TOTAL_CREATED_VMS = TOTAL_CREATED_VMS.replace("(","").replace(")","").replace(",","")
-    TOTAL_CREATED_VMS = (int(str(TOTAL_CREATED_VMS)) + 1)
-    TOTAL_CREATED_VMS = str(TOTAL_CREATED_VMS)
-    mysqlExecute("UPDATE competitions SET TOTAL_CREATED_VMS= '{}' WHERE UNAME = '{}'"
-                 .format(TOTAL_CREATED_VMS,COMPETITION_NAME))
-    addEvent(session['username'], "TOTAL_CREATED_VMS has been updated for competition ("+COMPETITION_NAME+")")
+    listOfVMs = get_all_undeployed_vms_by_competition_name(COMPETITION_NAME)
+    listOfTeams = []
+    for vm in listOfVMs:
+        """
+        Each VM looks like this:
+        ID INTEGER NOT NULL AUTO_INCREMENT,
+        COMPETITION_NAME VARCHAR(50) NOT NULL,  -- A unique name
+        TEAM VARCHAR(50) NOT NULL,
+        VM_NAME VARCHAR(50) NOT NULL, -- This is "Name" and "Hostname"
+        CPU VARCHAR(50) NOT NULL,
+        MEMORY VARCHAR(50) NOT NULL,
+        GUEST_OS_TYPE VARCHAR(50),
+        CREATED_FLAG INTEGER NOT NULL,
+        CREATED_FLAG_C INTEGER NOT NULL,
+        """
+        # TODO - check if pyTeamOb is a pyTeamObject
+
+        #pyVMObject.VM(COMPETITION_NAME)
+        VM_ID = vm[0]
+        COMPETITION_NAME = vm[1]
+        TEAM = vm[2]
+        VM_NAME = vm[3]
+        CPU = vm[4]
+        MEMORY = vm[5]
+        GUEST_OS_TYPE = vm[6]
+        CREATED_FLAG = vm[7]
+        CREATED_FLAG_C = vm[8]
+
+        pyTeamOb.add_VM(VM_NAME)
+    return pyTeamOb
 
 
 
 
-def next_unedited_vm(COMPETITION_NAME):
+def create_a_competition(COMPETITION_NAME):
     """
-    Database schema sensitive --> Which means this will break if you change he database structure for "competitions" table.
-    :param COMPETITION_NAME:
-    :return:
-    """
-    if debug:
-        debugMessage("Executing next_unedited_vm()")
-    teams = get_all_teams_by_competition_name(COMPETITION_NAME)
-    return teams
-
-
-
-def get_vms_comp(COMPETITION_NAME):
-    """
-    This function needs to be updated if MYSQL table changed
-    TAG: Table-dependent
-
-    :param COMPETITION_NAME:
-    :return:
-    """
-    elements = get_all_elements_comp(COMPETITION_NAME)
-    WIN_VMS = elements[4]
-    UNIX_VMS = elements[5]
-    TOTAL_VMS = elements[6]
-    TOTAL_CREATED_VMS = elements[7]
-    return WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS
-
-
-
-
-def get_next_team_to_configure(COMPETITION_NAME):
-    """
-    This function needs to be updated if MYSQL table changed
-    TAG: Table-dependent
+    This function gets a COMPETITION_NAME which should be a competition name for an existing object in table "competitions".
+    Using the given name, it will generate .....
 
     :param COMPETITION_NAME:
     :return:
     """
-    teams = get_competition_teams(COMPETITION_NAME)
-    for team in teams:
-        # If any team hasn't finished configuring its VMs
-        if has_configured_vms(team):
-            """
-            +----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
-            | ID | COMPETITION_NAME | TEAM  | DOMAIN_NAME | SUBNET      | GATEWAY    | DNS_SERVER1 | NIC   | CREATED_FLAG | CREATED_FLAG_C |
-            +----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
-            |  1 | co11             | co110 | co110.com   | 10.1.1.0/24 | 10.1.1.254 | 1.1.1.1     | go100 |            0 |              0 |
-            +----+------------------+-------+-------------+-------------+------------+-------------+-------+--------------+----------------+
-            """
-            elements = get_all_elements_team(COMPETITION_NAME, team)
-            COMPETITION_NAME = elements[1]
-            TEAM = elements[2]
-            CREATED_TEAMS = elements[3]
-            DOMAIN_NAME = elements[4]
-            SUBNET = elements[5]
-            GATEWAY = elements[6]
-            DNS_SERVER1 = elements[7]
-            NIC = elements[8]
-            return COMPETITION_NAME, TEAM, CREATED_TEAMS, DOMAIN_NAME, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, DNS_SERVER1, NIC
-    return None, None, None, None, None, None, None, None, None, None
+    pass
+    #TEAMS = get_all_teams_by_competition_name(COMPETITION_NAME)
+    #VMS = get_all_undeployed_vms_by_competition_name(COMPETITION_NAME)
+
+    # Create a python object for the Competition for a better management.
+    comp1 = pyCompetitionObject.Competition(COMPETITION_NAME)
+    # Convert the data from MySQL to this pyCompetitionObject object
+    comp1 = from_MySQL_table_to_pyObject_Competition(comp1, COMPETITION_NAME)
+    # Fill it with data (teams' names) from MySQL
+    # todo FIX this
+    #comp1 = from_MySQL_Teams_to_pyObject_Competition(COMPETITION_NAME, comp1)
+
+    # Get the teams
+    TeamsList = comp1.get_Competition_Teams()
+
+
+    for Team_Uname in TeamsList:
+        # Create a python object for a team for a better management.
+        pyTeamOb = pyTeamObject.Team(COMPETITION_NAME, Team_Uname)
+        # Convert the data from MySQL to this pyTeamObject object
+        pyTeamOb = from_MySQL_table_to_pyObject_Team(COMPETITION_NAME, Team_Uname, pyTeamOb)
+        # Fill it with data (vms' names) from MySQL
+        pyTeamOb = from_MySQL_wizard_vms_to_pyObject_Teams(COMPETITION_NAME, pyTeamOb)
+
+        all_undeployed_vms = pyTeamOb.get_VMs()
+
+
+        comp1.add_Team(pyTeamOb)
 
 
 
 
 
-def cleanSQLOutputs(outputs):
-    """
-    Takes a string
-    returns a list of elements
-    :param outputs:
-    :return:
-    """
-    outputs = str(outputs)
-    return [s.replace('(','').replace(')','').replace('\'','').strip() for s in outputs.split(',') if (len(str(s)) > 1)]
+
+
+@app.route("/competition_summary", methods=['GET'])
+def competition_summary():
+    if 'username' in session:
+        return render_template('competition_summary.html',competition_data = get_competition_data("co1"))
+    else:
+        debugMessage("No session competition_summary()")
+        debugMessage("Redirect #12313613")
+        return root()
 
 
 
-def debugMessage(q):
-    """
-    :param q: a string
-    :return: None
-    """
-    print("Debug Message :" + str(q), file=sys.stderr)
+
 
 
 if __name__ == "__main__":
