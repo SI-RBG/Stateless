@@ -12,7 +12,6 @@
 <br>
 
 
-<a class="btn btn-default" href={{ url_for('competitions_add') }}>Add a competition</a>
 
 <br>
 <br>
@@ -25,20 +24,14 @@
         <th>ID</th>
         <th>Name</th>
         <th>Teams</th>
-        <th>Created Teams</th>
-        <th>Deployed</th>
-        <th>Started</th>
-        <th>Edit</th>
+        <th>Action</th>
     </tr>
     {% for element in output_data %}
     <tr>
         <td>{{element[0]}}</td>
         <td>{{element[1]}}</td>
         <td>{{element[2]}}</td>
-        <td>{{element[3]}}</td>
-        <td>{{element[8]}}</td>
-        <td>{{element[9]}}</td>
-        <td><a href={{ url_for('competitions_edit') }}?COMP_ID={{element[0]}}>EDIT</a></td>
+        <td><a href={{ url_for('competitions_deployment') }}?COMP_ID={{element[0]}}>Deploy</a></td>
     </tr>
     {% endfor %}
 

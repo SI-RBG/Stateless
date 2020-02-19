@@ -24,9 +24,20 @@ VMs
             <p><td>Competition name <input type="text" value="" placeholder="{{element[1]}}" name="COMPETITION_NAME" readonly></td></p>
             <p><td>Team name <input type="text" value="" placeholder="{{element[2]}}" name="TEAM" readonly></td></p>
             <p><td>VM name <input type="text" value="" placeholder="{{element[3]}}" name="VM_NAME" readonly></td></p>
+
+                <p><td>Template name
+                    <select name="TEMPLATE_NAME">
+                    {% for t in TEMPLATES %}
+                    <option value="{{t[1]}}">{{t[1]}}</option>
+                    {% endfor %}
+                    <option value="Undefined">No Template</option>
+                        </select>
+                     </td></p>
+
             <p><td>CPUs <input type="text" value="" placeholder="{{element[4]}}" name="CPU"></td></p>
-            <p><td>Memory <input type="text" value="" placeholder="{{element[5]}}" name="MEMORY"></td></p>
-            <p><td>Guest type <input type="text" value="" placeholder="{{element[6]}}" name="GUEST_OS_TYPE" readonly></td></p>
+            <p><td>Disk <input type="text" value="" placeholder="{{element[5]}}" name="DISK"></td></p>
+            <p><td>Memory <input type="text" value="" placeholder="{{element[6]}}" name="MEMORY"></td></p>
+            <p><td>Guest type <input type="text" value="" placeholder="{{element[7]}}" name="GUEST_OS_TYPE" readonly></td></p>
             {% endfor %}
             <p><td><input type="submit" value="Submit changes"></td></p>
         </tr>

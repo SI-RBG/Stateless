@@ -28,25 +28,26 @@ Competitions
         <th>Gateway</th>
         <th>DNS server</th>
         <th>NIC/PortGroup</th>
-        <th>Windows VMs</th>
-        <th>Unix VMs</th>
-        <th>Total VMs</th>
         <th>Edit</th>
     </tr>
     {% for element in output_data %}
     <tr>
         <td><h3>Edit {{element[2]}}</h3></td>
         <input type="hidden" id="ID" name="ID" value="{{element[0]}}">
-        <td><input type="text" value="" placeholder="{{element[1]}}" name="COMPETITION_NAME"> </td>
+        <td>
+            <select name="COMPETITION_NAME">
+                    {% for c in COMPS %}
+                    <option value="{{c[1]}}">{{c[1]}}</option>
+                    {% endfor %}
+            </select>
+        </td>
         <td><input type="text" value="" placeholder="{{element[2]}}" name="TEAM"> </td>
         <td><input type="text" value="" placeholder="{{element[3]}}" name="DOMAIN_NAME"> </td>
         <td><input type="text" value="" placeholder="{{element[4]}}" name="SUBNET"> </td>
         <td><input type="text" value="" placeholder="{{element[5]}}" name="GATEWAY"> </td>
         <td><input type="text" value="" placeholder="{{element[6]}}" name="DNS_SERVER1"> </td>
         <td><input type="text" value="" placeholder="{{element[7]}}" name="NIC"> </td>
-        <td><input type="text" value="" placeholder="{{element[8]}}" name="WIN_VMS"> </td>
-        <td><input type="text" value="" placeholder="{{element[9]}}" name="UNIX_VMS"> </td>
-        <td><input type="submit" value="Submit changes"></p></td>
+        <td><input type="submit" value="Submit changes">/td>
     </tr>
     {% endfor %}
 </table>

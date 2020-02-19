@@ -21,17 +21,21 @@ Edit a competition
 <table align="center" cellspacing="25" >
     <tr>
         <th>Name</th>
+        <th>Competition name</th>
         <th>Teams</th>
-        <th>Edit</th>
+        <th>Windows VMs per team</th>
+        <th>Unix VMs per team</th>
         <th>Edit</th>
     </tr>
     {% for element in output_data %}
     <tr>
-        <td><h3>Edit {{element[1]}}</h3></td>
-        <input type="hidden" id="ID" name="ID" value="{{element[0]}}">
+            <input type="hidden" id="ID" name="ID" value="{{element[0]}}">
+        <td><h3>Edit {{element[1]}}  </h3></td>
         <td><input type="text" value="" placeholder="{{element[1]}}" name="UNAME"> </td>
         <td><input type="text" value="" placeholder="{{element[2]}}" name="TEAMS"> </td>
-        <td><input type="submit" value="Submit changes"></p></td>
+        <td><input type="text" value="" placeholder="{{element[4]}}" name="WIN_VMS"> </td>
+        <td><input type="text" value="" placeholder="{{element[5]}}" name="UNIX_VMS"> </td>
+        <td><input type="submit" value="Submit changes"></td>
     </tr>
     {% endfor %}
 </table>

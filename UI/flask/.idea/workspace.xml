@@ -2,15 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af7dd18d-2f15-45b4-947a-32d6cc35b059" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/pyCompetitionObject.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pyTeamObject.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pyVMObject.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/competitions_deployment.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/competitions_deployment_1.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wizard.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../db/database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../db/database.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCompetitionObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCompetitionObject.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyTeamObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyTeamObject.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyVMObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyVMObject.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/add_team_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/add_team_template.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/add_vm_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/add_vm_template.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/bar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/competitions.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/competitions.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/competitions_edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/competitions_edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/competitions_team_edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/competitions_team_edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/competitions_vm.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/competitions_vm.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/competitions_vm_edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/competitions_vm_edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/templates.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/templates.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/wizard_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/wizard_base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/validator.py" beforeDir="false" afterPath="$PROJECT_DIR$/validator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/ubuntu-16.04.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/ubuntu-16.04.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/variables.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/variables.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/tmp.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/tmp.py" afterDir="false" />
@@ -26,29 +36,52 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="740">
-              <caret line="2014" column="9" selection-start-line="2014" selection-start-column="9" selection-end-line="2014" selection-end-column="9" />
+            <state relative-caret-position="599">
+              <caret line="1820" column="39" lean-forward="true" selection-start-line="1820" selection-start-column="39" selection-end-line="1820" selection-end-column="39" />
               <folding>
-                <element signature="e#0#100#0" expanded="true" />
+                <element signature="e#0#16#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pyCompetitionObject.py">
+        <entry file="file://$PROJECT_DIR$/pyVMObject.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="17" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="17" />
+            <state relative-caret-position="195">
+              <caret line="13" column="28" lean-forward="true" selection-start-line="13" selection-start-column="28" selection-end-line="13" selection-end-column="28" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/wizard_base.html">
+        <entry file="file://$PROJECT_DIR$/templates/competitions_deployment_1.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="684">
-              <caret line="152" selection-start-line="152" selection-end-line="152" />
+            <state relative-caret-position="671">
+              <caret line="59" column="72" selection-start-line="59" selection-start-column="72" selection-end-line="59" selection-end-column="72" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/competitions_deployment.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="495">
+              <caret line="33" column="43" selection-start-line="33" selection-start-column="43" selection-end-line="33" selection-end-column="43" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/competitions_vm_add.html">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/competitions_vm_edit.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="510">
+              <caret line="34" column="30" selection-start-line="34" selection-start-column="30" selection-end-line="34" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -64,9 +97,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>UPDATE competitions SET CREATED_TEAMS=</find>
-      <find>#841611</find>
-      <find>PAGE_CREATE_TEAM</find>
       <find>Redirect #98181</find>
       <find>Redirect #1278313</find>
       <find>PAGE_CREATE_VM</find>
@@ -74,6 +104,29 @@
       <find>873216812</find>
       <find>login</find>
       <find>hidd</find>
+      <find>competitions_vm</find>
+      <find>competitions_team_add</find>
+      <find>competitions_team_edit</find>
+      <find>simple</find>
+      <find>TEAMS</find>
+      <find>select UNAME from competitions where id = '{}'</find>
+      <find>competitions_vm_edit</find>
+      <find>No COMP_ID</find>
+      <find>add</find>
+      <find>add_</find>
+      <find>_add</find>
+      <find>vms</find>
+      <find>vms</find>
+      <find>INSERT INTO vms</find>
+      <find>1324421354</find>
+      <find>templ</find>
+      <find>template</find>
+      <find>/template</find>
+      <find>and COMPETITION_NAME</find>
+      <find>get_all_undeployed_vms_by_competition_name</find>
+      <find>ompetition has been</find>
+      <find>312112</find>
+      <find>element</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -87,13 +140,23 @@
         <option value="$PROJECT_DIR$/Utilities.py" />
         <option value="$PROJECT_DIR$/databaseCommunication.py" />
         <option value="$PROJECT_DIR$/SQLFunctions.py" />
-        <option value="$PROJECT_DIR$/templates/competitions_vm.html" />
         <option value="$PROJECT_DIR$/validator.py" />
-        <option value="$PROJECT_DIR$/templates/add_team_template.html" />
-        <option value="$PROJECT_DIR$/templates/add_vm_template.html" />
-        <option value="$PROJECT_DIR$/templates/wizard_base.html" />
         <option value="$PROJECT_DIR$/pyTeamObject.py" />
         <option value="$PROJECT_DIR$/pyCompetitionObject.py" />
+        <option value="$PROJECT_DIR$/templates/wizard_base.html" />
+        <option value="$PROJECT_DIR$/templates/competitions.html" />
+        <option value="$PROJECT_DIR$/templates/add_team_template.html" />
+        <option value="$PROJECT_DIR$/templates/competitions_edit.html" />
+        <option value="$PROJECT_DIR$/templates/competitions_team_edit.html" />
+        <option value="$PROJECT_DIR$/wizard.py" />
+        <option value="$PROJECT_DIR$/templates/bar.html" />
+        <option value="$PROJECT_DIR$/pyVMObject.py" />
+        <option value="$PROJECT_DIR$/templates/competitions_vm.html" />
+        <option value="$PROJECT_DIR$/templates/add_vm_template.html" />
+        <option value="$PROJECT_DIR$/templates/competitions_vm_edit.html" />
+        <option value="$PROJECT_DIR$/templates/templates.html" />
+        <option value="$PROJECT_DIR$/templates/competitions_deployment.html" />
+        <option value="$PROJECT_DIR$/templates/competitions_deployment_1.html" />
         <option value="$PROJECT_DIR$/app.py" />
       </list>
     </option>
@@ -132,10 +195,15 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/templates" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="settings.github" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/templates" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -162,12 +230,12 @@
       <workItem from="1581468950466" duration="14003000" />
       <workItem from="1581890213233" duration="176000" />
       <workItem from="1581966983239" duration="732000" />
-      <workItem from="1581985221366" duration="9269000" />
+      <workItem from="1581985221366" duration="33342000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="24180000" />
+    <option name="totallyTimeSpent" value="48253000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-336" y="-1200" width="1920" height="1200" extended-state="0" />
@@ -247,28 +315,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/competitions_edit.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/competitions.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="83" selection-start-line="14" selection-start-column="72" selection-end-line="14" selection-end-column="83" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/competitions_vm_edit.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/header.html">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/competitions_vm.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="36" column="31" lean-forward="true" selection-start-line="36" selection-start-column="31" selection-end-line="36" selection-end-column="31" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/validator.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -277,28 +325,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/competitions_add.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/add_team_template.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="104" selection-start-line="10" selection-start-column="104" selection-end-line="10" selection-end-column="104" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/competitions_vm_add.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/wizard.html">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/add_vm_template.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="23" lean-forward="true" selection-start-line="18" selection-start-column="23" selection-end-line="18" selection-end-column="23" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pyTeamObject.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -307,26 +335,139 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pyCompetitionObject.py">
+    <entry file="file://$PROJECT_DIR$/templates/competitions_team.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_team_add.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_add.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_edit.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="17" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="17" />
+        <state relative-caret-position="480">
+          <caret line="32" column="47" lean-forward="true" selection-start-line="32" selection-start-column="47" selection-end-line="32" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_team_edit.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="395">
+          <caret line="37" column="12" selection-start-line="37" selection-start-column="12" selection-end-line="41" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/bar.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="512">
+          <caret line="36" column="77" selection-start-line="36" selection-start-column="77" selection-end-line="36" selection-end-column="77" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="25" column="21" lean-forward="true" selection-start-line="25" selection-start-column="21" selection-end-line="25" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/wizard_base.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="684">
-          <caret line="152" selection-start-line="152" selection-end-line="152" />
+        <state relative-caret-position="266">
+          <caret line="39" column="52" selection-start-line="39" selection-start-column="52" selection-end-line="39" selection-end-column="66" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wizard.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="646">
+          <caret line="307" column="12" selection-start-line="307" selection-start-column="12" selection-end-line="311" selection-end-column="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyCompetitionObject.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="8" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/after-bar.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_vm_edit.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="34" column="30" selection-start-line="34" selection-start-column="30" selection-end-line="34" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/add_team_template.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="54" selection-start-line="2" selection-start-column="33" selection-end-line="2" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/templates.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="630">
+          <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/add_competition_template.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="6" lean-forward="true" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_vm.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="6" lean-forward="true" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_vm_add.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/add_vm_template.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="63">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_deployment.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="495">
+          <caret line="33" column="43" selection-start-line="33" selection-start-column="43" selection-end-line="33" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyVMObject.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="28" lean-forward="true" selection-start-line="13" selection-start-column="28" selection-end-line="13" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/competitions_deployment_1.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="671">
+          <caret line="59" column="72" selection-start-line="59" selection-start-column="72" selection-end-line="59" selection-end-column="72" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="740">
-          <caret line="2014" column="9" selection-start-line="2014" selection-start-column="9" selection-end-line="2014" selection-end-column="9" />
+        <state relative-caret-position="599">
+          <caret line="1820" column="39" lean-forward="true" selection-start-line="1820" selection-start-column="39" selection-end-line="1820" selection-end-column="39" />
           <folding>
-            <element signature="e#0#100#0" expanded="true" />
+            <element signature="e#0#16#0" expanded="true" />
           </folding>
         </state>
       </provider>

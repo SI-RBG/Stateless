@@ -69,9 +69,7 @@ class Competition:
         Convert Competition_Uname value to a string and return it
         :return: string of Competition_Uname
         """
-        if type(self.Competition_Uname) != str:
-            return str(self.Competition_Uname)
-        return self.Competition_Uname
+        return str(self.Competition_Uname)
 
     def set_Competition_Teams(self, Competition_Teams):
         """
@@ -102,9 +100,7 @@ class Competition:
         Convert Competition_Teams value to a string and return it
         :return: string of Competition_Teams
         """
-        if type(self.Competition_Teams) != str:
-            return str(self.Competition_Teams)
-        return self.Competition_Teams
+        return str(self.Competition_Teams)
 
     def set_Win_VMs(self, Win_VMs):
         """
@@ -135,9 +131,7 @@ class Competition:
         Convert Win_VMs value to a string and return it
         :return: string of Win_VMs
         """
-        if type(self.Win_VMs) != str:
-            return str(self.Win_VMs)
-        return self.Win_VMs
+        return str(self.Win_VMs)
 
     def set_Unix_VMs(self, Unix_VMs):
         """
@@ -168,9 +162,7 @@ class Competition:
         Convert Unix_VMs value to a string and return it
         :return: string of Unix_VMs
         """
-        if type(self.Unix_VMs) != str:
-            return str(self.Unix_VMs)
-        return self.Unix_VMs
+        return str(self.Unix_VMs)
 
     def set_Total_VMs(self, Total_VMs):
         """
@@ -201,9 +193,7 @@ class Competition:
         Convert Total_VMs value to a string and return it
         :return: string of Total_VMs
         """
-        if type(self.Total_VMs) != str:
-            return str(self.Total_VMs)
-        return self.Total_VMs
+        return str(self.Total_VMs)
 
     def set_Resource_Pool(self, Resource_Pool):
         """
@@ -234,9 +224,4 @@ class Competition:
         Convert Resource_Pool value to a string and return it
         :return: string of Resource_Pool
         """
-        if type(self.Resource_Pool) != str:
-            return str(self.Resource_Pool)
-        return self.Resource_Pool
-
-
-
+        return str(self.Resource_Pool)

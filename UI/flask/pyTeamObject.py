@@ -4,7 +4,7 @@
 
 """
 import pyVMObject
-
+import ipaddress
 
 class Team:
 
@@ -20,6 +20,8 @@ class Team:
         self.NICAKA_PortGropu = None
         self.NICAKA_PortGropuList = None
         self.VMs = []
+        # List of ipaddress.IPv4Address('192.168.0.1')
+        self.reservedIP = []
 
 
     def add_VM(self, VM):
@@ -42,6 +44,26 @@ class Team:
         :return: object's VMs
         """
         return self.VMs
+
+    def add_reservedIP(self, IP):
+        """
+        Add a IP string to the list of IPs for this Team.
+        :return: object's VMs
+        """
+        pass
+        # TODO - Check if isinstance of VM class.
+        try:
+            self.reservedIP.append(IP)
+            return 1
+        except:
+            return 0
+
+    def get_reservedIP(self):
+        """
+        Add a IP string to the list of IPs for this Team.
+        :return: object's VMs
+        """
+        return self.reservedIP
 
     def set_Competition_Uname(self, Competition_Uname):
         """
@@ -72,9 +94,7 @@ class Team:
         Convert Competition_Uname value to a string and return it
         :return: string of Competition_Uname
         """
-        if type(self.Competition_Uname) != str:
-            return str(self.Competition_Uname)
-        return self.Competition_Uname
+        return str(self.Competition_Uname)
 
     def set_Team_Uname(self, Team_Uname):
         """
@@ -105,9 +125,7 @@ class Team:
         Convert Team_Uname value to a string and return it
         :return: string of Team_Uname
         """
-        if type(self.Team_Uname) != str:
-            return str(self.Team_Uname)
-        return self.Team_Uname
+        return str(self.Team_Uname)
 
     def set_Team_ID(self, Team_ID):
         """
@@ -138,9 +156,7 @@ class Team:
         Convert Team_ID value to a string and return it
         :return: string of Team_ID
         """
-        if type(self.Team_ID) != str:
-            return str(self.Team_ID)
-        return self.Team_ID
+        return str(self.Team_ID)
 
     def set_Domain_Name(self, Domain_Name):
         """
@@ -171,9 +187,7 @@ class Team:
         Convert Domain_Name value to a string and return it
         :return: string of Domain_Name
         """
-        if type(self.Domain_Name) != str:
-            return str(self.Domain_Name)
-        return self.Domain_Name
+        return str(self.Domain_Name)
 
     def set_Subnet(self, Subnet):
         """
@@ -204,9 +218,7 @@ class Team:
         Convert Subnet value to a string and return it
         :return: string of Subnet
         """
-        if type(self.Subnet) != str:
-            return str(self.Subnet)
-        return self.Subnet
+        return str(self.Subnet)
 
     def set_Gateway(self, Gateway):
         """
@@ -237,9 +249,7 @@ class Team:
         Convert Gateway value to a string and return it
         :return: string of Gateway
         """
-        if type(self.Gateway) != str:
-            return str(self.Gateway)
-        return self.Gateway
+        return str(self.Gateway)
 
     def set_DNS1(self, DNS1):
         """
@@ -270,9 +280,7 @@ class Team:
         Convert DNS1 value to a string and return it
         :return: string of DNS1
         """
-        if type(self.DNS1) != str:
-            return str(self.DNS1)
-        return self.DNS1
+        return str(self.DNS1)
 
     def set_DNS2(self, DNS2):
         """
@@ -303,9 +311,7 @@ class Team:
         Convert DNS2 value to a string and return it
         :return: string of DNS2
         """
-        if type(self.DNS2) != str:
-            return str(self.DNS2)
-        return self.DNS2
+        return str(self.DNS2)
 
     def set_NICAKA_PortGropu(self, NICAKA_PortGropu):
         """
@@ -336,7 +342,36 @@ class Team:
         Convert NICAKA_PortGropu value to a string and return it
         :return: string of NICAKA_PortGropu
         """
-        if type(self.NICAKA_PortGropu) != str:
-            return str(self.NICAKA_PortGropu)
-        return self.NICAKA_PortGropu
+        return str(self.NICAKA_PortGropu)
+
+    def set_NICAKA_PortGropuList(self, NICAKA_PortGropuList):
+        """
+        Set NICAKA_PortGropuList
+        :param NICAKA_PortGropuList:
+        :return: None
+        """
+        self.NICAKA_PortGropuList = NICAKA_PortGropuList
+
+    def get_NICAKA_PortGropuList(self):
+        """
+        Get the object's NICAKA_PortGropuList
+        :return: object's NICAKA_PortGropuList
+        """
+        return self.NICAKA_PortGropuList
+
+    def NICAKA_PortGropuList_is_empty(self):
+        """
+        Check if NICAKA_PortGropuList has a value
+        :return:
+        """
+        if self.NICAKA_PortGropuList == None:
+            return True
+        return False
+
+    def NICAKA_PortGropuList_to_string(self):
+        """
+        Convert NICAKA_PortGropuList value to a string and return it
+        :return: string of NICAKA_PortGropuList
+        """
+        return str(self.NICAKA_PortGropuList)
 
