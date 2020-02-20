@@ -1,0 +1,50 @@
+{% include "header.html" %}
+
+<title>Templates</title>
+</head> <!-- <head> in the header - End -->
+
+<body>
+{% include "bar.html" %}
+
+{% include "after-bar.html" %}
+
+
+Templates
+<br>
+
+
+<div class="form1">
+    <h3 >Add a template</h3>
+    <form class="form1" action="/add_templates" method="POST">
+        <p><input type="text" value="" placeholder="Template name" name="TEMPLATES_NAME">
+            <input type="text" value="" placeholder="Other things" name="OTHER"></p>
+        <p><input type="submit" value="Add"></p>
+    </form>
+</div>
+
+
+<!-- For every t in template print(t)-->
+<table align="center" cellspacing="25" >
+    <tr>
+        <th>  ID  </th>
+        <th>  Name  </th>
+        <th>  Description  </th>
+    </tr>
+    {% for element in output_data %}
+
+    <tr>
+        <td>  {{element[0]}}  </td>
+        <td>  {{element[1]}}  </td>
+        <td>  {{element[2]}}  </td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+
+
+
+</body>
+
+{% include "footer.html" %}
+
