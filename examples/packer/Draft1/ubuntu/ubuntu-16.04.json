@@ -1,16 +1,16 @@
 {
 	"variables": {
-    "vc_server": "",
-    "vc_username": "",
-    "vc_password": ""
+    "vsphere_server": "",
+    "vsphere_user": "",
+    "vsphere_password": ""
   },
   "builders": [
     {
       "type": "vsphere-iso",
 
-      "vcenter_server":      "{{ user `vc_server` }}",   
-      "username":            "{{ user `vc_username` }}",
-      "password":            "{{ user `vc_password` }}",
+      "vcenter_server":      "{{ user `vsphere_server` }}",
+      "username":            "{{ user `vsphere_user` }}",
+      "password":            "{{ user `vsphere_password` }}",
       "insecure_connection": "true",
 
       "vm_name": "example-ubuntu",
