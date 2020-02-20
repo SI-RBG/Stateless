@@ -2,18 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af7dd18d-2f15-45b4-947a-32d6cc35b059" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/lib/validator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SQLFunctions.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utilities.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app-bk.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comp.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/databaseCommunication.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/databaseCommunicationUtilities.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCompetitionObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pyCompetitionObject.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyTeamObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pyTeamObject.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyVMObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pyVMObject.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/style.css.bk" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/validator.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/ubuntu-16.04.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/ubuntu-16.04.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/variables.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/packer/Draft1/ubuntu/variables.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dev/tmp.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../dev/tmp.py" afterDir="false" />
@@ -26,60 +17,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="890">
-              <caret line="1281" selection-start-line="1281" selection-end-line="1281" />
+            <state relative-caret-position="180">
+              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/validator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" selection-start-line="6" selection-end-line="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/database/databaseCommunicationUtilities.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="10" lean-forward="true" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Utilities.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="9" lean-forward="true" selection-start-column="9" selection-end-column="9" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/auth.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/database/databaseCommunication.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" column="23" selection-start-line="1" selection-start-column="23" selection-end-line="1" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -136,7 +81,6 @@
         <option value="$PROJECT_DIR$/config.py" />
         <option value="$PROJECT_DIR$/databaseCommunicationUtilities.py" />
         <option value="$PROJECT_DIR$/databaseCommunication.py" />
-        <option value="$PROJECT_DIR$/validator.py" />
         <option value="$PROJECT_DIR$/templates/wizard_base.html" />
         <option value="$PROJECT_DIR$/templates/competitions.html" />
         <option value="$PROJECT_DIR$/templates/add_team_template.html" />
@@ -158,6 +102,7 @@
         <option value="$PROJECT_DIR$/app.py" />
         <option value="$PROJECT_DIR$/database/databaseCommunication.py" />
         <option value="$PROJECT_DIR$/database/databaseCommunicationUtilities.py" />
+        <option value="$PROJECT_DIR$/validator.py" />
       </list>
     </option>
   </component>
@@ -185,6 +130,11 @@
               <item name="flask" type="b2602c69:ProjectViewProjectNode" />
               <item name="flask" type="462c0819:PsiDirectoryNode" />
               <item name="database" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="flask" type="b2602c69:ProjectViewProjectNode" />
+              <item name="flask" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -233,12 +183,12 @@
       <workItem from="1581468950466" duration="14003000" />
       <workItem from="1581890213233" duration="176000" />
       <workItem from="1581966983239" duration="732000" />
-      <workItem from="1581985221366" duration="34971000" />
+      <workItem from="1581985221366" duration="36241000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="49882000" />
+    <option name="totallyTimeSpent" value="51152000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-336" y="-1200" width="1920" height="1200" extended-state="0" />
@@ -447,10 +397,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/validator.py">
+    <entry file="file://$PROJECT_DIR$/database/databaseCommunicationUtilities.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        <state relative-caret-position="45">
+          <caret line="3" column="10" lean-forward="true" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/databaseCommunication.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="23" selection-start-line="1" selection-start-column="23" selection-end-line="1" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/validator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
         </state>
       </provider>
     </entry>
@@ -469,25 +433,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="890">
-          <caret line="1281" selection-start-line="1281" selection-end-line="1281" />
+        <state relative-caret-position="180">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/database/databaseCommunication.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="23" selection-start-line="1" selection-start-column="23" selection-end-line="1" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/database/databaseCommunicationUtilities.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="10" lean-forward="true" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
         </state>
       </provider>
     </entry>
