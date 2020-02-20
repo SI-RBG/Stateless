@@ -59,8 +59,7 @@ class StatelessObj():
                     "username and password")
             return -1
         atexit.register(Disconnect, serviceInstance)
-        content = serviceInstance.RetrieveContent()
-        return content
+        return serviceInstance
 
     def logout(self, si):
         """
@@ -69,6 +68,15 @@ class StatelessObj():
         :return: N/A
         """
         si.content.sessionManager.Logout()
+
+    def retrive_content(self, si):
+        """
+        retrive content from a service instance
+        :param si: service instance
+        :return: service instance content 
+        """
+        content = si.RetrieveContent()
+        return content
 
     def get_obj(self,content, vimtype, name):
         """
@@ -86,7 +94,20 @@ class StatelessObj():
                 obj = c
                 break
         return obj
+    def wait_for_task(self,task):
+        """
+        wait for a vCenter task to finish 
+        :param task: task to be waited for
+        :return N/A
+        """
+        task_done = False
+        while not task_done:
+            if task.info.state == 'success':
+                return task.info.result
 
+            if task.info.state == 'error':
+                print("there was an error")
+                task_done = True
 
     def mkdir_task(self, base_obj, dir_name):
         """
@@ -240,22 +261,7 @@ class StatelessObj():
         print("NIC CARD ADDED")
 
 
-    def wait_for_task(self,task):
-        """
-        wait for a vCenter task to finish 
-        :param task: task to be waited for
-        :return N/A
-        """
-        task_done = False
-        while not task_done:
-            if task.info.state == 'success':
-                return task.info.result
-
-            if task.info.state == 'error':
-                print("there was an error")
-                task_done = True
-
-
+    
     def clone_vm(self,content, VM_Name, Template_Name, IP_Address, Gateway,NetMask, DNS_Server):
         """
         clone a virtual machine from a template
