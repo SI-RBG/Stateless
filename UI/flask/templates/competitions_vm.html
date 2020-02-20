@@ -1,0 +1,60 @@
+{% include "header.html" %}
+
+<title>Competitions</title>
+</head> <!-- <head> in the header - End -->
+
+
+
+<body>
+{% include "bar.html" %}
+
+{% include "after-bar.html" %}
+<br>
+<a class="btn btn-default" href={{ url_for('competitions_vm_add') }}>Add a VM</a>
+
+<br>
+<br>
+<br>
+<br>
+
+<!-- For every t in template print(t)-->
+<table align="center" class="c" >
+    <tr>
+        <th>ID</th>
+        <th>Competition Name</th>
+        <th>Team Name</th>
+        <th>VM name</th>
+        <th>Template name</th>
+        <th>CPU</th>
+        <th>Disk </th>
+        <th>Memory</th>
+        <th>Guest type</th>
+        <th>Started</th>
+        <th>Deployed</th>
+        <th>Edit</th>
+    </tr>
+    {% for element in output_data %}
+    <tr>
+
+        <td>{{element[0]}}</td>
+        <td>{{element[1]}}</td>
+        <td>{{element[2]}}</td>
+        <td>{{element[3]}}</td>
+        <td>{{element[4]}}</td>
+        <td>{{element[5]}}</td>
+        <td>{{element[6]}} Gb</td>
+        <td>{{element[7]}}</td>
+        <td>{{element[8]}}</td>
+        <td>{{element[9]}}</td>
+        <td>{{element[10]}}</td>
+        <td><a href={{ url_for('competitions_vm_edit') }}?VM_ID={{element[0]}}>EDIT</a></td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+
+
+{% include "footer.html" %}
+
