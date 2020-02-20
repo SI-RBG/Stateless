@@ -1,6 +1,5 @@
 """
-
-
+This class represents a VM object.
 
 """
 

@@ -1,10 +1,8 @@
 """
-
-
+This class represents a team object.
 
 """
-import pyVMObject
-import ipaddress
+
 
 class Team:
 

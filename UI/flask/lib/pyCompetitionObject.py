@@ -1,10 +1,7 @@
 """
-
-
+This class represents a competition object.
 
 """
-
-import pyTeamObject
 
 
 class Competition:
