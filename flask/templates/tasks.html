@@ -1,0 +1,43 @@
+{% include "header.html" %}
+
+<title>Tasks</title>
+</head> <!-- <head> in the header - End -->
+
+<body>
+{% include "bar.html" %}
+
+{% include "after-bar.html" %}
+
+Tasks
+<br>
+
+<!-- For every t in template print(t)-->
+<table align="center" cellspacing="25" >
+    <tr>
+        <th>ID</th>
+        <th>Task</th>
+        <th>Description</th>
+        <th>By</th>
+        <th>Time</th>
+    </tr>
+    {% for element in output_events %}
+
+    <tr>
+        <td>{{element[0]}}</td>
+        <td>{{element[2]}}</td>
+        <td>{{element[3]}}</td>
+        <td>{{element[1]}}</td>
+        <td>{{element[4]}}</td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+
+
+
+
+
+</body>
+{% include "footer.html" %}
+

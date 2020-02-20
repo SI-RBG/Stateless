@@ -1,0 +1,70 @@
+{% include "header.html" %}
+
+<title>Competitions</title>
+</head> <!-- <head> in the header - End -->
+
+
+
+<body>
+{% include "bar.html" %}
+
+{% include "after-bar.html" %}
+<br>
+
+This is a list of the VMs that will be deployed. Double check before submitting the job.
+
+<br>
+<br>
+<br>
+<br>
+
+<!-- For every t in template print(t)-->
+<table align="center" class="c" >
+    <tr>
+        <th>ID</th>
+        <th>Competition Name</th>
+        <th>Team Name</th>
+        <th>VM name</th>
+        <th>Template name</th>
+        <th>IP</th>
+        <th>Hostname</th>
+        <th>CPU</th>
+        <th>Disk </th>
+        <th>Memory</th>
+        <th>Guest type</th>
+        <th>Edit</th>
+    </tr>
+    {% for element in output_data %}
+    <tr>
+
+        <td>{{element[0]}}</td>
+        <td>{{element[1]}}</td>
+        <td>{{element[2]}}</td>
+        <td>{{element[3]}}</td>
+        <td>{{element[4]}}</td>
+        <td>{{element[5]}}</td>
+        <td>{{element[6]}}</td>
+        <td>{{element[7]}}</td>
+        <td>{{element[8]}}</td>
+        <td>{{element[9]}}</td>
+        <td>{{element[10]}}</td>
+        <td><a href={{ url_for('competitions_vm_edit') }}?VM_ID={{element[0]}}>Edit</a></td>
+    </tr>
+    {% endfor %}
+
+</table>
+<br>
+
+    <form class="form1" action="/competitions_deployment_post" method="POST">
+        <tr>
+            <p><td><input type="hidden" name="COMP_ID" value="{{ COMP_ID }}"></td></p>
+            <p><td><input type="submit" value="Submit a job"></td></p>
+        </tr>
+    </form>
+
+
+</body>
+
+
+{% include "footer.html" %}
+
