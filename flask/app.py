@@ -1,4 +1,4 @@
-import sys, ipaddress
+import sys, ipaddress, os
 from flask import Flask, flash, render_template, request, session, redirect, url_for, abort
 from flask_cors import CORS
 from flask_limiter import Limiter
@@ -7,7 +7,7 @@ from auth import *
 from database.databaseCommunication import *
 from database.databaseCommunicationUtilities import *
 from config import *
-from lib import pyTeamObject, pyCompetitionObject, pyVMObject
+from lib import pyTeamObject, pyCompetitionObject, pyVMObject, Stateless
 
 
 # Wait
@@ -77,6 +77,12 @@ def cleanSQLOutputs(outputs):
     return [s.replace('(','').replace(')','').replace('\'','').strip() for s in outputs.split(',') if (len(str(s)) > 1)]
 
 
+def test():
+    mysqlExecuteAll("INSERT INTO templates(TEMPLATES_NAME, OTHER) VALUES ('Ubuntu18-Server', '11')")
+    mysqlExecuteAll("INSERT INTO competitions(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C) VALUES ('ISTS' , '2', '0' , '2', '2', '4', '0', '0', '0')")
+    mysqlExecuteAll("INSERT INTO teams(COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG) VALUES ('ISTS', 'Tigers1','Tigers1.com','10.1.1.0/24', '10.1.1.254', '1.1.1.1', 'g1','0','0','0','0')")
+    mysqlExecuteAll("INSERT INTO teams(COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG) VALUES ('ISTS', 'Tigers2','Tigers2.com','10.2.2.0/24', '10.2.2.254', '2.2.2.2', 'go2','0','0','0','0')")
+    mysqlExecuteAll("INSERT INTO vms(COMPETITION_NAME, TEAM, VM_NAME, TEMPLATE_NAME, CPU, DISK, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C) VALUES ('ISTS', 'undefined', 'UServer', 'Ubuntu18-Server', '2','2', '1024', 'ubuntu64Guest', '0', '0')")
 
 
 
@@ -275,7 +281,91 @@ def create_a_competition(pyCompOb):
     :param pyCompOb:
     :return:
     """
-    pass
+    debugMessage("WORKKKKKKKK")
+
+    vcenter_ip_env = os.environ.get('VCENTER_IP')
+    vcenter_user_env = os.environ.get('VCENTER_USER')
+    vcenter_password_env = os.environ.get('VCENTER_PASSWORD')
+    debugMessage("vcenter_ip_env:"+vcenter_ip_env)
+    debugMessage("vcenter_user_env:" + vcenter_user_env)
+
+
+    # Create StatelessObj
+    so = Stateless.StatelessObj(vcenter_ip_env, vcenter_user_env, vcenter_password_env)
+    # Set the changeable variables.
+    so.set_datacenter("Datacenter")
+    so.set_datastore("datastore1")
+    so.set_cluster("CPTCCluster")
+    so.set_RP("DevRP")
+
+    # Login
+    si = so.login()
+    content = so.retrive_content(si)
+
+    # Set the root path for pyCompOb
+    rootpath = pyCompOb.Competition_Uname_to_string()+"/"
+
+
+    # Get a list of pyTeamObjs
+    listOfTeams = pyCompOb.get_Teams()
+    if debug:
+        debugMessage("Getting a list of teams that has a length of "+str(len(listOfTeams)))
+
+
+    for teamObj in listOfTeams:
+        teamUName = teamObj.Team_Uname_to_string()
+
+        # Get a list of pyVMObjs
+        VMs = teamObj.get_VMs()
+        if debug:
+            debugMessage("Getting a list of VMs, length of " + str(len(listOfTeams)))
+
+        for vmObj in VMs:
+            if vmObj.Template_Name_is_empty():
+                pass
+            # If it uses a template.
+            else:
+                #Competition_Uname = vmObj.get_Competition_Uname()
+                Team_Uname = vmObj.Team_Uname_to_string()
+                VM_Uname = vmObj.VM_Uname_to_string()
+                Template_Name = vmObj.Template_Name_to_string()
+                IP_Address = vmObj.IP_Address_to_string()
+                Hostname = vmObj.Hostname_to_string()
+                CPU = vmObj.CPU_to_string()
+                Disk_Space = vmObj.Disk_Space_to_string()
+                Memory = vmObj.Memory_to_string()
+                Guest_Type = vmObj.get_Guest_Type()
+
+                # Set the current path
+                currentPath = rootpath+Team_Uname+"/"
+
+                # Get last dir
+                lastSubPath = Team_Uname
+
+                # Create a folder
+                if (so.test_create_folder(content, currentPath)):
+                    if debug:
+                        debugMessage(currentPath+" folder has been created")
+                else:
+                    if debug:
+                        debugMessage(currentPath + " folder has NOT been created.\nError #79813923")
+
+                # Clone a vm based on the given information.
+                try:
+                    code = so.clone_vm(content, VM_Uname, Template_Name, lastSubPath, "", "", "", "")
+                    if debug:
+                        if code == 1:
+                            debugMessage("Kind of good so far!")
+                        if code == 0:
+                            debugMessage("Failed ")
+                        if code == -1:
+                            debugMessage("One of the inputs is None")
+                except Exception as e:
+                    if debug:
+                        debugMessage(str(e)+"\nError #892378")
+
+    so.logout(si)
+
 
 
 
@@ -295,6 +385,8 @@ def home():
 
 @app.route("/install", methods=['get', 'post'])
 def install():
+    # Remove me!
+    test()
     # Check the data base for config entry.
     result = mysqlExecute("select * from config")
     # returns this example: (1, 'VSPHERE_SERVER1', 'VSPHERE_SERVER2', 'VSPHERE_SERVER3')
@@ -1175,7 +1267,16 @@ def competitions_deployment():
                 vmsObjects =[]
                 ToBeSentList = []
                 # Get Comp ID
-                COMP_ID = pymysql.escape_string(request.args.get('COMP_ID'))
+                COMP_ID = pymysql.escape_string(str(request.args.get('COMP_ID')))
+                debugMessage("competitions_deployment() "+str(COMP_ID)+" length: "+str(len(COMP_ID)))
+
+                # If it's not a number
+                if type(int(COMP_ID)) != int:
+                    undeployed_comps = mysqlExecuteAll("select * from competitions where CREATED_FLAG = 0")
+
+                    return render_template('competitions_deployment.html', output_data=undeployed_comps,
+                                           username=session['username'],
+                                           templates_length=getTemplatesLength(), tasks_length=getEventsLength())
 
                 # Start looking for all the variables for this comp and add them to a comp object
 
@@ -1224,7 +1325,9 @@ def competitions_deployment():
                     if debug:
                         debugMessage(e)
                         debugMessage("Block #1324421354")
-
+                if debug:
+                    debugMessage("Redirecting to competitions_deployment_1.html")
+                    debugMessage("Passing "+str(COMP_ID))
                 return render_template('competitions_deployment_1.html', output_data=ToBeSentList, COMP_ID = COMP_ID, username=session['username'])
             except Exception as e:
                 if debug:
@@ -1249,7 +1352,17 @@ def competitions_deployment_post():
         try:
             pass
             if request.method == 'POST':
-                COMP_ID = pymysql.escape_string(request.args.get('COMP_ID'))
+                try:
+                    COMP_ID_V = request.form.get('COMPID')
+                    if COMP_ID_V == None:
+                        debugMessage("Error #98289293")
+                        return root()
+                    COMP_ID = pymysql.escape_string(str(COMP_ID_V))
+
+                except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Block #3234675665")
 
                 # Get COMPETITION_NAME by ID submitted
                 COMPETITION_NAME = mysqlExecute("select UNAME from competitions where id = '{}'".format(COMP_ID))
@@ -1266,12 +1379,64 @@ def competitions_deployment_post():
                         debugMessage(e)
                         debugMessage("Block #8239732981")
 
+                debugMessage("create_a_competition(pyCompOb) TIME!!!!!")
                 create_a_competition(pyCompOb)
-        except:
-            debugMessage("Error #34554323")
+        except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Error #345154323")
     return root()
 
 
+
+@app.route("/something", methods=['GET'])
+def something():
+    vcenter_ip_env = os.environ.get('VCENTER_IP')
+    vcenter_user_env = os.environ.get('VCENTER_USER')
+    vcenter_password_env = os.environ.get('VCENTER_PASSWORD')
+    debugMessage("vcenter_ip_env:"+vcenter_ip_env)
+    debugMessage("vcenter_user_env:" + vcenter_user_env)
+
+
+    # Create StatelessObj
+    so = Stateless.StatelessObj(vcenter_ip_env, vcenter_user_env, vcenter_password_env)
+    # Set the changeable variables.
+    so.set_datacenter("Datacenter")
+    so.set_datastore("datastore")
+    so.set_cluster("CPTCCluster")
+    so.set_RP("DevRP")
+
+    # Login
+    si = so.login()
+    content = so.retrive_content(si)
+
+
+    currentPath = "test100/test200"
+
+    # Create a folder
+    if (so.test_create_folder(content, currentPath)):
+        if debug:
+            debugMessage(currentPath + " folder has been created")
+    else:
+        if debug:
+            debugMessage(currentPath + " folder has NOT been created.\nError #79813923")
+
+    # Get last dir
+    lastSubPath = currentPath.split('/')[-1]
+
+    try:
+        code = so.clone_vm(content, "US234", "Ubuntu18-Server", "test200", "", "", "","")
+        if debug:
+            if code == 1:
+                debugMessage("Kind of good so far!")
+            if code == 0:
+                debugMessage("Failed ")
+            if code == -1:
+                debugMessage("One of the inputs is None")
+    except Exception as e:
+        if debug:
+           debugMessage(str(e)+"\nError #892378")
+    return "GOOD! "+str(code)
 
 
 
