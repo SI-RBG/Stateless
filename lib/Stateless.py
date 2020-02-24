@@ -40,7 +40,7 @@ class StatelessObj():
         self.vcenter_password = vcenter_password
 
     
-    def login(self, vcenter_ip, vcenter_user, vcenter_password):
+    def login(self):
         """
         login function take vcenter ip, user, password and sign in to retrive a service instance.
         :param vcenter_ip: vcenter ip address
@@ -50,9 +50,9 @@ class StatelessObj():
         """
         #Connectin to vCenter
         context = ssl._create_unverified_context()
-        serviceInstance = SmartConnect(host=vcenter_ip,
-                            user=vcenter_user,
-                            pwd=vcenter_user,
+        serviceInstance = SmartConnect(host=self.vcenter_ip,
+                            user=self.vcenter_user,
+                            pwd=self.vcenter_password,
                             port=int(443), sslContext=context)
         if not serviceInstance:
             print("Could not connect to the specified host using specified "
@@ -138,10 +138,10 @@ class StatelessObj():
                         base_obj = child_obj
                         break
                     elif y >= len(base_obj.childEntity)-1:
-                        base_obj = mkdir_task(base_obj, path_part)
+                        base_obj = self.mkdir_task(base_obj, path_part)
                         break
             else:
-                base_obj = mkdir_task(base_obj, path_part)
+                base_obj = self.mkdir_task(base_obj, path_part)
 
 
     def test_folder_creation(self,content, folder_path):
@@ -150,14 +150,14 @@ class StatelessObj():
         :param content: service instance content
         :param folder_path: nested path e.g. /folder1/folder2/folder3
         """
-        dc = get_obj(content, [vim.Datacenter], INPUTS['datacenter'])
-        if (get_obj(content, [vim.Folder], INPUTS['folder_path'])):
+        dc = self.get_obj(content, [vim.Datacenter], INPUTS['datacenter'])
+        if (self.get_obj(content, [vim.Folder], INPUTS['folder_path'])):
             print("Folder '%s' already exists" % INPUTS['folder_path'])
             return 0
         else:
-            create_folder(content, dc.hostFolder, INPUTS['folder_path'])
+            self.create_folder(content, dc.hostFolder, INPUTS['folder_path'])
             print("Successfully created the host folder '%s'" % INPUTS['folder_path'])
-            create_folder(content, dc.vmFolder, INPUTS['folder_path'])
+            self.create_folder(content, dc.vmFolder, INPUTS['folder_path'])
             print("Successfully created the VM folder '%s'" % INPUTS['folder_path'])
             return 0
 
@@ -237,7 +237,7 @@ class StatelessObj():
         nic_spec.device.deviceInfo = vim.Description()
         nic_spec.device.deviceInfo.summary = 'vCenter API test'
 
-        network = get_obj(content, [vim.Network], PG_Name)
+        network = self.get_obj(content, [vim.Network], PG_Name)
         if isinstance(network, vim.OpaqueNetwork):
             nic_spec.device.backing = vim.VM.device.VirtualEthernetCard.OpaqueNetworkBackingInfo()
             nic_spec.device.backing.opaqueNetworkType = network.summary.opaqueNetworkType
@@ -257,7 +257,7 @@ class StatelessObj():
 
         nic_changes.append(nic_spec)
         spec.deviceChange = nic_changes
-        e = VM.ReconfigVM_Task(spec=spec)
+        #e = VM.ReconfigVM_Task(spec=spec)
         print("NIC CARD ADDED")
 
 
@@ -275,24 +275,24 @@ class StatelessObj():
         :return N/A
         """
         # if none git the first one
-        datacenter = get_obj(content, [vim.Datacenter], INPUTS['datacenter'])
+        datacenter = self.get_obj(content, [vim.Datacenter], INPUTS['datacenter'])
 
         
-        #destfolder = get_obj(content, [vim.Folder], INPUTS['folder_path'])
+        #destfolder = self.get_obj(content, [vim.Folder], INPUTS['folder_path'])
         destfolder = datacenter.vmFolder
 
         
-        datastore = get_obj(content, [vim.Datastore], INPUTS['datastore'])
+        datastore = self.get_obj(content, [vim.Datastore], INPUTS['datastore'])
         
 
         # if None, get the first one
-        cluster = get_obj(content, [vim.ClusterComputeResource], INPUTS['cluster'])
+        cluster = self.get_obj(content, [vim.ClusterComputeResource], INPUTS['cluster'])
 
-        resource_pool = get_obj(content, [vim.ResourcePool], INPUTS['RP'])
+        resource_pool = self.get_obj(content, [vim.ResourcePool], INPUTS['RP'])
         
-        TheTemplate = get_obj(content, [vim.VirtualMachine], Template_Name)
+        TheTemplate = self.get_obj(content, [vim.VirtualMachine], Template_Name)
 
-        datastore = get_obj(content, [vim.Datastore], real_datastore_name)
+        #datastore = self.get_obj(content, [vim.Datastore], real_datastore_name)
 
         vmconf = vim.vm.ConfigSpec()
 
@@ -329,7 +329,7 @@ class StatelessObj():
 
         print("cloning VM...")
         task = TheTemplate.Clone(folder=destfolder, name=VM_Name, spec=clonespec)
-        wait_for_task(task)
+        self.wait_for_task(task)
     
     def motd(self, content, message):
         """
@@ -338,3 +338,4 @@ class StatelessObj():
         :param content: service instance content
         """
         content.content.sessionManager.UpdateServiceMessage(message=message)
+
