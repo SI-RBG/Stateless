@@ -2,6 +2,8 @@ version: "3"
 services:
   webapp:
     build: ./flask
+    env_file:
+      - web-variables.env
     links:
       - mysql
     depends_on:

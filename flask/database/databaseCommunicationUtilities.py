@@ -44,3 +44,15 @@ def mysqlExecuteAll(q):
     mysqlConnCursor.close()
     mysqlConn.close()
     return result
+
+
+def addEvent(BYUSER_VALUE, EVENT_NAME_VALUE, DESCRIPTIONS_VALUE = ""):
+    try:
+        BYUSER_VALUE = pymysql.escape_string(BYUSER_VALUE)
+        EVENT_NAME_VALUE = pymysql.escape_string(EVENT_NAME_VALUE)
+        DESCRIPTIONS_VALUE = pymysql.escape_string(DESCRIPTIONS_VALUE)
+        q = "INSERT INTO events(BYUSER, EVENT_NAME, DESCRIPTIONS, CREATION_DATE) VALUES ('{}', '{}', '{}', '{}')".format(str(BYUSER_VALUE), str(EVENT_NAME_VALUE), str(DESCRIPTIONS_VALUE), str(time.strftime('%Y-%m-%d %H:%M:%S')))
+        print("Adding an event: "+q, file=sys.stderr)
+        mysqlExecute(q)
+    except Exception as e:
+        print(e, file=sys.stderr)
