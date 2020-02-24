@@ -1,6 +1,7 @@
 
 from pyVmomi import vim
 from pyVim.connect import SmartConnect, SmartConnectNoSSL, Disconnect
+from pyVmomi import vmodl
 import atexit
 import argparse
 import getpass
@@ -10,8 +11,8 @@ import re
 "Static Inputs to connect to cptc-server"
 
 INPUTS = {'vcenter_ip': 'cptc-vcenter.csec.rit.edu',
-          'vcenter_user': 'cptc.local\admin',
-          'vcenter_password': 'WhereThingsGetTooComplicated',
+          'vcenter_user': 'cptc.local\\admin',
+          'vcenter_password': 'hello',
           'datacenter' : 'Datacenter',
           'datastore' : 'datastore1', 
           'cluster' : 'CPTCCluster',
@@ -24,17 +25,17 @@ INPUTS = {'vcenter_ip': 'cptc-vcenter.csec.rit.edu',
           'new_clone_gateway': '10.0.1.1',
           'new_clone_dns': '10.0.0.1',
           'folder_path' : 'dad/son/',
-          'vSwitch' :    'Test_vSwitch',
-          'PG' : 'Test_PG',
+          'vSwitch' :    'Test_vSwitch123',
+          'PG' : 'Test_PG123',
           'VlanID':     '1',
-          "Template_Name" : "pf", 
-          'VM_Name':   "TheWorking_VM"
+          "Template_Name" : "pfSense-2-2-4", 
+          'VM_Name':   "TheWorking_VM2"
           }
 
 
 class StatelessObj():
 
-    def __init__(self):
+    def __init__(self, vcenter_ip, vcenter_user, vcenter_password):
         self.vcenter_ip = vcenter_ip
         self.vcenter_user = vcenter_user
         self.vcenter_password = vcenter_password
@@ -339,3 +340,39 @@ class StatelessObj():
         """
         content.content.sessionManager.UpdateServiceMessage(message=message)
 
+def assign_IP(self):
+
+    pass
+
+def main():
+    print("Starting main!")
+    #Connectin to vCenter
+    StatelessObj1 = StatelessObj(INPUTS['vcenter_ip'],INPUTS['vcenter_user'],INPUTS['vcenter_password'])
+    si = StatelessObj1.login()
+    content = StatelessObj1.retrive_content(si)
+    
+    #Test Folder creating
+    #StatelessObj1.test_folder_creation(content,INPUTS['folder_path'])
+
+    #Test vSwitch_Creat
+    Hosts  =  StatelessObj1.GetVMHosts(content)
+    #StatelessObj1.Create_vSwitch(Hosts,INPUTS['vSwitch'])
+
+    #Test PGroup Creation 
+    #StatelessObj1.Create_PortGroup(Hosts, INPUTS['vSwitch'], INPUTS['PG'], INPUTS['VlanID'])
+
+    #Test adding NIC to a vim
+    vm = StatelessObj1.get_obj(content, [vim.VirtualMachine], "TheWorking_VM2")
+    StatelessObj1.add_nic(content, vm, INPUTS['PG'])
+
+
+    #Test clonning "GOD Speed"
+    #StatelessObj1.clone_vm(content, INPUTS['VM_Name'], INPUTS['Template_Name'], INPUTS['new_clone_ip'], INPUTS['new_clone_gateway'],INPUTS['new_clone_netmask'], INPUTS['new_clone_dns'])
+
+    #Logout
+    StatelessObj1.logout(si)
+
+
+# start this thing
+if __name__ == "__main__":
+    main()
