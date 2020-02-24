@@ -7,12 +7,15 @@ import argparse
 import getpass
 import ssl
 import re
+import sys
+import time
+
 
 "Static Inputs to connect to cptc-server"
 
 INPUTS = {'vcenter_ip': 'cptc-vcenter.csec.rit.edu',
-          'vcenter_user': 'cptc.local\\admin',
-          'vcenter_password': 'hello',
+          'vcenter_user': 'cptc.local\\wow',
+          'vcenter_password': 'weho!',
           'datacenter' : 'Datacenter',
           'datastore' : 'datastore1', 
           'cluster' : 'CPTCCluster',
@@ -20,16 +23,16 @@ INPUTS = {'vcenter_ip': 'cptc-vcenter.csec.rit.edu',
           'dea_name': 'Pf-Template',
           'new_clone_name': 'Pfsesne-wow',
           'new_clone_domain': 'cptc.local',
+          'isDHCP' : False,
           'new_clone_ip': '10.0.1.44',
           'new_clone_netmask': '255.255.255.0',
           'new_clone_gateway': '10.0.1.1',
           'new_clone_dns': '10.0.0.1',
-          'folder_path' : 'dad/son/',
           'vSwitch' :    'Test_vSwitch123',
           'PG' : 'Test_PG123',
           'VlanID':     '1',
-          "Template_Name" : "pfSense-2-2-4", 
-          'VM_Name':   "TheWorking_VM2"
+          "Template_Name" : "pfSense-2-2-4-Template", 
+          'VM_Name':   "pfSense-2-2-4-clone"
           }
 
 
@@ -110,6 +113,24 @@ class StatelessObj():
                 print("there was an error")
                 task_done = True
 
+    def wait_for_another_task(self,task,actionName='job', hideResult=False):
+        while task.info.state == vim.TaskInfo.State.running:
+            time.sleep(2)
+    
+        if task.info.state == vim.TaskInfo.State.success:
+            if task.info.result is not None and not hideResult:
+                out = '%s completed successfully, result: %s' % (actionName, task.info.result)
+                print(out)
+            else:
+                out = '%s completed successfully.' % actionName
+                print (out)
+        else:
+            out = '%s did not complete successfully: %s' % (actionName, task.info.error)
+            raise task.info.error
+            print (out)
+        
+        return task.info.result
+
     def mkdir_task(self, base_obj, dir_name):
         """
         helper function takes the base object and dir name and creat the folder with dir name
@@ -145,7 +166,7 @@ class StatelessObj():
                 base_obj = self.mkdir_task(base_obj, path_part)
 
 
-    def test_folder_creation(self,content, folder_path):
+    def test_create_folder(self,content, folder_path):
         """
         test the functionality of create_folder and check whether the folder exist or not
         :param content: service instance content
@@ -263,7 +284,7 @@ class StatelessObj():
 
 
     
-    def clone_vm(self,content, VM_Name, Template_Name, IP_Address, Gateway,NetMask, DNS_Server):
+    def clone_vm(self,content, VM_Name, Template_Name, Folder_Path,IP_Address, Gateway,NetMask, DNS_Server):
         """
         clone a virtual machine from a template
         :param content: service instance content
@@ -279,8 +300,8 @@ class StatelessObj():
         datacenter = self.get_obj(content, [vim.Datacenter], INPUTS['datacenter'])
 
         
-        #destfolder = self.get_obj(content, [vim.Folder], INPUTS['folder_path'])
-        destfolder = datacenter.vmFolder
+        destfolder = self.get_obj(content, [vim.Folder], Folder_Path)
+        #destfolder = datacenter.vmFolder
 
         
         datastore = self.get_obj(content, [vim.Datastore], INPUTS['datastore'])
@@ -340,9 +361,61 @@ class StatelessObj():
         """
         content.content.sessionManager.UpdateServiceMessage(message=message)
 
-def assign_IP(self):
+    def assign_IP(self,si, content):
+        try:
+            vm_name = INPUTS['VM_Name']      
+            vm = self.get_obj(content, [vim.VirtualMachine], vm_name)
 
-    pass
+            if vm.runtime.powerState != 'poweredOff':
+                print("WARNING:: Power off your VM before reconfigure")
+                sys.exit()
+
+            adaptermap = vim.vm.customization.AdapterMapping()
+            globalip = vim.vm.customization.GlobalIPSettings()
+            adaptermap.adapter = vim.vm.customization.IPSettings()
+            
+            isDHDCP = INPUTS['isDHCP']
+            if not isDHDCP:
+                """Static IP Configuration"""
+                adaptermap.adapter.ip = vim.vm.customization.FixedIp()
+                adaptermap.adapter.ip.ipAddress = INPUTS['new_clone_ip']
+                adaptermap.adapter.subnetMask = INPUTS['new_clone_netmask']
+                adaptermap.adapter.gateway = INPUTS['new_clone_gateway']  
+                globalip.dnsServerList = INPUTS['new_clone_dns']
+                
+            else:
+                """DHCP Configuration"""
+                adaptermap.adapter.ip = vim.vm.customization.DhcpIpGenerator()
+                
+            adaptermap.adapter.dnsDomain = INPUTS['new_clone_domain']
+            
+            globalip = vim.vm.customization.GlobalIPSettings()
+            
+            #For Linux . For windows follow sysprep
+            ident = vim.vm.customization.LinuxPrep(domain=INPUTS['new_clone_domain'], hostName=vim.vm.customization.FixedName(name=vm_name))        
+            
+            customspec = vim.vm.customization.Specification()
+            #For only one adapter
+            customspec.identity = ident
+            customspec.nicSettingMap = [adaptermap]
+            customspec.globalIPSettings = globalip
+            
+            #Configuring network for a single NIC
+            #For multipple NIC configuration contact me.
+
+            print("Reconfiguring VM Networks . . .")
+            
+            task = vm.Customize(spec=customspec)
+
+            # Wait for Network Reconfigure to complete
+            self.wait_for_another_task(task)        
+                
+        except vmodl.MethodFault as msg:
+            print("Caught vmodl fault: {}".format(msg))
+            return 1
+        except Exception as msg:
+            print("Caught exception: {}".format(msg))
+            return 1
 
 def main():
     print("Starting main!")
@@ -352,23 +425,26 @@ def main():
     content = StatelessObj1.retrive_content(si)
     
     #Test Folder creating
-    #StatelessObj1.test_folder_creation(content,INPUTS['folder_path'])
+    #StatelessObj1.test_create_folder(content,INPUTS['folder_path'])
 
     #Test vSwitch_Creat
-    Hosts  =  StatelessObj1.GetVMHosts(content)
+    #Hosts  =  StatelessObj1.GetVMHosts(content)
     #StatelessObj1.Create_vSwitch(Hosts,INPUTS['vSwitch'])
 
     #Test PGroup Creation 
     #StatelessObj1.Create_PortGroup(Hosts, INPUTS['vSwitch'], INPUTS['PG'], INPUTS['VlanID'])
 
     #Test adding NIC to a vim
-    vm = StatelessObj1.get_obj(content, [vim.VirtualMachine], "TheWorking_VM2")
-    StatelessObj1.add_nic(content, vm, INPUTS['PG'])
+    #vm = StatelessObj1.get_obj(content, [vim.VirtualMachine], "TheWorking_VM2")
+    #StatelessObj1.add_nic(content, vm, INPUTS['PG'])
 
 
     #Test clonning "GOD Speed"
-    #StatelessObj1.clone_vm(content, INPUTS['VM_Name'], INPUTS['Template_Name'], INPUTS['new_clone_ip'], INPUTS['new_clone_gateway'],INPUTS['new_clone_netmask'], INPUTS['new_clone_dns'])
+    Folder_Path = "Admin"
+    StatelessObj1.clone_vm(content, INPUTS['VM_Name'], INPUTS['Template_Name'],Folder_Path, INPUTS['new_clone_ip'], INPUTS['new_clone_gateway'],INPUTS['new_clone_netmask'], INPUTS['new_clone_dns'])
 
+    #Assign fixed IP addres
+    #StatelessObj1.assign_IP(si,content)
     #Logout
     StatelessObj1.logout(si)
 
