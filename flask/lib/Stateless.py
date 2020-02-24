@@ -9,35 +9,144 @@ import re
 
 "Static Inputs to connect to cptc-server"
 
-INPUTS = {'vcenter_ip': 'cptc-vcenter.csec.rit.edu',
-          'vcenter_user': 'cptc.local\admin',
-          'vcenter_password': 'WhereThingsGetTooComplicated',
-          'datacenter' : 'Datacenter',
-          'datastore' : 'datastore1', 
-          'cluster' : 'CPTCCluster',
-          'RP' :    'DevRP', 
-          'dea_name': 'Pf-Template',
-          'new_clone_name': 'Pfsesne-wow',
-          'new_clone_domain': 'cptc.local',
-          'new_clone_ip': '10.0.1.44',
-          'new_clone_netmask': '255.255.255.0',
-          'new_clone_gateway': '10.0.1.1',
-          'new_clone_dns': '10.0.0.1',
-          'folder_path' : 'dad/son/',
-          'vSwitch' :    'Test_vSwitch',
-          'PG' : 'Test_PG',
-          'VlanID':     '1',
-          "Template_Name" : "pf", 
-          'VM_Name':   "TheWorking_VM"
-          }
 
 
 class StatelessObj():
 
-    def __init__(self):
+    def __init__(self, vcenter_ip, vcenter_user, vcenter_password):
         self.vcenter_ip = vcenter_ip
         self.vcenter_user = vcenter_user
         self.vcenter_password = vcenter_password
+
+        # Changeable
+        self.datacenter = None
+        self.datastore = None
+        self.cluster = None
+        self.RP = None
+
+    def set_datacenter(self, datacenter):
+        """
+        Set datacenter
+        :param datacenter:
+        :return: None
+        """
+        self.datacenter = datacenter
+
+    def get_datacenter(self):
+        """
+        Get the object's datacenter
+        :return: object's datacenter
+        """
+        return self.datacenter
+
+    def datacenter_is_empty(self):
+        """
+        Check if datacenter has a value
+        :return:
+        """
+        if self.datacenter == None:
+            return True
+        return False
+
+    def datacenter_to_string(self):
+        """
+        Convert datacenter value to a string and return it
+        :return: string of datacenter
+        """
+        return str(self.datacenter)
+
+    def set_datastore(self, datastore):
+        """
+        Set datastore
+        :param datastore:
+        :return: None
+        """
+        self.datastore = datastore
+
+    def get_datastore(self):
+        """
+        Get the object's datastore
+        :return: object's datastore
+        """
+        return self.datastore
+
+    def datastore_is_empty(self):
+        """
+        Check if datastore has a value
+        :return:
+        """
+        if self.datastore == None:
+            return True
+        return False
+
+    def datastore_to_string(self):
+        """
+        Convert datastore value to a string and return it
+        :return: string of datastore
+        """
+        return str(self.datastore)
+
+    def set_cluster(self, cluster):
+        """
+        Set cluster
+        :param cluster:
+        :return: None
+        """
+        self.cluster = cluster
+
+    def get_cluster(self):
+        """
+        Get the object's cluster
+        :return: object's cluster
+        """
+        return self.cluster
+
+    def cluster_is_empty(self):
+        """
+        Check if cluster has a value
+        :return:
+        """
+        if self.cluster == None:
+            return True
+        return False
+
+    def cluster_to_string(self):
+        """
+        Convert cluster value to a string and return it
+        :return: string of cluster
+        """
+        return str(self.cluster)
+
+    def set_RP(self, RP):
+        """
+        Set RP
+        :param RP:
+        :return: None
+        """
+        self.RP = RP
+
+    def get_RP(self):
+        """
+        Get the object's RP
+        :return: object's RP
+        """
+        return self.RP
+
+    def RP_is_empty(self):
+        """
+        Check if RP has a value
+        :return:
+        """
+        if self.RP == None:
+            return True
+        return False
+
+    def RP_to_string(self):
+        """
+        Convert RP value to a string and return it
+        :return: string of RP
+        """
+        return str(self.RP)
 
     
     def login(self):
@@ -61,6 +170,7 @@ class StatelessObj():
         atexit.register(Disconnect, serviceInstance)
         return serviceInstance
 
+
     def logout(self, si):
         """
         logout function to logout 
@@ -68,6 +178,7 @@ class StatelessObj():
         :return: N/A
         """
         si.content.sessionManager.Logout()
+
 
     def retrive_content(self, si):
         """
@@ -77,6 +188,7 @@ class StatelessObj():
         """
         content = si.RetrieveContent()
         return content
+
 
     def get_obj(self,content, vimtype, name):
         """
@@ -94,6 +206,8 @@ class StatelessObj():
                 obj = c
                 break
         return obj
+
+
     def wait_for_task(self,task):
         """
         wait for a vCenter task to finish 
@@ -109,6 +223,7 @@ class StatelessObj():
                 print("there was an error")
                 task_done = True
 
+
     def mkdir_task(self, base_obj, dir_name):
         """
         helper function takes the base object and dir name and creat the folder with dir name
@@ -121,6 +236,7 @@ class StatelessObj():
         except (vim.fault.InvalidName) as e:
             print(e)
             import sys
+
 
     def create_folder(self, content, base_obj, folder_path):
         """
@@ -144,21 +260,24 @@ class StatelessObj():
                 base_obj = self.mkdir_task(base_obj, path_part)
 
 
-    def test_folder_creation(self,content, folder_path):
+    def test_create_folder(self,content, folder_path):
         """
         test the functionality of create_folder and check whether the folder exist or not
         :param content: service instance content
         :param folder_path: nested path e.g. /folder1/folder2/folder3
         """
-        dc = self.get_obj(content, [vim.Datacenter], INPUTS['datacenter'])
-        if (self.get_obj(content, [vim.Folder], INPUTS['folder_path'])):
-            print("Folder '%s' already exists" % INPUTS['folder_path'])
-            return 0
-        else:
-            self.create_folder(content, dc.hostFolder, INPUTS['folder_path'])
-            print("Successfully created the host folder '%s'" % INPUTS['folder_path'])
-            self.create_folder(content, dc.vmFolder, INPUTS['folder_path'])
-            print("Successfully created the VM folder '%s'" % INPUTS['folder_path'])
+        try:
+            dc = self.get_obj(content, [vim.Datacenter], self.datacenter)
+            if (self.get_obj(content, [vim.Folder], folder_path)):
+                print("Folder '%s' already exists" % folder_path)
+                return 1
+            else:
+                #self.create_folder(content, dc.hostFolder, folder_path)
+                #print("Successfully created the host folder '%s'" % folder_path)
+                self.create_folder(content, dc.vmFolder, folder_path)
+                print("Successfully created the VM folder '%s'" % folder_path)
+                return 1
+        except:
             return 0
 
 
@@ -262,7 +381,7 @@ class StatelessObj():
 
 
     
-    def clone_vm(self,content, VM_Name, Template_Name, IP_Address, Gateway,NetMask, DNS_Server):
+    def clone_vm(self,content, VM_Name, Template_Name, Folder_Path, IP_Address, Gateway,NetMask, DNS_Server):
         """
         clone a virtual machine from a template
         :param content: service instance content
@@ -271,66 +390,77 @@ class StatelessObj():
         :param IP_Address: ip adress of the VM
         :param Gateway: the Gateway of the virtual machine
         :param NetMask: network mask
-        :param DNS_Server: the DNS server 
+        :param DNS_Server: the DNS server
         :return N/A
         """
-        # if none git the first one
-        datacenter = self.get_obj(content, [vim.Datacenter], INPUTS['datacenter'])
 
-        
-        #destfolder = self.get_obj(content, [vim.Folder], INPUTS['folder_path'])
-        destfolder = datacenter.vmFolder
-
-        
-        datastore = self.get_obj(content, [vim.Datastore], INPUTS['datastore'])
-        
-
-        # if None, get the first one
-        cluster = self.get_obj(content, [vim.ClusterComputeResource], INPUTS['cluster'])
-
-        resource_pool = self.get_obj(content, [vim.ResourcePool], INPUTS['RP'])
-        
-        TheTemplate = self.get_obj(content, [vim.VirtualMachine], Template_Name)
-
-        #datastore = self.get_obj(content, [vim.Datastore], real_datastore_name)
-
-        vmconf = vim.vm.ConfigSpec()
-
-        # if datastorecluster_name:
-        #     podsel = vim.storageDrs.PodSelectionSpec()
-        #     pod = get_obj(content, [vim.StoragePod], datastorecluster_name)
-        #     podsel.storagePod = pod
-
-        #     storagespec = vim.storageDrs.StoragePlacementSpec()
-        #     storagespec.podSelectionSpec = podsel
-        #     storagespec.type = 'create'
-        #     storagespec.folder = destfolder
-        #     storagespec.resourcePool = resource_pool
-        #     storagespec.configSpec = vmconf
+        if self.datacenter == None:
+            return -1
+        if self.datastore == None:
+            return -1
+        if self.RP == None:
+            return -1
 
         try:
-            rec = content.storageResourceManager.RecommendDatastores(
-                storageSpec=storagespec)
-            rec_action = rec.recommendations[0].action[0]
-            real_datastore_name = rec_action.destination.name
-        except:
-            real_datastore_name = TheTemplate.datastore[0].info.name
+            # if none git the first one
+            datacenter = self.get_obj(content, [vim.Datacenter], self.datacenter)
 
-        
+            destfolder = self.get_obj(content, [vim.Folder], Folder_Path)
+            # destfolder = datacenter.vmFolde
+            datastore = self.get_obj(content, [vim.Datastore], self.datastore)
 
-    # set relospec
-        relospec = vim.vm.RelocateSpec()
-        relospec.datastore = datastore
-        relospec.pool = resource_pool
+            # if None, get the first one
+            cluster = self.get_obj(content, [vim.ClusterComputeResource], self.cluster)
 
-        clonespec = vim.vm.CloneSpec()
-        clonespec.location = relospec
-        clonespec.powerOn = True
+            resource_pool = self.get_obj(content, [vim.ResourcePool], self.RP)
 
-        print("cloning VM...")
-        task = TheTemplate.Clone(folder=destfolder, name=VM_Name, spec=clonespec)
-        self.wait_for_task(task)
-    
+            TheTemplate = self.get_obj(content, [vim.VirtualMachine], Template_Name)
+
+            # datastore = self.get_obj(content, [vim.Datastore], real_datastore_name)
+
+            vmconf = vim.vm.ConfigSpec()
+
+            # if datastorecluster_name:
+            #     podsel = vim.storageDrs.PodSelectionSpec()
+            #     pod = get_obj(content, [vim.StoragePod], datastorecluster_name)
+            #     podsel.storagePod = pod
+
+            #     storagespec = vim.storageDrs.StoragePlacementSpec()
+            #     storagespec.podSelectionSpec = podsel
+            #     storagespec.type = 'create'
+            #     storagespec.folder = destfolder
+            #     storagespec.resourcePool = resource_pool
+            #     storagespec.configSpec = vmconf
+
+            try:
+                rec = content.storageResourceManager.RecommendDatastores(
+                    storageSpec=storagespec)
+                rec_action = rec.recommendations[0].action[0]
+                real_datastore_name = rec_action.destination.name
+            except:
+                real_datastore_name = TheTemplate.datastore[0].info.name
+
+            # set relospec
+            relospec = vim.vm.RelocateSpec()
+            relospec.datastore = datastore
+            relospec.pool = resource_pool
+
+            clonespec = vim.vm.CloneSpec()
+            clonespec.location = relospec
+            clonespec.powerOn = True
+
+            print("cloning VM...")
+            task = TheTemplate.Clone(folder=destfolder, name=VM_Name, spec=clonespec)
+
+
+            #self.wait_for_task(task)
+
+            return 1
+        except Exception as e:
+            print("Stateless Debug Message :" + str(e), file=sys.stderr)
+            return 0
+
+
     def motd(self, content, message):
         """
         message of the day on vcenter
