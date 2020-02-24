@@ -14,8 +14,8 @@ import time
 "Static Inputs to connect to cptc-server"
 
 INPUTS = {'vcenter_ip': 'cptc-vcenter.csec.rit.edu',
-          'vcenter_user': 'cptc.local\\wow',
-          'vcenter_password': 'weho!',
+          'vcenter_user': 'cptc.local\\lol',
+          'vcenter_password': 'lol!',
           'datacenter' : 'Datacenter',
           'datastore' : 'datastore1', 
           'cluster' : 'CPTCCluster',
@@ -32,7 +32,7 @@ INPUTS = {'vcenter_ip': 'cptc-vcenter.csec.rit.edu',
           'PG' : 'Test_PG123',
           'VlanID':     '1',
           "Template_Name" : "pfSense-2-2-4-Template", 
-          'VM_Name':   "pfSense-2-2-4-clone"
+          'VM_Name':   "pfSense-2-2-4-folder-test"
           }
 
 
@@ -94,10 +94,16 @@ class StatelessObj():
         container = content.viewManager.CreateContainerView(
             content.rootFolder, vimtype, True)
         for c in container.view:
-            if c.name == name:
+            if name:
+                if c.name == name:
+                    obj = c
+                    break
+            else:
                 obj = c
                 break
+
         return obj
+
     def wait_for_task(self,task):
         """
         wait for a vCenter task to finish 
@@ -173,14 +179,14 @@ class StatelessObj():
         :param folder_path: nested path e.g. /folder1/folder2/folder3
         """
         dc = self.get_obj(content, [vim.Datacenter], INPUTS['datacenter'])
-        if (self.get_obj(content, [vim.Folder], INPUTS['folder_path'])):
-            print("Folder '%s' already exists" % INPUTS['folder_path'])
+        if (self.get_obj(content, [vim.Folder], folder_path)):
+            print("Folder '%s' already exists" % folder_path)
             return 0
         else:
-            self.create_folder(content, dc.hostFolder, INPUTS['folder_path'])
-            print("Successfully created the host folder '%s'" % INPUTS['folder_path'])
-            self.create_folder(content, dc.vmFolder, INPUTS['folder_path'])
-            print("Successfully created the VM folder '%s'" % INPUTS['folder_path'])
+            #self.create_folder(content, dc.hostFolder, INPUTS['folder_path'])
+            #print("Successfully created the host folder '%s'" % INPUTS['folder_path'])
+            self.create_folder(content, dc.vmFolder, folder_path)
+            print("Successfully created the VM folder '%s'" % folder_path)
             return 0
 
 
@@ -301,9 +307,7 @@ class StatelessObj():
 
         
         destfolder = self.get_obj(content, [vim.Folder], Folder_Path)
-        #destfolder = datacenter.vmFolder
-
-        
+        #destfolder = datacenter.vmFolde        
         datastore = self.get_obj(content, [vim.Datastore], INPUTS['datastore'])
         
 
@@ -361,7 +365,13 @@ class StatelessObj():
         """
         content.content.sessionManager.UpdateServiceMessage(message=message)
 
-    def assign_IP(self,si, content):
+    def assign_IP(self,si):
+        """
+        Assign IP address for a VM
+        :param si: service instance
+        :param content: service instance content
+        """
+        content = self.retrive_content(si)
         try:
             vm_name = INPUTS['VM_Name']      
             vm = self.get_obj(content, [vim.VirtualMachine], vm_name)
@@ -417,15 +427,128 @@ class StatelessObj():
             print("Caught exception: {}".format(msg))
             return 1
 
+    def PrintVmInfo(self,vm, depth=1):
+        """
+        Print information for a particular virtual machine or recurse into a folder
+        or vApp with depth protection
+        """
+        maxdepth = 10
+        # if this is a group it will have children. if it does, recurse into them
+        # and then return
+        if hasattr(vm, 'childEntity'):
+            if depth > maxdepth:
+                return
+            vmList = vm.childEntity
+            for c in vmList:
+                PrintVmInfo(c, depth+1)
+            return
+
+        # if this is a vApp, it likely contains child VMs
+        # (vApps can nest vApps, but it is hardly a common usecase, so ignore that)
+        if isinstance(vm, vim.VirtualApp):
+            vmList = vm.vm
+            for c in vmList:
+                PrintVmInfo(c, depth + 1)
+            return
+
+        summary = vm.summary
+        print("Name       : ", summary.config.name)
+        print("Path       : ", summary.config.vmPathName)
+        print("Guest      : ", summary.config.guestFullName)
+        annotation = summary.config.annotation
+        if annotation != None and annotation != "":
+            print("Annotation : ", annotation)
+        print("State      : ", summary.runtime.powerState)
+        if summary.guest != None:
+            ip = summary.guest.ipAddress
+            if ip != None and ip != "":
+                print("IP         : ", ip)
+        if summary.runtime.question != None:
+            print("Question  : ", summary.runtime.question.text)
+        print("")
+
+
+
+    def get_vm_path(self,content, vm_name):
+        """
+        Function to find the path of virtual machine.
+        Args:
+            content: VMware content object
+            vm_name: virtual machine managed object
+
+        Returns: Folder of virtual machine if exists, else None
+
+        """
+        folder_name = None
+        folder = vm_name.parent
+        if folder:
+            folder_name = folder.name
+            fp = folder.parent
+            # climb back up the tree to find our path, stop before the root folder
+            while fp is not None and fp.name is not None and fp != content.rootFolder:
+                folder_name = fp.name + '/' + folder_name
+                try:
+                    fp = fp.parent
+                except BaseException:
+                    break
+            folder_name = '/' + folder_name
+        return folder_name 
+
+    # def get_parent_datacenter(self,obj):
+    #     """ Walk the parent tree to find the objects datacenter """
+    #     if isinstance(obj, vim.Datacenter):
+    #         return obj
+    #     datacenter = None
+    #     while True:
+    #         if not hasattr(obj, 'parent'):
+    #             break
+    #         obj = obj.parent
+    #         if isinstance(obj, vim.Datacenter):
+    #             datacenter = obj
+    #             break
+    #     return datacenter
+
+    # def get_all_objs(self, content, types, confine_to_datacenter=True):
+    #     """ Wrapper around get_all_objs to set datacenter context """
+    #     objects = get_all_objs(content, types)
+    #     if confine_to_datacenter:
+    #         if hasattr(objects, 'items'):
+    #             # resource pools come back as a dictionary
+    #             for k, v in objects.items():
+    #                 parent_dc = get_parent_datacenter(k)
+    #                 if parent_dc.name != self.dc_name:
+    #                     objects.pop(k, None)
+    #         else:
+    #             # everything else should be a list
+    #             objects = [x for x in objects if get_parent_datacenter(x).name == self.dc_name]
+
+    #     return objects
+
+    # def get_folder_by_name(self, folder_name):
+    #     """
+    #     Function to get managed object of folder by name
+    #     Returns: Managed object of folder by name
+
+    #     """
+    #     folder_objs = get_all_objs(self.content, [vim.Folder])
+    #     for folder in folder_objs:
+    #         if folder.name == folder_name:
+    #             return folder
+
+    #     return None 
+
+
 def main():
     print("Starting main!")
+    folder_Path1 = 'folder1'
     #Connectin to vCenter
     StatelessObj1 = StatelessObj(INPUTS['vcenter_ip'],INPUTS['vcenter_user'],INPUTS['vcenter_password'])
     si = StatelessObj1.login()
     content = StatelessObj1.retrive_content(si)
     
     #Test Folder creating
-    #StatelessObj1.test_create_folder(content,INPUTS['folder_path'])
+
+    #StatelessObj1.test_create_folder(content,folder_Path1)
 
     #Test vSwitch_Creat
     #Hosts  =  StatelessObj1.GetVMHosts(content)
@@ -435,18 +558,40 @@ def main():
     #StatelessObj1.Create_PortGroup(Hosts, INPUTS['vSwitch'], INPUTS['PG'], INPUTS['VlanID'])
 
     #Test adding NIC to a vim
-    #vm = StatelessObj1.get_obj(content, [vim.VirtualMachine], "TheWorking_VM2")
+    vm = StatelessObj1.get_obj(content, [vim.VirtualMachine], "pfSense-2-2-4-clone")
     #StatelessObj1.add_nic(content, vm, INPUTS['PG'])
 
 
     #Test clonning "GOD Speed"
-    Folder_Path = "Admin"
-    StatelessObj1.clone_vm(content, INPUTS['VM_Name'], INPUTS['Template_Name'],Folder_Path, INPUTS['new_clone_ip'], INPUTS['new_clone_gateway'],INPUTS['new_clone_netmask'], INPUTS['new_clone_dns'])
+    #Folder_Path = "Admin"
+    StatelessObj1.clone_vm(content, INPUTS['VM_Name'], INPUTS['Template_Name'],folder_Path1, INPUTS['new_clone_ip'], INPUTS['new_clone_gateway'],INPUTS['new_clone_netmask'], INPUTS['new_clone_dns'])
 
     #Assign fixed IP addres
     #StatelessObj1.assign_IP(si,content)
+
+    #get_vm
+    # path = StatelessObj1.get_vm_path(content,vm)
+    # print(path)
+
+    #StatelessObj1.get_folder_by_name(folder_Path1)
+
+
+
+
+    
+    #show all VM
+    # for child in content.rootFolder.childEntity:
+    #     if hasattr(child, 'vmFolder'):
+    #         datacenter = child
+    #         vmFolder = datacenter.vmFolder
+    #         vmList = vmFolder.childEntity
+    #         for vm in vmList:
+    #             StatelessObj1.PrintVmInfo(vm)
+    # return 0
+
+
     #Logout
-    StatelessObj1.logout(si)
+    # StatelessObj1.logout(si)
 
 
 # start this thing
