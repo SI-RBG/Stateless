@@ -8,29 +8,6 @@ from lib import pyTeamObject, pyCompetitionObject, pyVMObject, Stateless
 import os, sys
 
 
-# template_vars = {'vc_server': 'vc.mohad.red'
-#     , 'vc_username': 'controller@vsphere.local'
-#     , 'vc_password': '07xAD!07xAD!*&'
-#
-#                  # This is the type of this template
-#     , 'guest_os_type': 'ubuntu64Guest'
-#
-#     , 'host': 'mikasa.mohammed.red'
-#     , 'vm_name': 'example-ubuntu2'
-#     , 'datastore': 'datastore2'
-#     , 'network': 'Group200'
-#     , 'username': 'testuser'
-#     , 'password': 'testuser'
-#     , 'CPUs': 2
-#     , 'RAM': 2048
-#     , 'disk_size': 32768
-#     , 'shellinline': 'ls /'
-#                  }
-
-
-
-
-
 def PackerCoreDeploy(pyCompOb):
     VMs = pyCompOb.get_sample_vms()
 
