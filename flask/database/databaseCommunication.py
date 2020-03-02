@@ -4,7 +4,7 @@ from config import *
 import sys
 
 
-def raw_competitions_add(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C):
+def raw_competitions_add(session, UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C):
     """
 
     :param UNAME:
@@ -44,7 +44,7 @@ def raw_competitions_add(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_V
 
 
 
-def raw_competitions_edit(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, ID):
+def raw_competitions_edit(session, UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, ID):
     """
 
     :param UNAME:
@@ -77,7 +77,7 @@ def raw_competitions_edit(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_
     addEvent(session['username'], "Competition modification", UNAME+" competition has been modified")
 
 
-def simple_competitions_edit(UNAME, TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, ID):
+def simple_competitions_edit(session, UNAME, TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, ID):
     """
 
     :param UNAME:
@@ -105,7 +105,7 @@ def simple_competitions_edit(UNAME, TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, ID):
 
 
 
-def safe_competitions_team_edit_by_name(COMPETITION_NAME,
+def safe_competitions_team_edit_by_name(session, COMPETITION_NAME,
                                         TEAM,
                                         DOMAIN_NAME,
                                         SUBNET,
@@ -196,7 +196,8 @@ def safe_competitions_team_edit(COMPETITION_NAME,TEAM,
 
 
 
-def raw_competitions_team_add(COMPETITION_NAME,
+def raw_competitions_team_add(session,
+                              COMPETITION_NAME,
                               TEAM,
                               DOMAIN_NAME,
                               SUBNET,

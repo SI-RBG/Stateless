@@ -8,7 +8,7 @@ from database.databaseCommunication import *
 from database.databaseCommunicationUtilities import *
 from config import *
 from lib import pyTeamObject, pyCompetitionObject, pyVMObject, Stateless
-
+from packer.PackerCore import *
 
 # Wait
 time.sleep(2)
@@ -294,7 +294,7 @@ def create_a_competition(pyCompOb):
     so = Stateless.StatelessObj(vcenter_ip_env, vcenter_user_env, vcenter_password_env)
     # Set the changeable variables.
     so.set_datacenter("Datacenter")
-    so.set_datastore("datastore1")
+    so.set_datastore("datastore3")
     so.set_cluster("CPTCCluster")
     so.set_RP("DevRP")
 
@@ -385,8 +385,7 @@ def home():
 
 @app.route("/install", methods=['get', 'post'])
 def install():
-    # Remove me!
-    test()
+
     # Check the data base for config entry.
     result = mysqlExecute("select * from config")
     # returns this example: (1, 'VSPHERE_SERVER1', 'VSPHERE_SERVER2', 'VSPHERE_SERVER3')
@@ -501,6 +500,17 @@ def add_templates():
     # TODO
     # Add more descriptive error with parameters!
     return abort(500, 'add_templates error...')
+
+
+@app.route("/create_templates", methods=['GET','POST'])
+def create_templates():
+    if 'username' in session:
+        data = mysqlExecuteAll("SELECT * FROM templates")
+        if debug:
+            print("The data object: "+ str(data),file=sys.stderr)
+        return render_template('templates.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+    return root()
+
 
 
 def getTemplatesLength():
@@ -651,7 +661,7 @@ def competitions_edit():
                 mysqlExecute("UPDATE vms SET COMPETITION_NAME = '{}'  WHERE COMPETITION_NAME  = '{}'".format(UNAME, OLD_UNAME))
 
 
-                simple_competitions_edit(UNAME, TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, ID)
+                simple_competitions_edit(session, UNAME, TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, ID)
 
 
                 return render_template('done.html', url = url_for('competitions'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
@@ -702,7 +712,7 @@ def competitions_add():
 
 
                 # Create a comp and make an event
-                raw_competitions_add(UNAME, TEAMS, "0", WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C)
+                raw_competitions_add(session, UNAME, TEAMS, "0", WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C)
 
                 return render_template('done.html', url = url_for('competitions'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
             except:
@@ -1007,7 +1017,8 @@ def competitions_team_add():
                 CREATED_FLAG_C = "0"
 
                 # Create a team and make an event
-                raw_competitions_team_add(COMPETITION_NAME,
+                raw_competitions_team_add(session,
+                                          COMPETITION_NAME,
                                           TEAM,
                                           DOMAIN_NAME,
                                           SUBNET,
@@ -1380,6 +1391,8 @@ def competitions_deployment_post():
                         debugMessage("Block #8239732981")
 
                 debugMessage("create_a_competition(pyCompOb) TIME!!!!!")
+                #
+                # TODO   - Add more teste here!!!!
                 create_a_competition(pyCompOb)
         except Exception as e:
                     if debug:
@@ -1437,6 +1450,267 @@ def something():
         if debug:
            debugMessage(str(e)+"\nError #892378")
     return "GOOD! "+str(code)
+
+
+
+
+
+@app.route("/guest_type_templates", methods=['GET'])
+def guest_type_templates():
+    if 'username' in session:
+        data = mysqlExecuteAll("SELECT * FROM gt_templates")
+        return render_template('gt_templates.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+    return root()
+
+
+
+
+@app.route("/guest_type_templates_edit", methods=['GET','POST'])
+def guest_type_templates_edit():
+    if 'username' in session:
+        if request.method == 'POST':
+            try:
+                error_message = ""
+                ID = pymysql.escape_string(request.values.get('ID'))
+
+
+
+                GUEST_TYPE = pymysql.escape_string(request.values.get('GUEST_TYPE'))
+                if len(GUEST_TYPE) < 1:
+                    if debug:
+                        error_message = "Missing GUEST_TYPE"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('guest_type_templates'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+
+                ISO_PATH = pymysql.escape_string(request.values.get('ISO_PATH'))
+                if len(ISO_PATH) < 1:
+                    if debug:
+                        error_message = "Missing ISO_PATH"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('guest_type_templates'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+
+                # Edit a gt_templates
+                # TODO make an event
+                mysqlExecute("UPDATE gt_templates SET "
+                             " GUEST_TYPE = '{}',"
+                             " ISO_PATH = '{}' WHERE ID = '{}'"
+                             .format(GUEST_TYPE,
+                                     ISO_PATH,
+                                     ID))
+
+
+                return render_template('done.html', url = url_for('guest_type_templates'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+            except:
+                debugMessage("Error #094290023")
+        else:
+            try:
+                ID = pymysql.escape_string(request.args.get('ID'))
+                data = mysqlExecuteAll("SELECT * FROM gt_templates WHERE ID={}".format(ID))
+                return render_template('gt_templates_edit.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+            except:
+                debugMessage("Error #023132873")
+    return root()
+
+
+
+
+@app.route("/guest_type_templates_add", methods=['GET','POST'])
+def guest_type_templates_add():
+    if 'username' in session:
+        if request.method == 'POST':
+            try:
+
+                GUEST_TYPE = pymysql.escape_string(request.values.get('GUEST_TYPE'))
+                if len(GUEST_TYPE) < 1:
+                    if debug:
+                        error_message = "Missing GUEST_TYPE"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('guest_type_templates'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+                ISO_PATH = pymysql.escape_string(request.values.get('ISO_PATH'))
+                if len(ISO_PATH) < 1:
+                    if debug:
+                        error_message = "Missing ISO_PATH"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('guest_type_templates'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
+
+                # Create a gt template.
+                # TODO make an event.
+                mysqlExecute("INSERT INTO gt_templates("
+                             "GUEST_TYPE, "
+                             "ISO_PATH) VALUES ('{}' , '{}')"
+                    .format(
+                    GUEST_TYPE,
+                    ISO_PATH))
+
+                return render_template('done.html', url = url_for('guest_type_templates'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+            except:
+                pass
+        return render_template('gt_templates_add.html', username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+    return root()
+
+
+
+@app.route("/competitions_deployment_packer", methods=['GET','POST'])
+def competitions_deployment_packer():
+    if 'username' in session:
+        try:
+            """
+            
+            """
+            try:
+                vmsObjects =[]
+                ToBeSentList = []
+                # Get Comp ID
+                COMP_ID = pymysql.escape_string(str(request.args.get('COMP_ID')))
+                debugMessage("competitions_deployment_packer() "+str(COMP_ID)+" length: "+str(len(COMP_ID)))
+
+                # If it's not a number
+                if type(int(COMP_ID)) != int:
+                    undeployed_comps = mysqlExecuteAll("select * from competitions where CREATED_FLAG = 0")
+
+                    return render_template('competitions_deployment_packer.html', output_data=undeployed_comps,
+                                           username=session['username'],
+                                           templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+
+                # Start looking for all the variables for this comp and add them to a comp object
+
+                # Get COMPETITION_NAME by ID submitted
+                COMPETITION_NAME = mysqlExecute("select UNAME from competitions where id = '{}'".format(COMP_ID))
+                COMPETITION_NAME = cleanSQLOutputs(COMPETITION_NAME)[0]
+
+                # Create a pyCompetitionObject object
+                pyCompOb = pyCompetitionObject.Competition(COMPETITION_NAME)
+
+                try:
+                    # Fill the object
+                    pyCompOb = from_MySQL_table_to_pyObject_Competition(pyCompOb, COMPETITION_NAME)
+                except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Block #32423412312")
+
+                try:
+                    listOfTeams = pyCompOb.get_Teams()
+                    listOfListofvmsObjects = [team.get_VMs() for team in listOfTeams]
+                    ToBeSentList = []
+                except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Block #3451453")
+
+                try:
+                    for vmsOfATeam in listOfListofvmsObjects:
+                    # https://dockertester.mohad.red:5000/competitions_deployment?COMP_ID=1
+                        for vm in vmsOfATeam:
+                            debugMessage(str(vm.get_VM_ID()) + " "+str(vm.get_VM_Uname()))
+                            ToBeSentList.append([vm.VM_ID_to_string(),
+                                                 vm.get_Competition_Uname(),
+                                                 vm.Team_Uname_to_string(),
+                                                 vm.VM_Uname_to_string(),
+                                                 vm.Template_Name_to_string(),
+                                                 vm.IP_Address_to_string(),
+                                                 vm.Hostname_to_string(),
+                                                 vm.CPU_to_string(),
+                                                 vm.Disk_Space_to_string(),
+                                                 vm.Memory_to_string(),
+                                                 vm.get_Guest_Type()
+                                                 ])
+                except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Block #1324421354")
+                if debug:
+                    debugMessage("Redirecting to competitions_deployment_packer_1.html")
+                    debugMessage("Passing "+str(COMP_ID))
+                return render_template('competitions_deployment_packer_1.html', output_data=ToBeSentList, COMP_ID = COMP_ID, username=session['username'])
+            except Exception as e:
+                if debug:
+                    debugMessage(e)
+                debugMessage("No COMP_ID")
+
+            # IF get GET
+            undeployed_comps = mysqlExecuteAll("select * from competitions where CREATED_FLAG = 0")
+
+            return render_template('competitions_deployment_packer.html', output_data=undeployed_comps,
+                                   username=session['username'],
+                                   templates_length=getTemplatesLength(), tasks_length=getEventsLength())
+        except:
+            debugMessage("Error #98239823")
+    return root()
+
+
+
+@app.route("/competitions_deployment_packer_post", methods=['GET','POST'])
+def competitions_deployment_packer_post():
+    if 'username' in session:
+        try:
+            pass
+            if request.method == 'POST':
+                try:
+                    COMP_ID_V = request.form.get('COMPID')
+                    if COMP_ID_V == None:
+                        debugMessage("Error #98289293")
+                        return root()
+                    COMP_ID = pymysql.escape_string(str(COMP_ID_V))
+
+                except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Block #3234675665")
+
+                # Get COMPETITION_NAME by ID submitted
+                COMPETITION_NAME = mysqlExecute("select UNAME from competitions where id = '{}'".format(COMP_ID))
+                COMPETITION_NAME = cleanSQLOutputs(COMPETITION_NAME)[0]
+
+                # Create a pyCompetitionObject object
+                pyCompOb = pyCompetitionObject.Competition(COMPETITION_NAME)
+
+                try:
+                    # Fill the object
+                    pyCompOb = from_MySQL_table_to_pyObject_Competition(pyCompOb, COMPETITION_NAME)
+                except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Block #8239732981")
+
+                # Deploy
+                pyCompOb.set_datastore("datastore2")
+                pyCompOb.set_ESXI_HOST("mikasa.mohammed.red")
+
+                debugMessage("Executing PackerCoreDeploy()")
+                # Deploy
+                try:
+                    PackerCoreDeploy(pyCompOb)
+                except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Block #834431181")
+
+
+        except Exception as e:
+                    if debug:
+                        debugMessage(e)
+                        debugMessage("Error #345154323")
+    return root()
+
+
+
+
+
+def create_a_competition_gt(pyCompOb):
+    """
+    This function gets a pyCompetitionObject object which should have all the information needed to deploy a comp.
+
+    :param pyCompOb:
+    :return:
+    """
+    pass
+
+
 
 
 

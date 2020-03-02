@@ -1,0 +1,49 @@
+{% include "header.html" %}
+
+<title>Competitions</title>
+</head> <!-- <head> in the header - End -->
+
+
+
+<body>
+{% include "bar.html" %}
+
+{% include "after-bar.html" %}
+
+<br>
+Edit a competition
+<br>
+<!--Form starting point-->
+<div class="form1">
+    <form class="form1" action="/guest_type_templates_edit" method="POST">
+
+
+<table align="center" cellspacing="25" >
+    <tr>
+        <th>Guest type</th>
+        <th>ISO path</th>
+        <th>Edit</th>
+    </tr>
+    {% for element in output_data %}
+    <tr>
+            <input type="hidden" id="ID" name="ID" value="{{element[0]}}">
+        <td><h3>Edit {{element[1]}}  </h3></td>
+        <td><input type="text" value="" placeholder="{{element[1]}}" name="GUEST_TYPE"> </td>
+        <td><input type="text" value="" placeholder="{{element[2]}}" name="ISO_PATH"> </td>
+
+        <td><input type="submit" value="Submit changes"></td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+        <!--Form ending point-->
+    </form>
+</div>
+
+
+</body>
+
+
+{% include "footer.html" %}
+

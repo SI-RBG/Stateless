@@ -1,0 +1,33 @@
+{% include "header.html" %}
+
+<title>Guest Type Templates</title>
+</head> <!-- <head> in the header - End -->
+
+
+
+<body>
+{% include "bar.html" %}
+
+{% include "after-bar.html" %}
+
+<br>
+Guest Type Templates
+<br>
+
+<div class="form1">
+    <h3 >Add a competition</h3>
+    <form class="form1" action="/guest_type_templates_add" method="POST">
+        <p>Guest type<input type="text" value="" placeholder="Guest type" name="GUEST_TYPE"></p>
+        <p>ISO path <input type="text" value="" placeholder="ISO path" name="ISO_PATH"></p>
+        <p><input type="submit" value="Start"></p>
+    </form>
+</div>
+
+</body>
+
+
+{% include "footer.html" %}
+
+
+
+

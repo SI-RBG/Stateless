@@ -4,3 +4,5 @@ flask_limiter
 requests
 flask-cors
 werkzeug
+pyVmomi
+packer.py
