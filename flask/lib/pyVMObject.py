@@ -27,6 +27,14 @@ class VM:
         self.NICAKA_PortGropuList = None
         self.Services = None
 
+        self.ssh_username = None
+        self.ssh_password = None
+        self.disk_controller_type = None
+        self.disk_thin_provisioned = None
+        self.network_card = None
+        self.Services = None
+        self.shellinline = None
+
     def set_Competition_Uname(self, Competition_Uname):
         """
         Set Competition_Uname
@@ -646,4 +654,35 @@ class VM:
         :return: string of Services
         """
         return str(self.Services)
+
+    def set_shellinline(self, shellinline):
+        """
+        Set shellinline
+        :param shellinline:
+        :return: None
+        """
+        self.shellinline = shellinline
+
+    def get_shellinline(self):
+        """
+        Get the object's shellinline
+        :return: object's shellinline
+        """
+        return self.shellinline
+
+    def shellinline_is_empty(self):
+        """
+        Check if shellinline has a value
+        :return:
+        """
+        if self.shellinline == None:
+            return True
+        return False
+
+    def shellinline_to_string(self):
+        """
+        Convert shellinline value to a string and return it
+        :return: string of shellinline
+        """
+        return str(self.shellinline)
 

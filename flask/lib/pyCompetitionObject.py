@@ -12,7 +12,10 @@ class Competition:
         self.Win_VMs = None
         self.Unix_VMs = None
         self.Total_VMs = None
-        self.Resource_Pool = None
+        self.datastore = None
+        self.vSphereFolder = None
+        self.ResourcePool = None
+        self.ESXI_HOST = None
         self.Teams = []
 
 
@@ -192,33 +195,134 @@ class Competition:
         """
         return str(self.Total_VMs)
 
-    def set_Resource_Pool(self, Resource_Pool):
+
+    def set_datastore(self, datastore):
         """
-        Set Resource_Pool
-        :param Resource_Pool:
+        Set datastore
+        :param datastore:
         :return: None
         """
-        self.Resource_Pool = Resource_Pool
+        self.datastore = datastore
 
-    def get_Resource_Pool(self):
+    def get_datastore(self):
         """
-        Get the object's Resource_Pool
-        :return: object's Resource_Pool
+        Get the object's datastore
+        :return: object's datastore
         """
-        return self.Resource_Pool
+        return self.datastore
 
-    def Resource_Pool_is_empty(self):
+    def datastore_is_empty(self):
         """
-        Check if Resource_Pool has a value
+        Check if datastore has a value
         :return:
         """
-        if self.Resource_Pool == None:
+        if self.datastore == None:
             return True
         return False
 
-    def Resource_Pool_to_string(self):
+    def datastore_to_string(self):
         """
-        Convert Resource_Pool value to a string and return it
-        :return: string of Resource_Pool
+        Convert datastore value to a string and return it
+        :return: string of datastore
         """
-        return str(self.Resource_Pool)
+        return str(self.datastore)
+
+    def set_vSphereFolder(self, vSphereFolder):
+        """
+        Set vSphereFolder
+        :param vSphereFolder:
+        :return: None
+        """
+        self.vSphereFolder = vSphereFolder
+
+    def get_vSphereFolder(self):
+        """
+        Get the object's vSphereFolder
+        :return: object's vSphereFolder
+        """
+        return self.vSphereFolder
+
+    def vSphereFolder_is_empty(self):
+        """
+        Check if vSphereFolder has a value
+        :return:
+        """
+        if self.vSphereFolder == None:
+            return True
+        return False
+
+    def vSphereFolder_to_string(self):
+        """
+        Convert vSphereFolder value to a string and return it
+        :return: string of vSphereFolder
+        """
+        return str(self.vSphereFolder)
+
+    def set_ResourcePool(self, ResourcePool):
+        """
+        Set ResourcePool
+        :param ResourcePool:
+        :return: None
+        """
+        self.ResourcePool = ResourcePool
+
+    def get_ResourcePool(self):
+        """
+        Get the object's ResourcePool
+        :return: object's ResourcePool
+        """
+        return self.ResourcePool
+
+    def ResourcePool_is_empty(self):
+        """
+        Check if ResourcePool has a value
+        :return:
+        """
+        if self.ResourcePool == None:
+            return True
+        return False
+
+    def ResourcePool_to_string(self):
+        """
+        Convert ResourcePool value to a string and return it
+        :return: string of ResourcePool
+        """
+        return str(self.ResourcePool)
+
+
+
+    def get_sample_vms(self):
+        if len(self.Teams) > 1:
+            return self.Teams[0].get_VMs()
+        else:
+            return None
+
+    
+    def set_ESXI_HOST(self, ESXI_HOST):
+        """
+        Set ESXI_HOST
+        :param ESXI_HOST:
+        :return: None
+        """
+        self.ESXI_HOST = ESXI_HOST
+    def get_ESXI_HOST(self):
+        """
+        Get the object's ESXI_HOST
+        :return: object's ESXI_HOST
+        """
+        return self.ESXI_HOST
+    def ESXI_HOST_is_empty(self):
+        """
+        Check if ESXI_HOST has a value
+        :return:
+        """
+        if self.ESXI_HOST == None:
+            return True
+        return False
+    def ESXI_HOST_to_string(self):
+        """
+        Convert ESXI_HOST value to a string and return it
+        :return: string of ESXI_HOST
+        """
+        return str(self.ESXI_HOST)
+
