@@ -1,0 +1,109 @@
+
+
+{
+    "variables": {
+        "vsphere-server": "cptc-vcenter.csec.rit.edu",
+        "vsphere-user": "administrator@cptc.local",
+        "vsphere-password": "CPTC4Capstone!",
+        "vsphere-datacenter": "Datacenter",
+        "vsphere-cluster": "CPTCCluster",
+        "vsphere-network": "VM Network",
+        "vsphere-datastore": "datastore1",
+        "vsphere-folder": "Templates",
+        "resource_pool": "DevRP",
+        "vm-name": "PfSense-Packer",
+        "vm-cpu-num": "4",
+        "vm-mem-size": "4096",
+        "vm-disk-size": "40960",
+        "ssh_username": "testuser",
+        "ssh_password": "Password123!",
+        "os_iso_path": "[datastore1] ISO/FreeBSD/pfSense-CE-2.4.4-RELEASE-p3-amd64.iso"
+    },
+
+
+    "sensitive-variables": ["vsphere_password", "ssh_password"],
+
+    "builders": [
+        {
+        "type": "vsphere-iso",
+
+        "vcenter_server": "{{user `vsphere-server`}}",
+        "username": "{{user `vsphere-user`}}",
+        "password": "{{user `vsphere-password`}}",
+        "insecure_connection": "true",
+
+        "datacenter": "{{user `vsphere-datacenter`}}",
+        "cluster": "{{user `vsphere-cluster`}}",
+        "network": "{{user `vsphere-network`}}",
+        "datastore": "{{user `vsphere-datastore`}}",
+        "folder": "{{user `vsphere-folder`}}",
+
+        "communicator": "ssh",
+        "ssh_username": "{{user `ssh_username`}}",
+        "ssh_password": "{{user `ssh_password`}}",
+
+        "convert_to_template": "true",
+
+        "vm_name": "{{user `vm-name`}}",
+        "guest_os_type": "freebsd12_64Guest",
+
+        "CPUs": "{{user `vm-cpu-num`}}",
+        "RAM": "{{user `vm-mem-size`}}",
+        "RAM_reserve_all": true,
+        "firmware": "bios",
+
+        "disk_size": "{{user `vm-disk-size`}}",
+        "disk_thin_provisioned": true,
+
+        "network_card": "vmxnet3",
+
+        "iso_paths": [
+            "{{user `os_iso_path`}}"
+          ],
+
+        "boot_wait": "30s",
+        "boot_command": [
+            "<wait5><enter>",
+            "<wait5><enter>",
+            "<wait5><enter>",
+            "<wait5><enter>",
+            "<wait5><enter>",
+            "<wait5><enter>",
+            "<wait5><down>",
+            "<wait5><enter>",
+            "<wait5><left>",
+            "<wait5><enter>",
+            "<wait5><enter>",
+            "<wait5><down>",
+            "<wait5><enter>",
+            "<wait5><enter>",
+            "<wait5><enter>",
+            "<wait10><wait10><wait10><wait10><enter>",
+            "<wait5><enter>",
+            "<wait10><wait10><wait10><wait10>",
+            "<left> <enter>",
+            "<left> <enter>",
+            "<left> <enter>",
+            "<wait5><enter>",
+            
+            "reboot<wait5><enter>"
+            "<wait10><wait10><wait10><wait10><wait10><wait10><wait10><wait10>",
+            "n <wait10>"
+
+        ],
+    
+        "floppy_files": [
+            "config.xml"
+        ]   
+    }
+    
+    ],
+
+    "provisioners": [
+        {
+          "type": "shell",
+          "inline": ["ifconfig"]
+        }
+      ]
+
+}
