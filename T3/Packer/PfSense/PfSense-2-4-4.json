@@ -85,10 +85,19 @@
             "<left> <enter>",
             "<left> <enter>",
             "<wait5><enter>",
-            
-            "reboot<wait5><enter>"
-            "<wait10><wait10><wait10><wait10><wait10><wait10><wait10><wait10>",
-            "n <wait10>"
+            "ls <enter>",
+            "reboot<wait5><enter>",
+            "<wait10><wait10><wait10><wait10><wait10><wait10><wait10>",
+            "n <enter><wait10>",
+            "vmx0 <enter><wait10>",
+            "<enter> <wait10>", 
+            "y <enter> <wait10>",
+            "n <enter> <wait10>",
+            "vmx0 <enter> <wait10>",
+            "n <enter> <wait10>",
+            "<wait10><wait10><wait10>",
+            "8 <enter><wait10>",
+            "ls / <enter><wait10>"
 
         ],
     
