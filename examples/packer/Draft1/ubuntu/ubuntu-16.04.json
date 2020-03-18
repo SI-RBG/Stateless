@@ -20,7 +20,7 @@
 
       "guest_os_type": "ubuntu64Guest",
       
-      "ssh_username": "testuser",
+      "ssh_username": "stateless",
       "ssh_password": "testuser",
 
       "CPUs":             1,
