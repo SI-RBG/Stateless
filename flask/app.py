@@ -1681,6 +1681,7 @@ def competitions_deployment_packer_post():
                 pyCompOb.set_datastore("datastore2")
                 pyCompOb.set_ESXI_HOST("mikasa.mohammed.red")
 
+
                 debugMessage("Executing PackerCoreDeploy()")
                 # Deploy
                 try:
