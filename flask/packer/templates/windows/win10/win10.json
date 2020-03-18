@@ -1,0 +1,88 @@
+{
+    "variables": {
+        "vsphere-server": "nope",
+        "vsphere-user": "nope",
+        "vsphere-password": "Nope!",
+        "vsphere-datacenter": "Datacenter",
+        "vsphere-cluster": "CPTCCluster",
+        "vsphere-network": "VM Network",
+        "vsphere-datastore": "datastore1",
+        "vsphere-folder": "Templates",
+        "resource_pool": "DevRP",
+        "vm-name": "Win10-Template-Base102",
+        "vm-cpu-num": "2",
+        "vm-mem-size": "4096",
+        "vm-disk-size": "40960",
+        "winadmin-password": "Password123!",
+        "os_iso_path": "[datastore1] ISO/Windowns/en_windows_10_consumer_edition_version_1809_updated_sept_2018_x64_dvd_491ea967.iso"
+    },
+
+
+    "sensitive-variables": ["vsphere_password", "winadmin_password"],
+
+    "builders": [
+        {
+        "type": "vsphere-iso",
+
+        "vcenter_server": "{{user `vsphere-server`}}",
+        "username": "{{user `vsphere-user`}}",
+        "password": "{{user `vsphere-password`}}",
+        "insecure_connection": "true",
+
+        "datacenter": "{{user `vsphere-datacenter`}}",
+        "cluster": "{{user `vsphere-cluster`}}",
+        "network": "{{user `vsphere-network`}}",
+        "datastore": "{{user `vsphere-datastore`}}",
+        "folder": "{{user `vsphere-folder`}}",
+
+        "communicator": "winrm",
+        "winrm_username": "Administrator",
+        "winrm_password": "{{user `winadmin-password`}}",
+
+        "convert_to_template": "true",
+
+        "vm_name": "{{user `vm-name`}}",
+        "guest_os_type": "windows9_64Guest",
+
+        "CPUs": "{{user `vm-cpu-num`}}",
+        "RAM": "{{user `vm-mem-size`}}",
+        "RAM_reserve_all": true,
+        "firmware": "bios",
+
+        "disk_controller_type": "lsilogic-sas",
+        "disk_size": "{{user `vm-disk-size`}}",
+        "disk_thin_provisioned": true,
+        
+        "shutdown_command": "shutdown /s /t 5 /f /d p:4:1 /c \"Packer Shutdown\"",
+        "shutdown_timeout": "30m",
+
+        "network_card": "vmxnet3",
+
+        "iso_paths": [
+            "{{user `os_iso_path`}}",
+            "[] /vmimages/tools-isoimages/windows.iso"
+        ],
+
+        "floppy_files": [
+            "autounattend.xml",
+            "./scripts/disable-winrm.ps1",
+            "./scripts/enable-rdp.cmd",
+            "./scripts/enable-winrm.ps1",
+            "./scripts/install-vm-tools.cmd",
+            "./scripts/set-temp.ps1",
+            "./scripts/disable-network-discovery.cmd"
+        ]
+        }
+        
+    ],
+
+    "provisioners": [
+        {
+        "type": "windows-shell",
+        "inline": ["ipconfig"]
+        }
+    
+    ]
+
+}
+
