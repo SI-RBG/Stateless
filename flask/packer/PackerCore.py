@@ -33,8 +33,11 @@ def PackerCoreDeploy(pyCompOb):
         pp.set_disk_size(int(vm.get_Disk_Space()) * 1000)
         pp.set_guest_os_type(vm.get_Guest_Type())
         # For now, this should match the preseed.cfg file.
-        pp.set_username(vm.get_VM_Uname())
-        pp.set_password(vm.get_VM_Uname())
+        pp.set_username("stateless")
+        pp.set_password("stateless")
+        #pp.set_username(vm.get_VM_Uname())
+        #pp.set_password(vm.get_VM_Uname())
+
 
         if vm.shellinline_is_empty():
             pp.set_shellinline("ls /")
