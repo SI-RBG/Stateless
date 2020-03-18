@@ -1,0 +1,87 @@
+{
+    "variables": {
+    "vc_server":      "",
+    "vc_username":    "",
+    "vc_password":    "",
+    "vm_name":        "",
+    "host":           "",
+    "datastore":      "",
+    "network":        "",
+    "cluster":        "",
+    "datacenter":     "",
+    "resource_pool":  "",
+    "guest_os_type":  "",
+    "username":       "",
+    "password":       "",
+    "CPUs":           "",
+    "RAM":            "",
+    "disk_size":      "",
+    "shellinline":    ""
+    },
+  "builders": [
+    {
+      "type": "vsphere-iso",
+
+      "vcenter_server":      "{{ user `vc_server` }}",
+      "username":            "{{ user `vc_username` }}",
+      "password":            "{{ user `vc_password` }}",
+      "insecure_connection": "true",
+
+      "vm_name": "{{ user `vm_name` }}",
+      "host":    "{{ user `host` }}",
+      "datastore":"{{ user `datastore` }}",
+      "network":"{{ user `network` }}",
+
+      "cluster": "{{ user `cluster` }}",
+      "datacenter": "{{ user `datacenter` }}",
+      "resource_pool": "{{ user `resource_pool` }}",
+
+
+      "guest_os_type": "{{ user `guest_os_type` }}",
+
+      "ssh_username": "{{ user `username` }}",
+      "ssh_password": "{{ user `password` }}",
+
+      "CPUs":             "{{ user `CPUs` }}",
+      "RAM":              "{{ user `RAM` }}",
+      "RAM_reserve_all": true,
+
+      "disk_controller_type":  "pvscsi",
+      "disk_size":        "{{ user `disk_size` }}",
+      "disk_thin_provisioned": true,
+
+      "network_card": "vmxnet3",
+
+      "iso_paths": [
+        "[datastore2] ISOs/LinuxServers/ubuntu-18.04.3-server-amd64.iso"
+      ],
+      "floppy_files": [
+        "/flask/packer/templates/ubuntu/ubuntu-18.04.3-server-amd64-preseed.cfg"
+      ],
+      "boot_command": [
+        "<enter><wait><f6><wait><esc><wait>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs>",
+        "/install/vmlinuz",
+        " initrd=/install/initrd.gz",
+        " priority=critical",
+        " locale=en_US",
+        " file=/media/ubuntu-18.04.3-server-amd64-preseed.cfg",
+        "<enter>"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": ["{{ user `shellinline` }}"]
+    }
+  ]
+}

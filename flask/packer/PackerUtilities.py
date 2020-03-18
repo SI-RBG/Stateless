@@ -1,6 +1,5 @@
 
 
-
 def getIP(out):
     listOut = str(out.decode("utf-8")).split("\n")
     for line in listOut:

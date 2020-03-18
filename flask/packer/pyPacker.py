@@ -20,6 +20,9 @@ class packerObject:
         self.host = None
         self.datastore = None
         self.network = None
+        self.cluster = None
+        self.datacenter = None
+        self.resource_pool = None
         self.guest_os_type = None
         self.CPUs = None
         self.RAM = None
@@ -28,7 +31,6 @@ class packerObject:
         self.disk_size = None
         self.disk_thin_provisioned = None
         self.network_card = None
-
 
         self.iso_paths = None
         self.floppy_files = None
@@ -52,19 +54,22 @@ class packerObject:
 
     def get_Template_and_Template_Vars(self):
         items = [self.vsphere_server,
-               self.vsphere_user,
-               self.vsphere_password,
-               self.guest_os_type,
-               self.host,
-               self.vm_name,
-               self.datastore,
-               self.network,
-               self.username,
-               self.password,
-               self.CPUs,
-               self.RAM,
-               self.disk_size,
-               self.shellinline]
+                self.vsphere_user,
+                self.vsphere_password,
+                self.cluster,
+                self.datacenter,
+                self.resource_pool,
+                self.guest_os_type,
+                self.host,
+                self.vm_name,
+                self.datastore,
+                self.network,
+                self.username,
+                self.password,
+                self.CPUs,
+                self.RAM,
+                self.disk_size,
+                self.shellinline]
         # Check if any item is missing
         for i in range(len(items)):
             item = items[i]
@@ -77,6 +82,10 @@ class packerObject:
             template_vars = {'vc_server': self.vsphere_server
                 , 'vc_username': self.vsphere_user
                 , 'vc_password': self.vsphere_password
+
+                , 'datacenter': self.datacenter
+                , 'cluster': self.cluster
+                , 'resource_pool': self.resource_pool
 
                 # This is the type of this template
                 , 'guest_os_type': self.guest_os_type
@@ -954,3 +963,95 @@ class packerObject:
             return str(self.shellinline)
         return self.shellinline
 
+    def set_cluster(self, cluster):
+        """
+        Set cluster
+        :param cluster:
+        :return: None
+        """
+        self.cluster = cluster
+
+    def get_cluster(self):
+        """
+        Get the object's cluster
+        :return: object's cluster
+        """
+        return self.cluster
+
+    def cluster_is_empty(self):
+        """
+        Check if cluster has a value
+        :return:
+        """
+        if self.cluster == None:
+            return True
+        return False
+
+    def cluster_to_string(self):
+        """
+        Convert cluster value to a string and return it
+        :return: string of cluster
+        """
+        return str(self.cluster)
+
+    def set_datacenter(self, datacenter):
+        """
+        Set datacenter
+        :param datacenter:
+        :return: None
+        """
+        self.datacenter = datacenter
+
+    def get_datacenter(self):
+        """
+        Get the object's datacenter
+        :return: object's datacenter
+        """
+        return self.datacenter
+
+    def datacenter_is_empty(self):
+        """
+        Check if datacenter has a value
+        :return:
+        """
+        if self.datacenter == None:
+            return True
+        return False
+
+    def datacenter_to_string(self):
+        """
+        Convert datacenter value to a string and return it
+        :return: string of datacenter
+        """
+        return str(self.datacenter)
+
+    def set_resource_pool(self, resource_pool):
+        """
+        Set resource_pool
+        :param resource_pool:
+        :return: None
+        """
+        self.resource_pool = resource_pool
+
+    def get_resource_pool(self):
+        """
+        Get the object's resource_pool
+        :return: object's resource_pool
+        """
+        return self.resource_pool
+
+    def resource_pool_is_empty(self):
+        """
+        Check if resource_pool has a value
+        :return:
+        """
+        if self.resource_pool == None:
+            return True
+        return False
+
+    def resource_pool_to_string(self):
+        """
+        Convert resource_pool value to a string and return it
+        :return: string of resource_pool
+        """
+        return str(self.resource_pool)
