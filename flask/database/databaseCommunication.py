@@ -336,6 +336,43 @@ def get_all_undeployed_vms_by_competition_name(COMPETITION_NAME):
     #elements = cleanSQLOutputs(elements)
     return elements
 
+def get_all_undeployed_vms_by_competition_name_to_deploying(COMPETITION_NAME):
+    if debug:
+        debugMessage("Changing "+COMPETITION_NAME+" VMs to 'Deploying' status")
+    elements = mysqlExecuteAll("select * from vms where COMPETITION_NAME = '{}' and TEAM = 'Deploying'".format(COMPETITION_NAME))
+    #elements = cleanSQLOutputs(elements)
+    return elements
+
+def get_all_undeployed_vms_by_competition_name_to_deployed(COMPETITION_NAME):
+    if debug:
+        debugMessage("Changing "+COMPETITION_NAME+" VMs to 'Deployed' status")
+    elements = mysqlExecuteAll("select * from vms where COMPETITION_NAME = '{}' and TEAM = 'Deployed'".format(COMPETITION_NAME))
+    #elements = cleanSQLOutputs(elements)
+    return elements
+
+def set_all_vms_by_competition_name_to_deploying(COMPETITION_NAME):
+    if debug:
+        debugMessage("Changing "+COMPETITION_NAME+" VMs to 'Deploying' status")
+    elements = mysqlExecuteAll("UPDATE vms SET TEAM = 'Deploying' where COMPETITION_NAME = '{}' ".format(COMPETITION_NAME))
+    #elements = cleanSQLOutputs(elements)
+    return elements
+
+def set_all_vms_by_competition_name_to_deployed(COMPETITION_NAME):
+    if debug:
+        debugMessage("Changing "+COMPETITION_NAME+" VMs to 'Deployed' status")
+    elements = mysqlExecuteAll("UPDATE vms SET TEAM = 'Deployed' where COMPETITION_NAME = '{}' ".format(COMPETITION_NAME))
+    #elements = cleanSQLOutputs(elements)
+    return elements
+
+def set_undeployed_competition_by_competition_name_to_deploying(COMPETITION_NAME):
+    elements = mysqlExecuteAll("UPDATE competitions SET CREATED_FLAG = 1 where COMPETITION_NAME = '{}'".format(
+        COMPETITION_NAME))
+    return elements
+
+def set_deploying_competition_by_competition_name_to_deployed(COMPETITION_NAME):
+    elements = mysqlExecuteAll("UPDATE competitions SET CREATED_FLAG = 2 where COMPETITION_NAME = '{}'".format(
+        COMPETITION_NAME))
+    return elements
 
 def get_all_elements_team_ordered(COMPETITION_NAME, TEAM):
     """

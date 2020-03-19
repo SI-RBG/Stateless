@@ -24,6 +24,7 @@ class packerObject:
         self.datacenter = None
         self.resource_pool = None
         self.guest_os_type = None
+        self.guest_os_name = None
         self.CPUs = None
         self.RAM = None
         self.RAM_reserve_all = None
@@ -60,6 +61,7 @@ class packerObject:
                 self.datacenter,
                 self.resource_pool,
                 self.guest_os_type,
+                self.guest_os_name,
                 self.host,
                 self.vm_name,
                 self.datastore,
@@ -69,6 +71,7 @@ class packerObject:
                 self.CPUs,
                 self.RAM,
                 self.disk_size,
+                self.iso_paths,
                 self.shellinline]
         # Check if any item is missing
         for i in range(len(items)):
@@ -77,8 +80,38 @@ class packerObject:
                 debugMessage(str(i)+" is missing")
                 return None, None
 
+        # Ubuntu server
         if self.guest_os_type == "ubuntu64Guest":
-            template = '/flask/packer/templates/ubuntu/ubuntu-18.04.3-server-amd64.json'
+            template = '/flask/packer/templates/ubuntu/{}/template.json'.format(self.guest_os_name)
+            template_vars = {'vc_server': self.vsphere_server
+                , 'vc_username': self.vsphere_user
+                , 'vc_password': self.vsphere_password
+
+                , 'datacenter': self.datacenter
+                , 'cluster': self.cluster
+                , 'resource_pool': self.resource_pool
+
+                             # This is the type of this template
+                , 'guest_os_type': self.guest_os_type
+
+                , 'host': self.host
+                , 'vm_name': self.vm_name
+                , 'datastore': self.datastore
+                , 'network': self.network
+                , 'username': self.username
+                , 'password': self.password
+                , 'CPUs': int(self.CPUs)
+                , 'RAM': int(self.RAM)
+                , 'disk_size': self.disk_size
+                , 'os_iso_path': self.iso_paths
+                , 'shellinline': self.shellinline
+                             }
+
+            return template, template_vars
+
+        # Windows 2019
+        if self.guest_os_type == "windows9Server64Guest":
+            template = '/flask/packer/templates/windows/{}/template.json'.format(self.guest_os_name)
             template_vars = {'vc_server': self.vsphere_server
                 , 'vc_username': self.vsphere_user
                 , 'vc_password': self.vsphere_password
@@ -94,11 +127,12 @@ class packerObject:
                 , 'vm_name': self.vm_name
                 , 'datastore': self.datastore
                 , 'network': self.network
-                , 'username': self.username
-                , 'password': self.password
+                #, 'username': self.username # In windows it's always going to be Administrator
+                #, 'password': self.password  # If we will enable this, we need to edit its XML file to they match otherwise winrm will not be able to connect
                 , 'CPUs': int(self.CPUs)
                 , 'RAM': int(self.RAM)
                 , 'disk_size': self.disk_size
+                , 'os_iso_path': self.iso_paths
                 , 'shellinline': self.shellinline
                 }
 
@@ -1055,3 +1089,32 @@ class packerObject:
         :return: string of resource_pool
         """
         return str(self.resource_pool)
+
+
+    def set_guest_os_name(self, guest_os_name):
+        """
+        Set guest_os_name
+        :param guest_os_name:
+        :return: None
+        """
+        self.guest_os_name = guest_os_name
+    def get_guest_os_name(self):
+        """
+        Get the object's guest_os_name
+        :return: object's guest_os_name
+        """
+        return self.guest_os_name
+    def guest_os_name_is_empty(self):
+        """
+        Check if guest_os_name has a value
+        :return:
+        """
+        if self.guest_os_name == None:
+            return True
+        return False
+    def guest_os_name_to_string(self):
+        """
+        Convert guest_os_name value to a string and return it
+        :return: string of guest_os_name
+        """
+        return str(self.guest_os_name)

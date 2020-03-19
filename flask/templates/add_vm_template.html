@@ -66,10 +66,9 @@
             <p><td>Memory <input type="text" value="" placeholder="1024" name="MEMORY"></td></p>
             <p><td>Guest Type
                 <select name="GUEST_OS_TYPE">
-                    <option value="ubuntu64Guest">Ubuntu 18 64bit</option>
-                    <option value="windows9_64Guest">Windows 10 64bit</option>
-                    <option value="darwin16_64Guest">MacOS</option>
-                    <option value="TODO">Audi</option>
+                    {% for t in TYPES %}
+                    <option value="{{t[0]}}">{{t[1]}}</option>
+                    {% endfor %}
                 </select>
             </td>
             </p>
