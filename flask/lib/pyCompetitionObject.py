@@ -292,7 +292,7 @@ class Competition:
 
 
     def get_sample_vms(self):
-        if len(self.Teams) > 1:
+        if len(self.Teams) > 0:
             return self.Teams[0].get_VMs()
         else:
             return None

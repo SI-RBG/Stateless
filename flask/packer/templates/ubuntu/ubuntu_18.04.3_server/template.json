@@ -1,22 +1,23 @@
 {
-    "variables": {
-    "vc_server":      "",
-    "vc_username":    "",
-    "vc_password":    "",
-    "vm_name":        "",
-    "host":           "",
-    "datastore":      "",
-    "network":        "",
-    "cluster":        "",
-    "datacenter":     "",
-    "resource_pool":  "",
-    "guest_os_type":  "",
-    "username":       "",
-    "password":       "",
-    "CPUs":           "",
-    "RAM":            "",
-    "disk_size":      "",
-    "shellinline":    ""
+      "variables": {
+      "vc_server":      "",
+      "vc_username":    "",
+      "vc_password":    "",
+      "vm_name":        "",
+      "host":           "",
+      "datastore":      "",
+      "network":        "",
+      "cluster":        "",
+      "datacenter":     "",
+      "resource_pool":  "",
+      "guest_os_type":  "",
+      "username":       "",
+      "password":       "",
+      "CPUs":           "",
+      "RAM":            "",
+      "disk_size":      "",
+      "os_iso_path":    "",
+      "shellinline":    ""
     },
   "builders": [
     {
@@ -53,10 +54,10 @@
       "network_card": "vmxnet3",
 
       "iso_paths": [
-        "[datastore2] ISOs/LinuxServers/ubuntu-18.04.3-server-amd64.iso"
+        "{{ user `os_iso_path` }}"
       ],
       "floppy_files": [
-        "/flask/packer/templates/ubuntu/ubuntu-18.04.3-server-amd64-preseed.cfg"
+        "/flask/packer/templates/ubuntu/ubuntu_18.04.3_server/ubuntu_18.04.3_server_amd64_preseed.cfg"
       ],
       "boot_command": [
         "<enter><wait><f6><wait><esc><wait>",
@@ -73,7 +74,7 @@
         " initrd=/install/initrd.gz",
         " priority=critical",
         " locale=en_US",
-        " file=/media/ubuntu-18.04.3-server-amd64-preseed.cfg",
+        " file=/media/ubuntu_18.04.3_server_amd64_preseed.cfg",
         "<enter>"
       ]
     }

@@ -23,6 +23,7 @@
 <table align="center" class="c" >
     <tr>
         <th>ID</th>
+        <th>Guest name</th>
         <th>Guest type</th>
         <th>ISO path</th>
         <th>Edit</th>
@@ -32,6 +33,7 @@
         <td>{{element[0]}}</td>
         <td>{{element[1]}}</td>
         <td>{{element[2]}}</td>
+        <td>{{element[3]}}</td>
         <td><a href={{ url_for('guest_type_templates_edit') }}?ID={{element[0]}}>EDIT</a></td>
     </tr>
     {% endfor %}

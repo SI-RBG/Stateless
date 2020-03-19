@@ -20,6 +20,7 @@ Edit a competition
 
 <table align="center" cellspacing="25" >
     <tr>
+        <th>Guest name</th>
         <th>Guest type</th>
         <th>ISO path</th>
         <th>Edit</th>
@@ -28,8 +29,9 @@ Edit a competition
     <tr>
             <input type="hidden" id="ID" name="ID" value="{{element[0]}}">
         <td><h3>Edit {{element[1]}}  </h3></td>
-        <td><input type="text" value="" placeholder="{{element[1]}}" name="GUEST_TYPE"> </td>
-        <td><input type="text" value="" placeholder="{{element[2]}}" name="ISO_PATH"> </td>
+        <td><input type="text" value="" placeholder="{{element[1]}}" name="GUEST_NAME"> </td>
+        <td><input type="text" value="" placeholder="{{element[2]}}" name="GUEST_TYPE"> </td>
+        <td><input type="text" value="" placeholder="{{element[3]}}" name="ISO_PATH"> </td>
 
         <td><input type="submit" value="Submit changes"></td>
     </tr>

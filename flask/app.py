@@ -225,7 +225,13 @@ def from_MySQL_table_to_pyObject_Competition(pyCompOb, COMPETITION_NAME):
                 CPU = undeployed_vm[5]
                 DISK = undeployed_vm[6]
                 MEMORY = undeployed_vm[7]
-                GUEST_OS_TYPE = undeployed_vm[8]
+                GUEST_OS_TYPE_ID = undeployed_vm[8]
+                GUEST_OS_TYPE = \
+                mysqlExecuteAll("SELECT GUEST_TYPE FROM gt_templates where id = '{}'".format(GUEST_OS_TYPE_ID))[0][0]
+                ISO_PATH = \
+                mysqlExecuteAll("SELECT ISO_PATH FROM gt_templates where id = '{}'".format(GUEST_OS_TYPE_ID))[0][0]
+                GUEST_NAME = \
+                mysqlExecuteAll("SELECT GUEST_NAME FROM gt_templates where id = '{}'".format(GUEST_OS_TYPE_ID))[0][0]
                 CREATED_FLAG = undeployed_vm[9]
                 CREATED_FLAG_C = undeployed_vm[10]
                 # Set
@@ -236,7 +242,7 @@ def from_MySQL_table_to_pyObject_Competition(pyCompOb, COMPETITION_NAME):
                 pyVMOb.set_CPU(CPU)
                 pyVMOb.set_Memory(MEMORY)
                 pyVMOb.set_Disk_Space(DISK)
-                # pyVMOb.set_ISO_Path()
+                pyVMOb.set_ISO_Path(ISO_PATH)
 
                 # Check if an ip is used in the network of the current team.
                 try:
@@ -260,6 +266,7 @@ def from_MySQL_table_to_pyObject_Competition(pyCompOb, COMPETITION_NAME):
                 pyVMOb.set_Gateway(GATEWAY)
                 pyVMOb.set_Subnet(SUBNET)
                 pyVMOb.set_Guest_Type(GUEST_OS_TYPE)
+                pyVMOb.set_Guest_Name(GUEST_NAME)
                 pyVMOb.set_Template_Name(TEMPLATE_NAME)
                 # pyVMOb.set_Services()
                 # pyVMOb.set_NICAKA_PortGropu(NIC)
@@ -268,8 +275,9 @@ def from_MySQL_table_to_pyObject_Competition(pyCompOb, COMPETITION_NAME):
                 pyTeamOb.add_VM(pyVMOb)
 
         return pyCompOb
-    except:
-        debugMessage("Error #89238942389423")
+    except Exception as e:
+        debugMessage(e)
+        debugMessage("Error #89238922342389423")
         return None
 
 
@@ -1259,7 +1267,8 @@ def competitions_vm_add():
         COMPS = mysqlExecuteAll("SELECT * FROM competitions")
         TEAMS = mysqlExecuteAll("SELECT * FROM teams")
         TEMPLATES = mysqlExecuteAll("SELECT * FROM templates")
-        return render_template('competitions_vm_add.html', username = session['username'], TEMPLATES = TEMPLATES, COMPS = COMPS, TEAMS = TEAMS, templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+        GT_TYPES = mysqlExecuteAll("SELECT * FROM gt_templates")
+        return render_template('competitions_vm_add.html', username = session['username'], TEMPLATES = TEMPLATES, COMPS = COMPS, TEAMS = TEAMS, TYPES = GT_TYPES, templates_length = getTemplatesLength(), tasks_length = getEventsLength())
     return root()
 
 
@@ -1474,6 +1483,13 @@ def guest_type_templates_edit():
                 ID = pymysql.escape_string(request.values.get('ID'))
 
 
+                GUEST_NAME = pymysql.escape_string(request.values.get('GUEST_NAME'))
+                if len(GUEST_NAME) < 1:
+                    if debug:
+                        error_message = "Missing GUEST_NAME"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('guest_type_templates'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
 
                 GUEST_TYPE = pymysql.escape_string(request.values.get('GUEST_TYPE'))
                 if len(GUEST_TYPE) < 1:
@@ -1494,9 +1510,11 @@ def guest_type_templates_edit():
                 # Edit a gt_templates
                 # TODO make an event
                 mysqlExecute("UPDATE gt_templates SET "
+                             " GUEST_NAME = '{}',"
                              " GUEST_TYPE = '{}',"
                              " ISO_PATH = '{}' WHERE ID = '{}'"
-                             .format(GUEST_TYPE,
+                             .format(GUEST_NAME,
+                                     GUEST_TYPE,
                                      ISO_PATH,
                                      ID))
 
@@ -1522,6 +1540,13 @@ def guest_type_templates_add():
         if request.method == 'POST':
             try:
 
+                GUEST_NAME = pymysql.escape_string(request.values.get('GUEST_NAME'))
+                if len(GUEST_NAME) < 1:
+                    if debug:
+                        error_message = "Missing GUEST_NAME"
+                        debugMessage(error_message)
+                    return render_template('error.html', message= error_message ,url = url_for('guest_type_templates'), templates_length = getTemplatesLength(), tasks_length = getEventsLength())
+
                 GUEST_TYPE = pymysql.escape_string(request.values.get('GUEST_TYPE'))
                 if len(GUEST_TYPE) < 1:
                     if debug:
@@ -1540,9 +1565,11 @@ def guest_type_templates_add():
                 # Create a gt template.
                 # TODO make an event.
                 mysqlExecute("INSERT INTO gt_templates("
+                             "GUEST_NAME, "
                              "GUEST_TYPE, "
-                             "ISO_PATH) VALUES ('{}' , '{}')"
+                             "ISO_PATH) VALUES ('{}' ,'{}' , '{}')"
                     .format(
+                    GUEST_NAME,
                     GUEST_TYPE,
                     ISO_PATH))
 
@@ -1632,7 +1659,7 @@ def competitions_deployment_packer():
                     debugMessage(e)
                 debugMessage("No COMP_ID")
 
-            # IF get GET
+            # IF get GET. 0 Means undeployed
             undeployed_comps = mysqlExecuteAll("select * from competitions where CREATED_FLAG = 0")
 
             return render_template('competitions_deployment_packer.html', output_data=undeployed_comps,
@@ -1676,6 +1703,10 @@ def competitions_deployment_packer_post():
                     if debug:
                         debugMessage(e)
                         debugMessage("Block #8239732981")
+                if pyCompOb is None:
+                    if debug:
+                        debugMessage("from_MySQL_table_to_pyObject_Competition() returned none")
+                        debugMessage("Block #9043099121")
 
                 # Deploy
                 pyCompOb.set_datastore("datastore2")
@@ -1685,7 +1716,9 @@ def competitions_deployment_packer_post():
                 debugMessage("Executing PackerCoreDeploy()")
                 # Deploy
                 try:
-                    PackerCoreDeploy(pyCompOb)
+                    if PackerCoreDeploy(pyCompOb):
+                        #set_all_vms_by_competition_name_to_deploying(pyCompOb.get_Competition_Uname())
+                        set_undeployed_competition_by_competition_name_to_deploying(pyCompOb.get_Competition_Uname())
                 except Exception as e:
                     if debug:
                         debugMessage(e)

@@ -14,6 +14,7 @@
         "CPUs":             "",
         "RAM":              "",
         "disk_size":        "",
+        "password":         "",
         "shellinline":      "",
         "os_iso_path":      ""
     },
@@ -38,9 +39,8 @@
 
         "communicator": "winrm",
         "winrm_username": "Administrator",
-        "winrm_password": "Stateless",
-
-	    "convert_to_template": "true",
+        "winrm_password": "stateless",
+	    "convert_to_template": "false",
 
         "vm_name": "{{user `vm_name`}}",
         "guest_os_type": "windows9Server64Guest",
@@ -62,7 +62,7 @@
         ],
 
         "floppy_files": [
-            "/flask/packer/templates/windows/en_windows_server_2019_x64/autounattend.xml",
+            "/flask/packer/templates/windows/en_windows_server_2016_x64/autounattend.xml",
             "/flask/packer/templates/windows/scripts/disable-network-discovery.cmd",
             "/flask/packer/templates/windows/scripts/enable-rdp.cmd",
             "/flask/packer/templates/windows/scripts/enable-winrm.ps1",

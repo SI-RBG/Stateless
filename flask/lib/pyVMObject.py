@@ -22,6 +22,7 @@ class VM:
         self.DNS2 = None
         self.ISO_Path = None
         self.Guest_Type = None
+        self.Guest_Name = None
         self.Template_Name = None
         self.NICAKA_PortGropu = None
         self.NICAKA_PortGropuList = None
@@ -686,3 +687,30 @@ class VM:
         """
         return str(self.shellinline)
 
+    def set_Guest_Name(self, Guest_Name):
+        """
+        Set Guest_Name
+        :param Guest_Name:
+        :return: None
+        """
+        self.Guest_Name = Guest_Name
+    def get_Guest_Name(self):
+        """
+        Get the object's Guest_Name
+        :return: object's Guest_Name
+        """
+        return self.Guest_Name
+    def Guest_Name_is_empty(self):
+        """
+        Check if Guest_Name has a value
+        :return:
+        """
+        if self.Guest_Name == None:
+            return True
+        return False
+    def Guest_Name_to_string(self):
+        """
+        Convert Guest_Name value to a string and return it
+        :return: string of Guest_Name
+        """
+        return str(self.Guest_Name)

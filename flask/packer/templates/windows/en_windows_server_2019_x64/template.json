@@ -38,9 +38,8 @@
 
         "communicator": "winrm",
         "winrm_username": "Administrator",
-        "winrm_password": "Stateless",
-
-	    "convert_to_template": "true",
+        "winrm_password": "stateless",
+	    "convert_to_template": "false",
 
         "vm_name": "{{user `vm_name`}}",
         "guest_os_type": "windows9Server64Guest",
