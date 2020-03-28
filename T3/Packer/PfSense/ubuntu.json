@@ -1,0 +1,86 @@
+{
+  "builders": [
+    {
+      "type": "vmware-iso",
+      "iso_url": "http://releases.ubuntu.com/16.04/ubuntu-16.04.3-server-amd64.iso",
+      "iso_checksum": "10fcd20619dce11fe094e960c85ba4a9",
+      "iso_checksum_type": "md5",
+      "ssh_username": "root",
+      "ssh_password": "RootPw",
+      "vm_name": "Ubuntu_16.04_x64",
+      "ssh_wait_timeout": "600s",
+      "shutdown_command": "shutdown -P now",
+      "output_directory": "ubuntu_1604",
+      "boot_command": [
+        "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "/install/vmlinuz<wait>",
+        " auto<wait>",
+        " console-setup/ask_detect=false<wait>",
+        " console-setup/layoutcode=us<wait>",
+        " console-setup/modelcode=pc105<wait>",
+        " debconf/frontend=noninteractive<wait>",
+        " debian-installer=en_US<wait>",
+        " fb=false<wait>",
+        " hostname=ubuntu1604<wait>",
+        " initrd=/install/initrd.gz<wait>",
+        " kbd-chooser/method=us<wait>",
+        " keyboard-configuration/layout=USA<wait>",
+        " keyboard-configuration/variant=USA<wait>",
+        " locale=en_US<wait>",
+        " noapic<wait>",
+        " preseed/file=/floppy/ubuntu_preseed.cfg",
+        " -- <wait>",
+        "<enter><wait>"
+      ],
+      "guest_os_type": "ubuntu-64",
+      "floppy_files": [
+        "./ubuntu_preseed.cfg"
+      ],
+      "vmx_data": {
+        "ethernet0.present": true,
+        "ethernet0.startConnected": true,
+        "ethernet0.connectionType": "custom",
+        "ethernet0.vnet": "vmnet8",
+        "ethernet1.present": true,
+        "ethernet1.startConnected": true,
+        "ethernet1.connectionType": "custom",
+        "ethernet1.vnet": "vmnet1"
+      },
+      "vmx_data_post": {
+        "floppy0.present": false,
+        "ethernet1.present": false
+      }
+    }
+  ],
+  "provisioners": [],
+  "post-processors": [
+    {
+      "type": "shell-local",
+      "inline": [
+        "/c/Program\\ Files\\ \\(x86\\)/VMware/VMware\\ Workstation/OVFTool/ovftool.exe ubuntu_1604/Ubuntu_16.04_x64.vmx ubuntu_1604/Ubuntu_16.04_x64.ovf"
+      ]
+    },
+    [
+      {
+        "type": "artifice",
+        "files": [
+          "ubuntu_1604\\*"
+        ]
+      },
+      {
+        "type": "vsphere-template",
+        "datacenter": "dc",
+        "datastore": "ds",
+        "host": "host",
+        "password": "pw",
+        "username": "user",
+        "vm_name": "Ubuntu_16.04_x64",
+        "resource_pool": "rp",
+        "folder": "folder"
+      }
+    ]
+  ]
+}

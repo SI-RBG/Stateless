@@ -2,7 +2,7 @@
 
 {
     "variables": {
-        
+       
     },
 
 
@@ -51,9 +51,6 @@
               "network_card": "vmxnet3" }
           ], 
 
-        "floppy_files": [
-            "/Users/t3/Documents/githubRepo/All-Stateless/Stateless-T3-Dev2/T3/Packer/PfSense/config.xml"
-        ],
         "boot_wait": "30s",
         "boot_command": [
             "<wait5><enter>",
@@ -81,13 +78,13 @@
             "<wait10><wait10><wait10>",
             "n<enter><wait5>vmx0<enter><wait5>vmx1<enter><wait10>y",
             "8<enter><wait10>",
-            "ls / <enter><wait10>",
-            "cp /media/config.xml /cf/conf/config.xml",
-            "<enter>"
+            "ls / <enter><wait10>"
 
-        ]
+        ],
     
-        
+        "floppy_files": [
+            "config.xml"
+        ]
            
     }
     
