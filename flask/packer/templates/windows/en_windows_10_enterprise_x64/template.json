@@ -19,7 +19,7 @@
         "os_iso_path":      ""
     },
 
-    "sensitive-variables": ["vc_password", "winadmin_password"],
+    "sensitive-variables": ["vsphere_password", "winadmin_password"],
 
     "builders": [
         {
@@ -62,7 +62,7 @@
         ],
 
         "floppy_files": [
-            "/flask/packer/templates/windows/en_windows_server_2016_x64/autounattend.xml",
+            "/flask/packer/templates/windows/en_windows_10_x64/autounattend.xml",
             "/flask/packer/templates/windows/scripts/disable-network-discovery.cmd",
             "/flask/packer/templates/windows/scripts/enable-rdp.cmd",
             "/flask/packer/templates/windows/scripts/enable-winrm.ps1",

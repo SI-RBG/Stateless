@@ -1,8 +1,9 @@
 """
-This a class to hold values for packer templates.
-
-
+File name: pyPacker.py
+Purpose: This a class to hold values for packer templates.
 """
+
+
 from packerpy import PackerExecutable
 from Utilities import *
 

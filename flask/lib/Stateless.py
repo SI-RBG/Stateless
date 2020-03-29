@@ -1,3 +1,7 @@
+"""
+File name: Stateless.py
+Purpose: Hold vSphere common variables like Admin credentials, Datacenter, Datastore, Cluster and Resources pool.
+"""
 
 from pyVmomi import vim
 from pyVim.connect import SmartConnect, SmartConnectNoSSL, Disconnect
@@ -7,13 +11,16 @@ import getpass
 import ssl
 import re
 
-"Static Inputs to connect to cptc-server"
-
 
 
 class StatelessObj():
 
     def __init__(self, vcenter_ip, vcenter_user, vcenter_password):
+        """
+        :param vcenter_ip: ip address ,Type: string
+        :param vcenter_user: username ,Type: string
+        :param vcenter_password: password ,Type: string
+        """
         self.vcenter_ip = vcenter_ip
         self.vcenter_user = vcenter_user
         self.vcenter_password = vcenter_password
@@ -294,14 +301,14 @@ class StatelessObj():
         return obj
 
 
-    def Create_vSwitch(self, hosts, vswitch_Name):
+    def Create_vSwitch(self, vcenter, vswitch_Name):
         """
         create a virtual switch to the vcenter
         :param hosts: hosts to create virtual switch to
         :param vswitch_Name: the vswitch name 
         :return : N/A
         """
-        for host in hosts:
+        for host in vcenter:
             try:
                 vswitch_spec = vim.host.VirtualSwitch.Specification()
                 vswitch_spec.numPorts = 1024
@@ -311,16 +318,16 @@ class StatelessObj():
                 print("vSwitch {} alredy exist".format(vswitch_Name))
 
 
-    def Create_PortGroup(self,hosts, vswitch_Name, PG_Name, vlanId):
+    def Create_PortGroup(self,vcenter, vswitch_Name, PG_Name, vlanId):
         """
-        create a port group to the vcenter and add it to a virtual switch with a spesfic vlan ID 
+        create a port group to the vcenter and add it to a virtual switch with a spesfic vlan ID
         :param hosts: hosts to create virtual switch to
         :param vswitch_Name: the vswitch name 
         :param PG_Name: port group name
         :param vlanId: vlan id number
         :return : N/A
         """
-        for host in hosts:
+        for host in vcenter:
             try:
                 portgroup_spec = vim.host.PortGroup.Specification()
                 portgroup_spec.vswitchName = vswitch_Name

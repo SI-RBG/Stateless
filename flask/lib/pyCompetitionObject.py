@@ -1,8 +1,7 @@
 """
-This class represents a competition object.
-
+File name: pyCompetitionObject.py
+Purpose: This class represents a Competition object.
 """
-
 
 class Competition:
 

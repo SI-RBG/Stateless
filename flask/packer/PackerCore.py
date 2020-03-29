@@ -1,3 +1,8 @@
+"""
+File name: PackerCore.py
+Purpose: Provide the necessary functionalities to communicate with Paker.
+"""
+
 #import packerpy
 from packerpy import PackerExecutable
 from packer.PackerUtilities import *
@@ -10,6 +15,14 @@ import os, sys, threading
 
 
 def packerBuild(pyVMObject, pyPackerObject, template, template_vars):
+    """
+    This function builds a VM/VM_Template from a json packer template.
+    :param pyVMObject: This is a VM object type.
+    :param pyPackerObject: This is an packerObject object type.
+    :param template: json
+    :param template_vars: changeable variables in template
+    :return:
+    """
     try:
         (ret, out, err) = p.build(template, var=template_vars)
         ip = getIP(out)
@@ -22,17 +35,44 @@ def packerBuild(pyVMObject, pyPackerObject, template, template_vars):
         debugMessage("Error #89237236789")
 
 
-"""
-This function should deploy the play gerund team.
-"""
-def PackerCoreDeploy(pyCompOb):
-    VMs = pyCompOb.get_sample_vms()
+def createPlayground():
+    pass
 
+
+def PackerCoreDeploy(pyCompOb):
+    """
+    This function deploys the play gerund team.
+    :param pyCompOb: This is a pyCompObject object type.
+    :return: True or False
+    """
+    # Get env vars
     vcenter_ip_env = os.environ.get('VCENTER_IP')
     vcenter_user_env = os.environ.get('VCENTER_USER')
     vcenter_password_env = os.environ.get('VCENTER_PASSWORD')
-    debugMessage("Connecting to "+str(vcenter_ip_env)+" to start deploying")
+    debugMessage("vcenter_ip_env:"+vcenter_ip_env)
+    debugMessage("vcenter_user_env:" + vcenter_user_env)
 
+    # Create StatelessObj
+    so = Stateless.StatelessObj(vcenter_ip_env, vcenter_user_env, vcenter_password_env)
+    # Login
+    si = so.login()
+
+    # Create a vSwitch for
+    so.Create_vSwitch(vcenter_ip_env,"StatelessPlaygroundvSwitch")
+    # Create a PortGroup
+    so.Create_PortGroup(vcenter_ip_env, "StatelessPlaygroundvSwitch", "StatelessPlaygroundvPG", 0)
+    # Logout
+    so.logout(si)
+
+    # Create an upstream for the playground LAN.
+    # Check if the VM already exists
+    # If exists turn it on
+    # If it doesn't exist create it and make sure it's on all the time.
+
+    # Get a sample for just one team.
+    VMs = pyCompOb.get_sample_vms()
+
+    debugMessage("Connecting to "+str(vcenter_ip_env)+" to start deploying")
     debugMessage(str(len(VMs))+" VMs will be created")
 
     try:

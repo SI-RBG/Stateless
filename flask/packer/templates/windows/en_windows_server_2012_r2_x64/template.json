@@ -22,7 +22,7 @@
     "sensitive-variables": ["vc_password", "winadmin_password"],
 
     "builders": [
-        {
+      {
         "type": "vsphere-iso",
 
         "vcenter_server": "{{user `vc_server`}}",
@@ -43,7 +43,7 @@
 	    "convert_to_template": "false",
 
         "vm_name": "{{user `vm_name`}}",
-        "guest_os_type": "windows9Server64Guest",
+        "guest_os_type": "windows8srv-64",
 
         "CPUs": "{{user `CPUs`}}",
         "RAM": "{{user `RAM`}}",

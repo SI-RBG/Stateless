@@ -1,3 +1,8 @@
+"""
+File name: TestPackerCore.py
+Purpose: Test deploying Packer templates.
+"""
+
 #import packerpy
 from packerpy import PackerExecutable
 from packer.PackerUtilities import *
@@ -45,9 +50,12 @@ def PackerCoreDeploy(guest_os_type,guest_os_name,iso_path):
 
 def test():
     #PackerCoreDeploy("windows9Server64Guest","en_windows_server_2019_x64","[datastore2] ISOs/Windows_2019/en_windows_server_2019_x64_dvd_3c2cf1202.iso")
-    PackerCoreDeploy("windows9Server64Guest", "en_windows_server_2019_x64",
+    #PackerCoreDeploy("windows9Server64Guest", "en_windows_server_2019_x64",
+                     #"[datastore2] ISOs/Windows_2019/en_windows_server_2019_x64_dvd_3c2cf1202.iso")
+    #PackerCoreDeploy("windows7-64", "en_windows_server_2012_r2_x64",
+                     #"[datastore2] ISOs/Windows_2012/en_windows_server_2019_x64_dvd_3c2cf1202.iso")
+    PackerCoreDeploy("windows8srv-64", "en_windows_7_x64",
                      "[datastore2] ISOs/Windows_2019/en_windows_server_2019_x64_dvd_3c2cf1202.iso")
-
 
 
 if __name__ == '__main__':

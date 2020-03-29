@@ -77,14 +77,6 @@ def cleanSQLOutputs(outputs):
     return [s.replace('(','').replace(')','').replace('\'','').strip() for s in outputs.split(',') if (len(str(s)) > 1)]
 
 
-def test():
-    mysqlExecuteAll("INSERT INTO templates(TEMPLATES_NAME, OTHER) VALUES ('Ubuntu18-Server', '11')")
-    mysqlExecuteAll("INSERT INTO competitions(UNAME, TEAMS, CREATED_TEAMS, WIN_VMS, UNIX_VMS, TOTAL_VMS, TOTAL_CREATED_VMS, CREATED_FLAG, CREATED_FLAG_C) VALUES ('ISTS' , '2', '0' , '2', '2', '4', '0', '0', '0')")
-    mysqlExecuteAll("INSERT INTO teams(COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG) VALUES ('ISTS', 'Tigers1','Tigers1.com','10.1.1.0/24', '10.1.1.254', '1.1.1.1', 'g1','0','0','0','0')")
-    mysqlExecuteAll("INSERT INTO teams(COMPETITION_NAME, TEAM, DOMAIN_NAME, SUBNET, GATEWAY, DNS_SERVER1, NIC, CREATED_FLAG, CREATED_FLAG_C, CREATED_VMS_FLAG, CONFIGURED_VMS_FLAG) VALUES ('ISTS', 'Tigers2','Tigers2.com','10.2.2.0/24', '10.2.2.254', '2.2.2.2', 'go2','0','0','0','0')")
-    mysqlExecuteAll("INSERT INTO vms(COMPETITION_NAME, TEAM, VM_NAME, TEMPLATE_NAME, CPU, DISK, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C) VALUES ('ISTS', 'undefined', 'UServer', 'Ubuntu18-Server', '2','2', '1024', 'ubuntu64Guest', '0', '0')")
-
-
 
 def from_MySQL_table_to_pyObject_Competition(pyCompOb, COMPETITION_NAME):
     """
@@ -379,6 +371,10 @@ def create_a_competition(pyCompOb):
 
 @app.route("/")
 def root():
+    """
+    Root
+    :return:
+    """
     if 'username' in session:
         return home()
     return render_template('login.html')
@@ -386,6 +382,10 @@ def root():
 
 @app.route("/home")
 def home():
+    """
+    Return home.html
+    :return:
+    """
     if 'username' in session:
         return render_template('home.html', templates_length = getTemplatesLength(), tasks_length = getEventsLength())
     return render_template('login.html')
@@ -393,7 +393,10 @@ def home():
 
 @app.route("/install", methods=['get', 'post'])
 def install():
-
+    """
+    Install the application
+    :return:
+    """
     # Check the data base for config entry.
     result = mysqlExecute("select * from config")
     # returns this example: (1, 'VSPHERE_SERVER1', 'VSPHERE_SERVER2', 'VSPHERE_SERVER3')
@@ -426,6 +429,11 @@ TODO LIST:
 @app.route("/login", methods=['GET','POST'])
 @limiter.limit("14400/day;600/hour;1000/minute")
 def login():
+    """
+    Login
+
+    :return:
+    """
     # If submitting data
     if request.method == 'POST':
         session['username'] = request.form['username']
@@ -482,6 +490,10 @@ def login():
 
 @app.route("/templates", methods=['GET','POST'])
 def templates():
+    """
+    return templates.html
+    :return:
+    """
     if 'username' in session:
         data = mysqlExecuteAll("SELECT * FROM templates")
         if debug:
@@ -492,6 +504,10 @@ def templates():
 
 @app.route("/add_templates", methods=['POST'])
 def add_templates():
+    """
+    Add a template
+    :return:
+    """
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -512,6 +528,10 @@ def add_templates():
 
 @app.route("/create_templates", methods=['GET','POST'])
 def create_templates():
+    """
+    create a template
+    :return:
+    """
     if 'username' in session:
         data = mysqlExecuteAll("SELECT * FROM templates")
         if debug:
@@ -522,6 +542,10 @@ def create_templates():
 
 
 def getTemplatesLength():
+    """
+    Get how many templates
+    :return:
+    """
     if 'username' in session:
         try:
             data = mysqlExecuteAll("SELECT * FROM templates")
@@ -532,6 +556,10 @@ def getTemplatesLength():
     return root()
 
 def getEventsLength():
+    """
+    Get how many events
+    :return:
+    """
     if 'username' in session:
         try:
             data = mysqlExecuteAll("SELECT * FROM events")
@@ -543,6 +571,13 @@ def getEventsLength():
 
 
 def addEvent(BYUSER_VALUE, EVENT_NAME_VALUE, DESCRIPTIONS_VALUE = ""):
+    """
+    This function adds an event to the database.
+    :param BYUSER_VALUE:
+    :param EVENT_NAME_VALUE:
+    :param DESCRIPTIONS_VALUE:
+    :return:
+    """
     if 'username' in session:
         try:
             BYUSER_VALUE = pymysql.escape_string(BYUSER_VALUE)
@@ -559,6 +594,11 @@ def addEvent(BYUSER_VALUE, EVENT_NAME_VALUE, DESCRIPTIONS_VALUE = ""):
 
 @app.route("/tasks", methods=['GET','POST'])
 def tasks():
+    """
+    This function retunrs tasks.html with the tasks printed.
+
+    :return:
+    """
     if 'username' in session:
         events = mysqlExecuteAll("SELECT * FROM events")
         if debug:
@@ -576,6 +616,11 @@ def settings():
 
 @app.route("/logout", methods=['GET','POST'])
 def logout():
+    """
+    Kill the current session
+
+    :return:
+    """
     session.pop('username', None)
     flash('You were logged out.')
     return redirect(url_for('login'))
@@ -616,6 +661,11 @@ def invalid_password():
 
 @app.route("/competitions", methods=['GET'])
 def competitions():
+    """
+    Return a competitions.html
+
+    :return:
+    """
     if 'username' in session:
         data = mysqlExecuteAll("SELECT * FROM competitions")
         return render_template('competitions.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
@@ -624,6 +674,12 @@ def competitions():
 
 @app.route("/competitions_edit", methods=['GET','POST'])
 def competitions_edit():
+    """
+    This function handles editing a COMPETITION_NAME.
+
+    :param COMPETITION_NAME:
+    :return:
+    """
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -692,6 +748,12 @@ def competitions_edit():
 
 @app.route("/competitions_add", methods=['GET','POST'])
 def competitions_add():
+    """
+    This function dandles adding a COMPETITION_NAME.
+
+    :param COMPETITION_NAME:
+    :return:
+    """
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -732,6 +794,12 @@ def competitions_add():
 
 
 def check_competition_existence(COMPETITION_NAME):
+    """
+    This function checks a COMPETITION_NAME existence.
+
+    :param COMPETITION_NAME:
+    :return:
+    """
     try:
         q = "select UNAME from competitions where UNAME = '{}'".format(COMPETITION_NAME)
         result = mysqlExecute(q)
@@ -747,6 +815,13 @@ def check_competition_existence(COMPETITION_NAME):
     return 1
 
 def check_team_existence(COMPETITION_NAME, TEAM):
+    """
+    This function checks a team existence.
+
+    :param COMPETITION_NAME:
+    :param TEAM:
+    :return:
+    """
     try:
         q = "select ID from teams where TEAM = '{}' and COMPETITION_NAME ='{}'".format(TEAM, COMPETITION_NAME)
         result = mysqlExecute(q)
@@ -766,6 +841,11 @@ def check_team_existence(COMPETITION_NAME, TEAM):
 
 @app.route("/competitions_team", methods=['GET'])
 def competitions_team():
+    """
+    The function returns competitions_team.html
+
+    :return:
+    """
     if 'username' in session:
         data = mysqlExecuteAll("SELECT * FROM teams")
         return render_template('competitions_team.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
@@ -775,6 +855,12 @@ def competitions_team():
 
 @app.route("/competitions_team_edit", methods=['GET','POST'])
 def competitions_team_edit():
+    """
+    The function handles editing a team's data in the database.
+
+    :return:
+    """
+
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -889,27 +975,41 @@ def simple_competitions_team_edit(COMPETITION_NAME,
                                    DNS_SERVER1,
                                    NIC,
                                    ID):
-        q = "UPDATE teams SET " \
-            "COMPETITION_NAME = '{}'," \
-            "TEAM= '{}'," \
-            "DOMAIN_NAME= '{}'," \
-            "SUBNET= '{}'," \
-            "GATEWAY= '{}'," \
-            "DNS_SERVER1= '{}'," \
-            "NIC= '{}' WHERE ID = '{}'".format(COMPETITION_NAME,
-                                                                TEAM,
-                                                                DOMAIN_NAME,
-                                                                SUBNET,
-                                                                GATEWAY,
-                                                                DNS_SERVER1,
-                                                                NIC,
-                                                                ID)
+    """
+    It handles editing a Team's data to the database. (Simpler version)
 
-        if debug:
-            debugMessage("UPDATING " + q)
-        mysqlExecute(q)
-        addEvent(session['username'], "Team modification",
-                 TEAM + " from competition " + COMPETITION_NAME + " has been updated")
+    :param COMPETITION_NAME:
+    :param TEAM:
+    :param DOMAIN_NAME:
+    :param SUBNET:
+    :param GATEWAY:
+    :param DNS_SERVER1:
+    :param NIC:
+    :param ID:
+    :return:
+    """
+
+    q = "UPDATE teams SET " \
+        "COMPETITION_NAME = '{}'," \
+        "TEAM= '{}'," \
+        "DOMAIN_NAME= '{}'," \
+        "SUBNET= '{}'," \
+        "GATEWAY= '{}'," \
+        "DNS_SERVER1= '{}'," \
+        "NIC= '{}' WHERE ID = '{}'".format(COMPETITION_NAME,
+                                                            TEAM,
+                                                            DOMAIN_NAME,
+                                                            SUBNET,
+                                                            GATEWAY,
+                                                            DNS_SERVER1,
+                                                            NIC,
+                                                            ID)
+
+    if debug:
+        debugMessage("UPDATING " + q)
+    mysqlExecute(q)
+    addEvent(session['username'], "Team modification",
+             TEAM + " from competition " + COMPETITION_NAME + " has been updated")
 
 
 
@@ -925,6 +1025,23 @@ def raw_competitions_team_edit(COMPETITION_NAME,
                                CREATED_VMS_FLAG,
                                CONFIGURED_VMS_FLAG,
                                ID):
+    """
+    It handles editing a Team's data to the database.
+
+    :param COMPETITION_NAME:
+    :param TEAM:
+    :param DOMAIN_NAME:
+    :param SUBNET:
+    :param GATEWAY:
+    :param DNS_SERVER1:
+    :param NIC:
+    :param CREATED_FLAG:
+    :param CREATED_FLAG_C:
+    :param CREATED_VMS_FLAG:
+    :param CONFIGURED_VMS_FLAG:
+    :param ID:
+    :return:
+    """
     q = "UPDATE teams SET " \
         "COMPETITION_NAME = '{}'," \
         "TEAM= '{}'," \
@@ -959,6 +1076,11 @@ def raw_competitions_team_edit(COMPETITION_NAME,
 
 @app.route("/competitions_team_add", methods=['GET','POST'])
 def competitions_team_add():
+    """
+    It handles adding a Team's data to the database on the website.
+
+    :return:
+    """
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -1051,9 +1173,6 @@ def competitions_team_add():
 
 # VMs section
 
-"""
-
-"""
 def raw_competitions_vm_edit(COMPETITION_NAME, TEAM, VM_NAME, CPU, DISK, MEMORY, GUEST_OS_TYPE, CREATED_FLAG, CREATED_FLAG_C, ID):
     mysqlExecute("UPDATE vms SET CPU = '{}', DISK = '{}', MEMORY = '{}', CREATED_FLAG = '{}', CREATED_FLAG_C = '{}' WHERE ID = '{}'".format(CPU, DISK, MEMORY, CREATED_FLAG, CREATED_FLAG_C, ID))
     addEvent(session['username'], "VM modification", VM_NAME+" VM for team "+TEAM+" in competition "+COMPETITION_NAME+" has been modified")
@@ -1118,6 +1237,11 @@ def raw_competitions_wizard_vm_add(COMPETITION_NAME, TEAM, VM_NAME, TEMPLATE_NAM
 
 @app.route("/competitions_vm", methods=['GET'])
 def competitions_vm():
+    """
+    It gets all the vms in "vms" table from the database.
+
+    :return:
+    """
     if 'username' in session:
         data = mysqlExecuteAll("SELECT * FROM vms")
         return render_template('competitions_vm.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
@@ -1126,6 +1250,11 @@ def competitions_vm():
 
 @app.route("/competitions_vm_edit", methods=['GET','POST'])
 def competitions_vm_edit():
+    """
+    It handles editing a VM data to the database.
+
+    :return:
+    """
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -1165,6 +1294,11 @@ def competitions_vm_edit():
 
 @app.route("/competitions_vm_add", methods=['GET','POST'])
 def competitions_vm_add():
+    """
+    It handles adding a VM data to the database.
+
+    :return:
+    """
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -1276,6 +1410,11 @@ def competitions_vm_add():
 
 @app.route("/competitions_deployment", methods=['GET','POST'])
 def competitions_deployment():
+    """
+    #1
+    This function deploys a competition via vCenter API
+    :return:
+    """
     if 'username' in session:
         try:
             """
@@ -1368,6 +1507,11 @@ def competitions_deployment():
 
 @app.route("/competitions_deployment_post", methods=['GET','POST'])
 def competitions_deployment_post():
+    """
+    #2
+    This function deploys a competition via vCenter API
+    :return:
+    """
     if 'username' in session:
         try:
             pass
@@ -1413,6 +1557,11 @@ def competitions_deployment_post():
 
 @app.route("/something", methods=['GET'])
 def something():
+    """
+    Test function
+
+    :return:
+    """
     vcenter_ip_env = os.environ.get('VCENTER_IP')
     vcenter_user_env = os.environ.get('VCENTER_USER')
     vcenter_password_env = os.environ.get('VCENTER_PASSWORD')
@@ -1466,6 +1615,10 @@ def something():
 
 @app.route("/guest_type_templates", methods=['GET'])
 def guest_type_templates():
+    """
+    This function gets all current gr_templates.
+    :return: sql results
+    """
     if 'username' in session:
         data = mysqlExecuteAll("SELECT * FROM gt_templates")
         return render_template('gt_templates.html', output_data = data, username = session['username'], templates_length = getTemplatesLength(), tasks_length = getEventsLength())
@@ -1476,6 +1629,10 @@ def guest_type_templates():
 
 @app.route("/guest_type_templates_edit", methods=['GET','POST'])
 def guest_type_templates_edit():
+    """
+    This function edits a row in gr_templates
+    :return:
+    """
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -1536,6 +1693,10 @@ def guest_type_templates_edit():
 
 @app.route("/guest_type_templates_add", methods=['GET','POST'])
 def guest_type_templates_add():
+    """
+    This function adds a row to gr_templates
+    :return:
+    """
     if 'username' in session:
         if request.method == 'POST':
             try:
@@ -1583,6 +1744,11 @@ def guest_type_templates_add():
 
 @app.route("/competitions_deployment_packer", methods=['GET','POST'])
 def competitions_deployment_packer():
+    """
+    #1
+    This function deploys a completion from ISOs using packer template
+    :return:
+    """
     if 'username' in session:
         try:
             """
@@ -1673,6 +1839,11 @@ def competitions_deployment_packer():
 
 @app.route("/competitions_deployment_packer_post", methods=['GET','POST'])
 def competitions_deployment_packer_post():
+    """
+    #2
+    This function deploys a completion from ISOs using packer template
+    :return:
+    """
     if 'username' in session:
         try:
             pass
@@ -1730,8 +1901,6 @@ def competitions_deployment_packer_post():
                         debugMessage(e)
                         debugMessage("Error #345154323")
     return root()
-
-
 
 
 

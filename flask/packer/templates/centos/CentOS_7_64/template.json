@@ -1,0 +1,64 @@
+{
+  "variables": {
+    "vc_server":        "",
+    "vc_username":      "",
+    "vc_password":      "",
+    "host":             "",
+    "datacenter":       "",
+    "cluster":          "",
+    "network":          "",
+    "datastore":        "",
+    "folder":           "",
+    "resource_pool":    "",
+    "vm_name":          "",
+    "CPUs":             "",
+    "RAM":              "",
+    "disk_size":        "",
+    "password":         "",
+    "shellinline":      "",
+    "os_iso_path":      ""
+  },
+
+  "builders": [
+    {
+      "type": "vsphere-iso",
+
+      "vcenter_server": "{{user `vc_server`}}",
+      "username": "{{user `vc_username`}}",
+      "password": "{{user `vc_password`}}",
+      "insecure_connection": "true",
+
+      "vm_name": "{{user `vm_name`}}",
+      "host":    "{{ user `host` }}",
+      "datacenter": "{{user `datacenter`}}",
+      "cluster": "{{user `cluster`}}",
+      "network": "{{user `network`}}",
+      "datastore": "{{user `datastore`}}",
+      "folder": "{{user `folder`}}",
+
+      "guest_os_type": "centos7_64Guest",
+      "convert_to_template": "false",
+
+      "boot_wait": "10s",
+      "boot_order": "disk,cdrom,floppy",
+
+      "ssh_username": "{{ user `username` }}",
+      "ssh_password": "{{ user `password` }}",
+
+      "CPUs":    "{{ user `CPUs` }}",
+      "RAM":     "{{ user `RAM` }}",
+      "RAM_reserve_all": false,
+      "disk_controller_type": "pvscsi",
+      "disk_size":        "{{ user `disk_size` }}",
+      "disk_thin_provisioned": true,
+      "network_card": "vmxnet3",
+
+      "iso_paths": ["{{user `os_iso_path`}}"],
+      "floppy_files": ["ks.cfg"],
+      "boot_command": [
+        "<esc><wait>",
+        "linux ks=hd:fd0:/ks.cfg<enter>"
+      ]
+    }
+  ]
+}

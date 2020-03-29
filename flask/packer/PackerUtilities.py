@@ -1,4 +1,7 @@
-
+"""
+File name: PackerUtilities.py
+Purpose: This file is only for common functions that PackerCore.py or other test files might use.
+"""
 
 def getIP(out):
     listOut = str(out.decode("utf-8")).split("\n")

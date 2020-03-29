@@ -1,5 +1,6 @@
 """
-This class represents a VM object.
+File name: pyVMObject.py
+Purpose: This class represents a VM object.
 
 """
 

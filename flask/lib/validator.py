@@ -1,6 +1,6 @@
 """
-This file should have independent fuctions where it validates data.
-
+File name: validator.py
+Purpose: This file should have independent functions where it validates data.
 
     # Tested on:
         # https://regex101.com/
