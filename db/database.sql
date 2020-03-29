@@ -48,7 +48,7 @@ CREATE TABLE competitions(
 	UNIX_VMS INTEGER NOT NULL,
 	TOTAL_VMS INTEGER NOT NULL,
 	TOTAL_CREATED_VMS INTEGER NOT NULL,
-	CREATED_FLAG INTEGER NOT NULL,
+	CREATED_FLAG INTEGER NOT NULL, -- 0, means undeployed. 1, means deploying. 2, means deployed.
 	CREATED_FLAG_C INTEGER NOT NULL,
 	CONSTRAINT users_pk PRIMARY KEY(ID)
 );
@@ -106,8 +106,9 @@ CREATE TABLE packer_templates(
 
 CREATE TABLE gt_templates(
 	ID INTEGER NOT NULL AUTO_INCREMENT,
-	GUEST_TYPE VARCHAR(50) NOT NULL,
-	ISO_PATH VARCHAR(50) NOT NULL,
+	GUEST_NAME VARCHAR(80) NOT NULL,
+	GUEST_TYPE VARCHAR(80) NOT NULL,
+	ISO_PATH VARCHAR(200) NOT NULL,
 	CONSTRAINT users_pk PRIMARY KEY(ID)
 );
 
@@ -120,7 +121,7 @@ CREATE TABLE undeployed_vms(
 	CPU VARCHAR(50) NOT NULL,
 	DISK VARCHAR(50) NOT NULL,
 	MEMORY VARCHAR(50) NOT NULL,
-    GUEST_OS_TYPE VARCHAR(50),
+    GUEST_OS_TYPE VARCHAR(50), -- This is the Guest id from gt_templates table.
     CREATED_FLAG INTEGER NOT NULL,
 	CREATED_FLAG_C INTEGER NOT NULL,
 	CONSTRAINT users_pk PRIMARY KEY(ID)
@@ -140,6 +141,22 @@ CREATE TABLE wizard_vms(
 	CONSTRAINT users_pk PRIMARY KEY(ID)
 );
 
+
+-- This is the type of systems that can be deployed.
+INSERT INTO gt_templates (GUEST_NAME, GUEST_TYPE, ISO_PATH) VALUES (
+    'ubuntu_18.04.3_server',
+    'ubuntu64Guest' ,
+    '[datastore2] ISOs/LinuxServers/ubuntu-18.04.3-server-amd64.iso');
+
+INSERT INTO gt_templates(GUEST_NAME, GUEST_TYPE,  ISO_PATH) VALUES (
+    'en_windows_server_2016_x64' ,
+    'windows9Server64Guest' ,
+    '[datastore2] ISOs/Windows_2016/en_windows_server_2016_updated_feb_2018_x64_dvd_11636692.iso');
+
+INSERT INTO gt_templates(GUEST_NAME, GUEST_TYPE,  ISO_PATH) VALUES (
+    'en_windows_server_2019_x64' ,
+    'windows9Server64Guest' ,
+    '[datastore2] ISOs/Windows_2019/en_windows_server_2019_x64_dvd_3c2cf1202.iso');
 
 
 --  For the active users

@@ -10,6 +10,8 @@ services:
       - mysql
     ports:
       - "5000:5000"
+    dns:
+      - 10.10.10.200
   mysql:
     build: ./db
     ports:
