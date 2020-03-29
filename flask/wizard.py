@@ -1,3 +1,7 @@
+"""
+File name: wizard.py
+All the wizard functions for app.py
+"""
 
 @app.route("/competitions_wizard", methods=['GET', 'POST'])
 def competitions_wizard():

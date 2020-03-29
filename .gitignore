@@ -1,0 +1,12 @@
+tmp.py
+temp.py
+test.py
+tmp.*
+*.bk
+.idea
+*.pem
+*.env
+s.py
+.DS_Store
+test.sh
+test.*

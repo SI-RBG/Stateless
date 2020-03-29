@@ -1,5 +1,9 @@
-import requests
+"""
+File name: auth.py
+Purpose: To be used when we need to check for valid creds
+"""
 
+import requests
 
 
 # Function to get the vCenter server session

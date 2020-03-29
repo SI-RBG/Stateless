@@ -1,5 +1,6 @@
 """
-This class represents a team object.
+File name: pyTeamObject.py
+Purpose: This class represents a team object.
 
 """
 

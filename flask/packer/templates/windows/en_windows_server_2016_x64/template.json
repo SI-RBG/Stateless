@@ -19,7 +19,7 @@
         "os_iso_path":      ""
     },
 
-    "sensitive-variables": ["vsphere_password", "winadmin_password"],
+    "sensitive-variables": ["vc_password", "winadmin_password"],
 
     "builders": [
         {
