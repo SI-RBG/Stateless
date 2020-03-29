@@ -1,7 +1,7 @@
 ![Stateless](./img/pic.png)
 # Stateless 
 
-Stateless designs scalable infrastructures for BlueRed-Team themed competitions. The project aims to reduce overhead management and increase performance and easily speed up the process.The project intended to facilitate and limit management overhead for Black and Gray Teams, who run the competition infrastructure, as well as giving more reliable and fair environments across all teams.
+Stateless designs scalable infrastructures for BlueRed-Team themed competitions. The project aims to reduce overhead management and increase performance and easily speed up the process. The project intended to facilitate and limit management overhead for Black and Gray teams, who run the competition infrastructure, as well as giving more reliable and fair environments across all teams.
 
 ## Purpose:
 This project has been designed with scalability in mind. Its main goal is to quickly build BlueRed-Team themed competitions that come preloaded with some customizable services. It can easily be modified to fit the theme of the competition.
