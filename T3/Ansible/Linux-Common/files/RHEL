@@ -1,0 +1,16 @@
+RHEL_packages:
+    - libselinux-python
+    - ntp
+    - ntpdate
+    - bind-utils
+    - vim
+    - htop
+    - tree
+    - wget
+    - man
+    - zip
+    - unzip
+    - tmux
+    - lsof
+    - traceroute
+    - gcc

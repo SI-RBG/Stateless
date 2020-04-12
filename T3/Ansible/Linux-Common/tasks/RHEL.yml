@@ -1,0 +1,66 @@
+---
+
+- name: set hostname
+  hostname: name = {{ hostname }}
+
+- name:  Ensure EPEL repo exists
+  yum: 
+    name: epel-release 
+    state: present
+
+- name: Perform updates "Debian" (apt-get update)
+  yum: 
+    name: all
+    state: latest
+  when: when: ansible_os_family == "Debian"
+
+
+- name: Perform updates "RedHat" (yum update)
+  yum: 
+    name: all
+    state: latest
+  when: ansible_os_family == "RedHat"
+
+- name: Perform updates for "FreeBSD" (pkg update)
+  yum: 
+    name: all
+    state: latest
+  when: ansible_os_family == "FreeBSD"
+
+
+
+- name: install standard packages for Redhat distro
+  yum: 
+    pkg: {{ item }} 
+    state: present
+  with_items: "{{ RHEL_packages }}"
+  when: ansible_os_family == "RedHat"
+    
+
+- name: disable SELinux
+  selinux: 
+    state: disabled
+    notify: reboot server
+
+
+
+
+#SSH users and key variables are in the vars folder. Public keys are stored inside files folder
+#Thanks to http://brokenbad.com/better-handling-of-public-ssh-keys-using-ansible/ for this solution
+- name: copy ssh key for users.
+  authorized_key: user={{ item.name }} key="{{ item.key }}" state=present
+  with_items: ssh_users
+
+
+- name: enable standard services
+  service: name={{item}} enabled=yes
+  with_items:
+      - sshd
+      - network
+
+#Services should be started
+- name: start standard services
+  service: name={{ item }} state=started
+  with_items:
+    - sshd
+    - network

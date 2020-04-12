@@ -1,0 +1,6 @@
+---
+
+- hosts: myLinux
+  roles:
+          - Linux-Standar
+  gather_facts: no
