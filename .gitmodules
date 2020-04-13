@@ -1,3 +1,12 @@
 [submodule "T3/Ansible/ansible-role-gitlab"]
 	path = T3/Ansible/ansible-role-gitlab
 	url = https://github.com/geerlingguy/ansible-role-gitlab
+[submodule "T3/Ansible/--force"]
+	path = T3/Ansible/--force
+	url = https://github.com/geerlingguy/ansible-role-gitlab
+[submodule "T3/Ansible/--name"]
+	path = T3/Ansible/--name
+	url = https://github.com/geerlingguy/ansible-role-gitlab
+[submodule "T3/Ansible/Linux-Gitlab"]
+	path = T3/Ansible/Linux-Gitlab
+	url = https://github.com/geerlingguy/ansible-role-gitlab
