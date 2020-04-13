@@ -1,0 +1,57 @@
+---
+
+- name: Add sudo users - Debian
+  user:
+    name: "{{ item }}"
+    password: "{{ hash_password }}"
+    state: present
+    groups: 
+        - "sudo"
+  with_items: "{{ sudo_users }}"
+  when: ansible_os_family == "Debian"
+
+- name: Add users - Debian
+  user:
+    name: "{{ item }}"
+    password: "{{ hash_password }}"
+    state: present
+  with_items: "{{ users }}"
+  when: ansible_os_family == "Debian"
+
+- name: Add sudo users - RedHat
+  user:
+    name: "{{ item }}"
+    password: "{{ sudo_users }}"
+    state: present
+    groups: 
+      - "wheel"
+  with_items: "{{ hash_password }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Add users - RedHat
+  user:
+    name: "{{ item }}"
+    password: "{{ users }}"
+    state: present
+  with_items: "{{ hash_password }}"
+  when: ansible_os_family == "RedHat"
+
+
+- name: Add sudo users - FreeBSD
+  user:
+    name: "{{ item }}"
+    password: "{{ hash_password }}"
+    state: present
+    groups: 
+      - "sudoers"
+  with_items: "{{ sudo_users }}"
+  when: ansible_os_family == "FreeBSD"
+
+- name: Add  users - FreeBSD
+  user:
+    name: "{{ item }}"
+    password: "{{ hash_password }}"
+    state: present
+
+  with_items: "{{ users }}"
+  when: ansible_os_family == "FreeBSD"

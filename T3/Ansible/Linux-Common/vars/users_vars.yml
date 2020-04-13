@@ -1,0 +1,10 @@
+sudo_users:
+    - sudo_userA
+    - sudo_userB
+
+users:
+    - userA
+    - userB
+    
+hash_password:
+    - "$6$Ri2zp1t.$0b1ba1e72bf7880a19cb25d9403de559857cb053b0061c4559c69ade2d40b3163de2d53e9337fb947dc810dcb649c93fd4f65be57a4022e4ca0f63effb0e0f7a" #this is a hash password is 'changeme2020'
