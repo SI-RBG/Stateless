@@ -1,3 +1,6 @@
 [submodule "T3/Ansible/Linux-Gitlab"]
 	path = T3/Ansible/Linux-Gitlab
 	url = https://github.com/geerlingguy/ansible-role-gitlab
+[submodule "T3/Ansible/Linux-Bind"]
+	path = T3/Ansible/Linux-Bind
+	url = https://github.com/bertvv/ansible-role-bind
