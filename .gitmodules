@@ -4,3 +4,6 @@
 [submodule "T3/Ansible/Linux-Bind"]
 	path = T3/Ansible/Linux-Bind
 	url = https://github.com/bertvv/ansible-role-bind
+[submodule "T3/Ansible/Linux-DHCP"]
+	path = T3/Ansible/Linux-DHCP
+	url = https://github.com/robertdebock/ansible-role-dhcpd
